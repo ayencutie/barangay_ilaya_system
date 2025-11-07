@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db_connect.php';
+include 'db.php';
 
 $user_id = $_SESSION['user_id'];
 $sql = "SELECT * FROM appointments WHERE user_id='$user_id' ORDER BY date DESC";

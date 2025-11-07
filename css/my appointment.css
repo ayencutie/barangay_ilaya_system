@@ -1,21 +1,135 @@
-body {
+/* RESET + BASE STYLE */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: "Segoe UI", sans-serif;
-  background: #f9f9f9;
-  color: #222;
 }
 
+body {
+  color: #222;
+  background: #f9f9f9;
+  overflow-x: hidden;
+}
+
+/* NAVBAR */
 .navbar {
   background-color: #009900;
-  padding: 15px 60px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  padding: 15px 60px;
+  flex-wrap: wrap;
+}
+
+.navbar .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar .logo img {
+  width: 45px;
+  height: 45px;
+}
+
+.navbar h1 {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+nav ul li a,
+.dropbtn {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+nav ul li a:hover,
+.dropbtn:hover {
+  background-color: #007a00;
+  color: #e0e0e0;
+}
+
+/* ACTIVE LINK */
+nav ul li a.active {
+  background-color: #007a00;
+}
+
+/* DROPDOWN MENU */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: #fff;
+  min-width: 180px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  top: 45px;
+  right: 0;
+  z-index: 10;
+}
+
+.dropdown-content a {
+  color: #009900;
+  padding: 10px 16px;
+  text-decoration: none;
+  display: block;
+  font-weight: 600;
+  border-radius: 5px;
+}
+
+.dropdown-content a:hover {
+  background: #f2f2f2;
+  color: #007a00;
+}
+
+.dropdown-content.show {
+  display: block;
+}
+
+/* LOGOUT BUTTON */
+.logout-btn {
+  border: 2px solid #fff;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #007a00;
+  border-color: #007a00;
+}
+
+/* MAIN CONTENT */
+.content {
+  background: #f9fff9;
+  padding: 60px 20px;
+  min-height: calc(100vh - 90px);
 }
 
 .appointments-container {
-  max-width: 900px;
-  margin: 80px auto;
-  background: #fff;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #ffffff;
   padding: 40px;
   border-radius: 15px;
   box-shadow: 0 8px 20px rgba(0, 153, 51, 0.1);
@@ -23,40 +137,151 @@ body {
 
 .appointments-container h1 {
   text-align: center;
-  color: #009900;
+  color: #1b5e20;
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.appointments-container p {
+  text-align: center;
+  color: #555;
   margin-bottom: 30px;
 }
 
+/* TABLE STYLING */
 table {
   width: 100%;
   border-collapse: collapse;
-}
-
-th, td {
-  padding: 14px 12px;
   text-align: center;
-  border-bottom: 1px solid #ccc;
+  font-size: 15px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-th {
+thead {
   background-color: #009900;
   color: white;
 }
 
-tr:hover {
-  background-color: #f1f8f1;
+thead th {
+  padding: 12px;
+  font-weight: 600;
 }
 
-.pending, .approved, .rejected, .canceled {
-  display: inline-block;
-  padding: 5px 12px;
-  border-radius: 12px;
-  color: #fff;
-  font-weight: bold;
-  font-size: 14px;
+tbody td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
 }
 
-.pending { background-color: #ff9800; }
-.approved { background-color: #4caf50; }
-.rejected { background-color: #d32f2f; }
-.canceled { background-color: #757575; }
+tbody tr:hover {
+  background-color: #f2fff2;
+  transition: background 0.3s ease;
+}
+
+/* STATUS COLORS */
+td[data-status="Pending"] {
+  color: #ff9800;
+  font-weight: 600;
+}
+
+td[data-status="Canceled"] {
+  color: #e53935;
+  font-weight: 600;
+}
+
+td[data-status="Approved"] {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+/* BUTTONS INSIDE TABLE */
+button {
+  background: #009900;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+  margin: 0 4px;
+}
+
+button:hover {
+  background: #007a00;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1000px) {
+  .navbar {
+    padding: 15px 30px;
+  }
+
+  nav ul {
+    gap: 15px;
+  }
+
+  .appointments-container {
+    padding: 25px;
+  }
+
+  table {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 800px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav ul {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .navbar h1 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tr {
+    background: #fff;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    padding: 10px;
+  }
+
+  td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: none;
+    position: relative;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    display: block;
+    color: #007a00;
+    margin-bottom: 5px;
+  }
+}

@@ -61,7 +61,24 @@
   </section>
 
 <script>
-/* Generates time slots and handles selection; client-side placeholder */
+// ✅ Dropdown toggle
+const menuButton = document.getElementById("menuButton");
+const dropdownMenu = document.getElementById("dropdownMenu");
+
+menuButton.addEventListener("click", () => {
+  dropdownMenu.classList.toggle("show");
+});
+
+// ✅ Optional: close dropdown when clicking outside
+window.addEventListener("click", (e) => {
+  if (!e.target.matches("#menuButton")) {
+    if (dropdownMenu.classList.contains("show")) {
+      dropdownMenu.classList.remove("show");
+    }
+  }
+});
+
+/* ✅ Existing appointment script below */
 const timeGrid = document.getElementById('time-grid');
 const start = 8*60, end = 17*60;
 for (let t=start; t<end; t+=10){
@@ -82,7 +99,6 @@ document.getElementById('submitBtn').addEventListener('click', ()=>{
   const date = document.getElementById('appt_date').value;
   const selected = document.querySelector('.time-slot.selected');
   if (!selectedService || !date || !selected) { alert('Please select service, date and time.'); return; }
-  // store to localStorage as placeholder; server-side implementation in PHP part
   let appts = JSON.parse(localStorage.getItem('appointments'))||[];
   appts.push({service:selectedService, date, time:selected.textContent, status:'Pending'});
   localStorage.setItem('appointments', JSON.stringify(appts));
@@ -90,5 +106,6 @@ document.getElementById('submitBtn').addEventListener('click', ()=>{
   window.location='my_appointment.html';
 });
 </script>
+
 </body>
 </html>

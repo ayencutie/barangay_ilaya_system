@@ -1,39 +1,225 @@
-body {
-  background-color: #f8f8f8;
-  font-family: "Segoe UI", sans-serif;
-  color: #333;
+/* === GLOBAL STYLE === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
 }
 
+body {
+  background-color: #f9f9f9;
+  color: #222;
+  line-height: 1.6;
+}
+
+/* === NAVBAR (Professional & Consistent) === */
 .navbar {
   background-color: #009900;
-  padding: 15px 60px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  padding: 15px 60px;
+  flex-wrap: wrap;
 }
 
-.navbar h1, .navbar a {
-  color: white;
+.navbar .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar .logo img {
+  width: 45px;
+  height: 45px;
+}
+
+.navbar h1 {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+nav ul li a,
+.dropbtn {
+  color: #fff;
   text-decoration: none;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s ease;
 }
 
+nav ul li a:hover,
+.dropbtn:hover {
+  background-color: #007a00;
+  color: #fff;
+}
+
+nav ul li a.active {
+  background-color: #007a00;
+  color: #fff;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  min-width: 200px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  top: 45px;
+  right: 0;
+  z-index: 999;
+}
+
+.dropdown-content a {
+  color: #009900;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-weight: 600;
+  border-radius: 5px;
+  transition: 0.2s;
+}
+
+.dropdown-content a:hover {
+  background-color: #f0f9f0;
+  color: #007a00;
+}
+
+.dropdown-content.show {
+  display: block;
+}
+
+.logout-btn {
+  border: 2px solid #fff;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #007a00;
+  border-color: #007a00;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 25px;
+  }
+
+  nav ul {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+/* === ABOUT US SECTION === */
 .about-section {
   max-width: 900px;
-  margin: 80px auto;
-  background: white;
-  border-radius: 12px;
-  padding: 40px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  margin: 60px auto 100px;
+  padding: 50px 40px;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.about-section:hover {
+  transform: translateY(-3px);
 }
 
 .about-section h2 {
-  color: #009900;
-  text-align: center;
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 50px;
+  color: #007a00;
+  text-shadow: 1px 1px 4px rgba(0, 119, 0, 0.2);
+}
+
+.about-section h3 {
+  font-size: 1.8rem;
   margin-bottom: 20px;
-  font-size: 28px;
+  font-weight: 800;
+  color: #005500;
+  display: inline-block;
+  border-bottom: 3px solid #009900;
+  padding-bottom: 8px;
 }
 
 .about-section p {
-  line-height: 1.7;
-  text-align: justify;
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #2f4f2f;
+  margin-bottom: 30px;
+}
+
+.about-section ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 20px;
+}
+
+.about-section ul li {
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 15px;
+  text-align: left;
+  color: #2f4f2f;
+  font-size: 1.1rem;
+}
+
+.about-section ul li::before {
+  content: "✔";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #009900;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.about-section .contact p strong {
+  color: #004d00;
+  font-weight: 700;
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 768px) {
+  .about-section {
+    padding: 35px 25px;
+    margin: 40px 20px 60px;
+  }
+
+  .about-section h2 {
+    font-size: 2.4rem;
+  }
+
+  .about-section h3 {
+    font-size: 1.4rem;
+  }
+
+  .about-section p,
+  .about-section ul li {
+    font-size: 1rem;
+  }
 }

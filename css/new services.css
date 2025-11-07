@@ -11,7 +11,7 @@ body {
   color: #222;
 }
 
-/* === NAVBAR (Same as Landing Page) === */
+/* === MAIN NAVBAR === */
 .navbar {
   background-color: #009900;
   display: flex;
@@ -37,6 +37,7 @@ body {
   font-weight: 700;
 }
 
+/* === NAVIGATION LINKS === */
 nav ul {
   list-style: none;
   display: flex;
@@ -64,6 +65,7 @@ nav ul li a:hover,
   color: #e0e0e0;
 }
 
+/* === DROPDOWN MENU === */
 .dropdown {
   position: relative;
 }
@@ -110,152 +112,107 @@ nav ul li a:hover,
   border-color: #007a00;
 }
 
-/* === CONTENT AREA === */
-.content {
-  padding: 50px 20px;
-  display: flex;
-  justify-content: center;
+/* === HERO SECTION === */
+.hero {
+  text-align: center;
+  padding: 60px 20px 40px;
 }
 
-.inbox-wrapper {
+.hero h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #1b5e20;
+  font-weight: 700;
+}
+
+.hero p {
+  color: #555;
+  font-size: 15px;
+}
+
+/* === GRID SECTION === */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
   background: #f0f9f0;
   border-radius: 15px;
   box-shadow: 0 8px 20px rgba(0, 153, 51, 0.1);
-  padding: 30px;
-  width: 100%;
-  max-width: 800px;
 }
 
-.inbox-wrapper h1 {
-  color: #1b5e20;
-  margin-bottom: 15px;
-}
-
-.tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.tab {
-  flex: 1;
+.card {
   background: #fff;
-  border: 2px solid #009900;
-  color: #009900;
-  padding: 10px;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.tab.active,
-.tab:hover {
-  background: #009900;
-  color: #fff;
-}
-
-/* === MESSAGE LIST === */
-.message-list {
-  background: #fff;
-  border-radius: 8px;
-  padding: 15px;
-  min-height: 150px;
   border: 1px solid #ccc;
-}
-
-.msg-card {
-  background: #eafbea;
-  border: 1px solid #b2dfb2;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 10px;
-}
-
-.msg-card .hdr {
-  display: flex;
-  justify-content: space-between;
-  font-weight: 600;
-  color: #1b5e20;
-  margin-bottom: 8px;
-}
-
-.msg-card p {
-  color: #333;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.controls {
-  display: flex;
-  gap: 10px;
-}
-
-.controls button {
-  background: #009900;
-  color: #fff;
-  border: none;
   border-radius: 6px;
-  padding: 6px 10px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.controls button:hover {
-  background: #007a00;
-}
-
-/* === CONTACT FORM === */
-form {
-  margin-top: 20px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-form input,
-form textarea {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 15px rgba(0, 153, 51, 0.2);
 }
 
-form textarea {
-  resize: vertical;
-  min-height: 80px;
+.card .image {
+  background: #ddd;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-form .btn {
-  background: #009900;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 10px;
+.image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card .content {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card h3 {
   font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
+  color: #1b5e20;
+  font-weight: 700;
 }
 
-form .btn:hover {
-  background: #007a00;
+.card p {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.4;
 }
 
-/* === RESPONSIVE === */
-@media (max-width: 700px) {
+/* === RESPONSIVE GRID === */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
   .navbar {
     flex-direction: column;
     align-items: flex-start;
-    padding: 15px 20px;
+    gap: 10px;
   }
 
   nav ul {
     flex-wrap: wrap;
     gap: 10px;
-  }
-
-  .inbox-wrapper {
-    padding: 20px;
   }
 }

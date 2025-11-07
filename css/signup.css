@@ -1,77 +1,188 @@
+/* === GLOBAL RESET === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* === BODY & BACKGROUND === */
 body {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: #e9f6e9;
-  font-family: "Segoe UI", sans-serif;
+  overflow: auto;
+  position: relative;
+  background-color: #ffffff;
 }
 
+/* ✅ Blurred Background with Green Tint */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(rgba(0, 100, 0, 0.3), rgba(0, 153, 51, 0.2)),
+    url('https://i.ibb.co/fdQ620PT/Untitled-design-1.png') no-repeat center center fixed;
+  background-size: cover;
+  filter: blur(10px) brightness(0.9);
+  transform: scale(1.1);
+  z-index: -1;
+}
+
+/* === CONTAINER === */
 .container {
-  background: white;
-  padding: 40px 50px;
-  border-radius: 15px;
-  box-shadow: 0 6px 20px rgba(0,153,0,0.15);
-  width: 400px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 45px 55px;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  width: 850px;
   text-align: center;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  margin: 50px 0;
 }
 
-.container h2 {
-  color: #009900;
-  margin-bottom: 20px;
+/* === HEADING === */
+h2 {
+  color: #1b5e20;
+  margin-bottom: 25px;
 }
 
-form label {
-  display: block;
+/* === FIELD STYLES === */
+.field {
+  display: flex;
+  flex-direction: column;
   text-align: left;
+}
+
+.field label {
+  font-size: 14px;
+  color: #1b5e20;
   font-weight: 600;
-  margin-top: 15px;
-  color: #444;
+  margin-bottom: 5px;
 }
 
-form input {
+/* === INPUTS & SELECTS === */
+input, select {
   width: 100%;
-  padding: 10px 12px;
+  padding: 11px;
+  border: 1px solid #b0bec5;
   border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-top: 5px;
   outline: none;
-  transition: 0.3s;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  margin-bottom: 10px;
 }
 
-form input:focus {
-  border-color: #009900;
-  box-shadow: 0 0 5px rgba(0,153,0,0.3);
+input:focus, select:focus {
+  border-color: #2e7d32;
+  box-shadow: 0 0 6px rgba(46, 125, 50, 0.4);
 }
 
+/* === GRID LAYOUT === */
+.row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.name-row {
+  grid-template-columns: 2fr 2fr 1fr;
+}
+
+.full {
+  grid-column: span 3;
+}
+
+/* === PASSWORD ROW === */
+.password-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Only 2 equal columns */
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+/* === BIRTHDATE GROUP === */
+.birthdate-group {
+  display: flex;
+  gap: 6px;
+}
+
+.birthdate-group select {
+  flex: 1;
+}
+
+/* === GENDER === */
+.gender-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+#customGender {
+  margin-top: 6px;
+}
+
+/* === BUTTON === */
 button {
-  width: 100%;
-  background-color: #009900;
+  display: block;
+  margin: 20px auto 0 auto;
+  width: 60%;
+  max-width: 350px;
+  padding: 13px;
+  background-color: #2e7d32;
   color: white;
-  padding: 12px;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  margin-top: 25px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
-  background-color: #007a00;
+  background-color: #1b5e20;
+  transform: translateY(-2px);
 }
 
+/* === FOOTER TEXT === */
 p {
   margin-top: 15px;
   font-size: 14px;
+  color: #444;
 }
 
 a {
-  color: #009900;
+  color: #2e7d32;
   text-decoration: none;
+  font-weight: 600;
 }
 
 a:hover {
   text-decoration: underline;
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 850px) {
+  .container {
+    width: 90%;
+    padding: 30px 25px;
+  }
+
+  .row,
+  .password-row,
+  .name-row {
+    grid-template-columns: 1fr;
+  }
+
+  button {
+    width: 80%;
+  }
 }

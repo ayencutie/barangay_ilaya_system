@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Account Settings – Barangay Ilaya Health Center</title>
-  <link rel="stylesheet" href="css/account.css" />
+  <link rel="stylesheet" href="css/account.css">
 </head>
 <body>
 
+  <!-- NAVBAR -->
   <header class="navbar">
-    <div class="logo"><img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo"><h1>BARANGAY ILAYA HEALTH CENTER</h1></div>
+    <div class="logo">
+      <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
+      <h1>BARANGAY ILAYA HEALTH CENTER</h1>
+    </div>
     <nav>
       <ul>
         <li><a href="index.html">HOME</a></li>
@@ -29,28 +33,35 @@
     </nav>
   </header>
 
+  <!-- MAIN CONTENT -->
   <main class="content">
     <div class="account-card form-card">
       <h2>Account Settings</h2>
 
-      <div class="profile-grid">
+      <div class="profile-list">
         <div class="profile-item"><label>Account ID</label><div id="acct">0001</div></div>
         <div class="profile-item"><label>Full Name</label><div id="name">Juan Dela Cruz</div></div>
+        <div class="profile-item"><label>Address</label><div id="address">123 Barangay Ilaya Street</div></div>
         <div class="profile-item"><label>Email</label><div id="email">juan@example.com</div></div>
-        <div class="profile-item"><label>Phone</label><div id="phone">09171234567 <button id="chgPhone" class="btn small">Change</button></div></div>
+        <div class="profile-item"><label>Phone</label><div id="phone">09171234567</div></div>
       </div>
 
-      <hr>
-      <h3>Change Password</h3>
-      <form id="pwdForm">
+      <div class="action-buttons">
+        <button id="chgPhone" class="btn">Change Phone</button>
+        <button id="chgPassword" class="btn">Change Password</button>
+      </div>
+
+      <form id="pwdForm" class="password-form" style="display:none;">
+        <h3>Change Password</h3>
         <input type="password" id="oldpwd" placeholder="Old password" required>
         <input type="password" id="newpwd" placeholder="New password" required>
         <input type="password" id="confirmpwd" placeholder="Confirm new password" required>
-        <button type="submit" class="btn">Change Password</button>
+        <button type="submit" class="btn">Save Password</button>
       </form>
     </div>
   </main>
 
+  <!-- PHONE MODAL -->
   <div id="phoneModal" class="modal">
     <div class="modal-content">
       <h4>Change Phone Number</h4>
@@ -64,10 +75,43 @@
   </div>
 
 <script>
-document.getElementById('chgPhone').addEventListener('click', ()=>document.getElementById('phoneModal').style.display='flex');
-document.getElementById('closePhone').addEventListener('click', ()=>document.getElementById('phoneModal').style.display='none');
-document.getElementById('savePhone').addEventListener('click', ()=>{ const phone=document.getElementById('newPhone').value; const pwd=document.getElementById('pwdForPhone').value; if(!/^\d{11}$/.test(phone)){alert('Enter 11-digit'); return;} alert('Phone updated (simulated).'); document.getElementById('phone').firstChild.nodeValue=phone+' '; document.getElementById('phoneModal').style.display='none';});
-document.getElementById('pwdForm').addEventListener('submit',(e)=>{ e.preventDefault(); if(document.getElementById('newpwd').value !== document.getElementById('confirmpwd').value){ alert('Passwords do not match'); return;} alert('Password changed (simulated).'); e.target.reset(); });
+  // DROPDOWN MENU
+  const menuButton = document.getElementById('menuButton');
+  const dropdownMenu = document.getElementById('dropdownMenu');
+  menuButton.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
+  window.addEventListener('click', (e) => {
+    if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) dropdownMenu.classList.remove('show');
+  });
+
+  // SHOW PASSWORD FORM
+  const pwdForm = document.getElementById('pwdForm');
+  document.getElementById('chgPassword').addEventListener('click', () => {
+    pwdForm.style.display = pwdForm.style.display === 'none' ? 'flex' : 'none';
+    pwdForm.scrollIntoView({behavior:'smooth'});
+  });
+
+  // PHONE MODAL
+  document.getElementById('chgPhone').addEventListener('click', ()=>document.getElementById('phoneModal').style.display='flex');
+  document.getElementById('closePhone').addEventListener('click', ()=>document.getElementById('phoneModal').style.display='none');
+  document.getElementById('savePhone').addEventListener('click', ()=>{
+    const phone=document.getElementById('newPhone').value;
+    const pwd=document.getElementById('pwdForPhone').value;
+    if(!/^\d{11}$/.test(phone)){ alert('Enter 11-digit phone number'); return; }
+    alert('Phone updated (simulated).');
+    document.getElementById('phone').textContent = phone;
+    document.getElementById('phoneModal').style.display='none';
+  });
+
+  // PASSWORD FORM SUBMIT
+  document.getElementById('pwdForm').addEventListener('submit',(e)=>{
+    e.preventDefault();
+    if(document.getElementById('newpwd').value !== document.getElementById('confirmpwd').value){
+      alert('Passwords do not match'); return;
+    }
+    alert('Password changed (simulated).');
+    e.target.reset();
+    pwdForm.style.display='none';
+  });
 </script>
 </body>
 </html>
