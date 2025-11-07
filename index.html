@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Barangay Ilaya Health Center — Home</title>
+  <link rel="stylesheet" href="css/new landing page.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">
+      <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
+      <h1>BARANGAY ILAYA HEALTH CENTER</h1>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html" class="active">HOME</a></li>
+        <li><a href="new about us.html">ABOUT US</a></li>
+        <li><a href="new services.html">SERVICES</a></li>
+        <li class="dropdown">
+          <button class="dropbtn" id="menuButton">MENU ▼</button>
+          <div class="dropdown-content" id="dropdownMenu">
+            <a href="book appointment.html">Book Appointment</a>
+            <a href="my_appointment.html">My Appointment</a>
+            <a href="inbox.html">Inbox</a>
+            <a href="account.html">Account</a>
+          </div>
+        </li>
+        <li><a href="login.html" class="logout-btn">LOG OUT</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="overlay">
+      <div class="hero-text">
+        <h2>MAKE A<br><span>BOOKING</span></h2>
+        <p>Now, you can get expert advice and schedule an appointment online.</p>
+        <a href="book appointment.html" class="book-btn">BOOK APPOINTMENT</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="testimonials">
+    <h2>What Our Patients Say</h2>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <p class="quote">“Napakadaling magpa-book online, hindi na kailangang pumila.”</p>
+        <p class="author">— Maria L.</p>
+      </div>
+      <div class="testimonial-card">
+        <p class="quote">“Mabait at maasikaso ang mga staff. Salamat Barangay Ilaya Health Center!”</p>
+        <p class="author">— Ruel D.</p>
+      </div>
+      <div class="testimonial-card">
+        <p class="quote">“Malinis at maayos ang pasilidad. Highly recommended!”</p>
+        <p class="author">— Ana G.</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const menuButton = document.getElementById('menuButton');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    menuButton.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
+    window.addEventListener('click', (e) => {
+      if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) dropdownMenu.classList.remove('show');
+    });
+  </script>
+</body>
+</html>

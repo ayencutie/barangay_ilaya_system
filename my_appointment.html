@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Appointment – Barangay Ilaya Health Center</title>
+  <link rel="stylesheet" href="css/my appointment.css" />
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo"><img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo"><h1>BARANGAY ILAYA HEALTH CENTER</h1></div>
+    <nav>
+      <ul>
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="new about us.html">ABOUT US</a></li>
+        <li><a href="new services.html">SERVICES</a></li>
+        <li class="dropdown">
+          <button class="dropbtn" id="menuButton">MENU ▼</button>
+          <div class="dropdown-content" id="dropdownMenu">
+            <a href="book appointment.html">Book Appointment</a>
+            <a href="my_appointment.html" class="active">My Appointment</a>
+            <a href="inbox.html">Inbox</a>
+            <a href="account.html">Account</a>
+          </div>
+        </li>
+        <li><a href="login.html" class="logout-btn">LOG OUT</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="content">
+    <div class="appointments-container">
+      <h1>My Appointments</h1>
+      <p>Here are the appointments you have booked.</p>
+
+      <table id="appointmentsTable">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+<script>
+const tbody = document.querySelector('#appointmentsTable tbody');
+let appts = JSON.parse(localStorage.getItem('appointments')) || [];
+function render(){
+  tbody.innerHTML='';
+  if (!appts.length){ tbody.innerHTML='<tr><td colspan="5">No appointments booked yet.</td></tr>'; return; }
+  appts.forEach((a,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${a.service}</td><td>${a.date}</td><td>${a.time}</td><td>${a.status}</td>
+      <td><button onclick="edit(${i})"${a.status==='Canceled'?' disabled':''}>Edit</button>
+      <button onclick="cancel(${i})">Cancel</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function edit(i){
+  if(appts[i].status==='Canceled'){ alert('Cannot edit canceled'); return; }
+  const t=prompt('New time',appts[i].time);
+  if(t){ appts[i].time=t; appts[i].status='Pending'; localStorage.setItem('appointments',JSON.stringify(appts)); render(); alert('Updated'); }
+}
+function cancel(i){
+  if(!confirm('Cancel appointment?')) return;
+  appts[i].status='Canceled'; localStorage.setItem('appointments',JSON.stringify(appts)); render(); alert('Canceled');
+}
+render();
+</script>
+</body>
+</html>

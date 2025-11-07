@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inbox – Barangay Ilaya Health Center</title>
+  <link rel="stylesheet" href="css/inbox.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo"><img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo"><h1>BARANGAY ILAYA HEALTH CENTER</h1></div>
+    <nav>
+      <ul>
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="new about us.html">ABOUT US</a></li>
+        <li><a href="new services.html">SERVICES</a></li>
+        <li><a href="book appointment.html">Book Appointment</a></li>
+        <li><a href="my_appointment.html">My Appointment</a></li>
+        <li><a href="account.html">Account</a></li>
+        <li><a href="login.html" class="logout-btn">LOG OUT</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="content">
+    <div class="inbox-wrapper form-card">
+      <h1>Inbox</h1>
+      <div class="tabs">
+        <button class="tab active" data-tab="inbox">Inbox</button>
+        <button class="tab" data-tab="reminders">Reminders</button>
+        <button class="tab" data-tab="archive">Archive</button>
+      </div>
+
+      <div id="list" class="message-list"></div>
+
+      <hr>
+      <h3>Contact Admin</h3>
+      <form id="contactForm">
+        <input id="subject" placeholder="Subject" required>
+        <textarea id="msgBody" placeholder="Type your message here..." required></textarea>
+        <button type="submit" class="btn">Send to Admin</button>
+      </form>
+    </div>
+  </main>
+
+<script>
+const key='ilaya_messages';
+if(!localStorage.getItem(key)){
+  localStorage.setItem(key, JSON.stringify([
+    {id:1,type:'Inbox',subject:'Welcome',body:'Welcome to Ilaya Health Center online services.',created_at:new Date().toLocaleString(),archived:false},
+    {id:2,type:'Reminder',subject:'Vaccine',body:'You have a vaccine next week.',created_at:new Date().toLocaleString(),archived:false}
+  ]));
+}
+let tab='inbox';
+function render(){
+  const all=JSON.parse(localStorage.getItem(key));
+  let items=all.filter(m=> (tab==='inbox'? m.type==='Inbox' && !m.archived : tab==='reminders'? m.type==='Reminder' && !m.archived : m.archived));
+  const list=document.getElementById('list'); list.innerHTML='';
+  if(!items.length) list.innerHTML='<p>No messages.</p>';
+  items.forEach(m=>{
+    const div=document.createElement('div'); div.className='msg-card';
+    div.innerHTML=`<div class="hdr"><strong>${m.subject}</strong><span>${m.created_at}</span></div><p>${m.body}</p>
+      <div class="controls"><button onclick="reply(${m.id})">Reply</button><button onclick="toggleArchive(${m.id})">${m.archived?'Unarchive':'Archive'}</button></div>`;
+    list.appendChild(div);
+  });
+}
+function reply(id){ const t=prompt('Reply to admin:'); if(t) alert('Reply sent (simulated).'); }
+function toggleArchive(id){ const all=JSON.parse(localStorage.getItem(key)); const idx=all.findIndex(x=>x.id===id); if(idx>-1){ all[idx].archived=!all[idx].archived; localStorage.setItem(key,JSON.stringify(all)); render(); } }
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); b.classList.add('active'); tab=b.dataset.tab; render(); }));
+document.getElementById('contactForm').addEventListener('submit',(e)=>{ e.preventDefault(); const subj=document.getElementById('subject').value; const body=document.getElementById('msgBody').value; const all=JSON.parse(localStorage.getItem(key)); const id=all.length? all[all.length-1].id+1:1; all.push({id,type:'Inbox',subject:subj,body,created_at:new Date().toLocaleString(),archived:false}); localStorage.setItem(key,JSON.stringify(all)); alert('Message sent to admin (simulated).'); e.target.reset(); render(); });
+render();
+</script>
+</body>
+</html>
