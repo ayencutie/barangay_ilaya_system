@@ -46,7 +46,6 @@
             <th>Date</th>
             <th>Time</th>
             <th>Status</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -54,61 +53,49 @@
     </div>
   </section>
 
-  <!-- SCRIPT -->
   <script>
-    // --- Appointments Table ---
-    const tbody = document.querySelector('#appointmentsTable tbody');
-    let appts = JSON.parse(localStorage.getItem('appointments')) || [];
+    async function loadAppointments() {
+      const tbody = document.querySelector('#appointmentsTable tbody');
+      tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
 
-    function render(){
-      tbody.innerHTML='';
-      if (!appts.length){ 
-        tbody.innerHTML='<tr><td colspan="5">No appointments booked yet.</td></tr>'; 
-        return; 
+      try {
+        const response = await fetch('php/my_appointment.php');
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+          tbody.innerHTML = '<tr><td colspan="4">Failed to load appointments.</td></tr>';
+          return;
+        }
+
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4">No appointments booked yet.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = '';
+        data.forEach(a => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${a.service}</td>
+            <td>${a.date}</td>
+            <td>${a.time_slot}</td>
+            <td>${a.status}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error(err);
+        document.querySelector('#appointmentsTable tbody').innerHTML =
+          '<tr><td colspan="4">Error loading appointments.</td></tr>';
       }
-      appts.forEach((a,i)=>{
-        const tr=document.createElement('tr');
-        tr.innerHTML=`
-          <td>${a.service}</td>
-          <td>${a.date}</td>
-          <td>${a.time}</td>
-          <td>${a.status}</td>
-          <td>
-            <button onclick="edit(${i})" ${a.status==='Canceled'?'disabled':''}>Edit</button>
-            <button onclick="cancel(${i})">Cancel</button>
-          </td>`;
-        tbody.appendChild(tr);
-      });
     }
 
-    function edit(i){
-      if(appts[i].status==='Canceled'){ alert('Cannot edit canceled'); return; }
-      const t=prompt('New time',appts[i].time);
-      if(t){ 
-        appts[i].time=t; 
-        appts[i].status='Pending'; 
-        localStorage.setItem('appointments',JSON.stringify(appts)); 
-        render(); 
-        alert('Updated'); 
-      }
-    }
+    loadAppointments();
 
-    function cancel(i){
-      if(!confirm('Cancel appointment?')) return;
-      appts[i].status='Canceled'; 
-      localStorage.setItem('appointments',JSON.stringify(appts)); 
-      render(); 
-      alert('Canceled');
-    }
-
-    render();
-
-    // --- DROPDOWN MENU ---
+    // Dropdown toggle
     const menuButton = document.getElementById('menuButton');
     const dropdownMenu = document.getElementById('dropdownMenu');
-
     menuButton.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
-
     window.addEventListener('click', (e) => {
       if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
         dropdownMenu.classList.remove('show');
