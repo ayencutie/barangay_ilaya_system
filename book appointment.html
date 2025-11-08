@@ -8,103 +8,146 @@
 </head>
 <body>
 
-  <header class="navbar">
-    <div class="logo">
-      <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
-      <h1>BARANGAY ILAYA HEALTH CENTER</h1>
+<header class="navbar">
+  <div class="logo">
+    <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
+    <h1>BARANGAY ILAYA HEALTH CENTER</h1>
+  </div>
+  <nav>
+    <ul>
+      <li><a href="index.html">HOME</a></li>
+      <li><a href="new about us.html">ABOUT US</a></li>
+      <li><a href="new services.html">SERVICES</a></li>
+      <li class="dropdown">
+        <button class="dropbtn" id="menuButton">MENU ▼</button>
+        <div class="dropdown-content" id="dropdownMenu">
+          <a href="book appointment.html" class="active">Book Appointment</a>
+          <a href="my_appointment.html">My Appointment</a>
+          <a href="inbox.html">Inbox</a>
+          <a href="account.html">Account</a>
+        </div>
+      </li>
+      <li><a href="php/logout.php" class="logout-btn">LOG OUT</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="content">
+  <div class="booking-container">
+    <h1>BOOK AN APPOINTMENT</h1>
+    <p>Select a service and available time slot below.</p>
+
+    <h3>Select a Service</h3>
+    <div class="services-grid" id="services">
+      <div class="service-card" data-service="Immunization"><h4>Immunization</h4><p>Free vaccines for all.</p></div>
+      <div class="service-card" data-service="Medical Certificate"><h4>Medical Certificate</h4><p>Certified documentation.</p></div>
+      <div class="service-card" data-service="Pre Natal / Post Natal"><h4>Pre/Post Natal</h4><p>Care for mothers.</p></div>
+      <div class="service-card" data-service="Outpatient Consultation"><h4>Consultation</h4><p>General illnesses.</p></div>
     </div>
-    <nav>
-      <ul>
-        <li><a href="index.html">HOME</a></li>
-        <li><a href="new about us.html">ABOUT US</a></li>
-        <li><a href="new services.html">SERVICES</a></li>
-        <li class="dropdown">
-          <button class="dropbtn" id="menuButton">MENU ▼</button>
-          <div class="dropdown-content" id="dropdownMenu">
-            <a href="book appointment.html" class="active">Book Appointment</a>
-            <a href="my_appointment.html">My Appointment</a>
-            <a href="inbox.html">Inbox</a>
-            <a href="account.html">Account</a>
-          </div>
-        </li>
-        <li><a href="landing_page.html" class="logout-btn">LOG OUT</a></li>
-      </ul>
-    </nav>
-  </header>
 
-  <section class="content">
-    <div class="booking-container">
-      <h1>BOOK AN APPOINTMENT</h1>
-      <p>Select a service and available time slot below.</p>
+    <h3>Choose Date</h3>
+    <input id="appt_date" type="date" min="<?= date('Y-m-d') ?>">
 
-      <h3>Select a Service</h3>
-      <div class="services-grid" id="services">
-        <div class="service-card" data-service="Immunization"><h4>Immunization</h4><p>Free vaccines for all.</p></div>
-        <div class="service-card" data-service="Medical Certificate"><h4>Medical Certificate</h4><p>Certified medical documentation.</p></div>
-        <div class="service-card" data-service="Pre Natal / Post Natal"><h4>Pre Natal / Post Natal</h4><p>Care before and after childbirth.</p></div>
-        <div class="service-card" data-service="Diagnostic"><h4>Diagnostic</h4><p>Basic diagnostic tests.</p></div>
-        <div class="service-card" data-service="Outpatient Consultation"><h4>Outpatient Consultation</h4><p>Consultations for illnesses.</p></div>
-        <div class="service-card" data-service="Death Certificate / Burial"><h4>Death Certificate / Burial</h4><p>Processing and certification.</p></div>
-        <div class="service-card" data-service="Greencard / Hospitalization"><h4>Greencard / Hospitalization</h4><p>Assistance in applying programs.</p></div>
-        <div class="service-card" data-service="Dental Care"><h4>Dental Care</h4><p>Free checkups and extractions.</p></div>
-        <div class="service-card" data-service="Family Planning"><h4>Family Planning</h4><p>Modern family planning services.</p></div>
-      </div>
+    <h3>Available Time Slots</h3>
+    <div id="time-grid" class="time-grid"></div>
 
-      <h3>Choose Date</h3>
-      <input id="appt_date" type="date" min="<?= date('Y-m-d') ?>">
-
-      <h3>Available Time Slots</h3>
-      <div id="time-grid" class="time-grid"></div>
-
-      <button id="submitBtn" class="btn">Submit Appointment</button>
-    </div>
-  </section>
+    <button id="submitBtn" class="btn">Submit Appointment</button>
+  </div>
+</section>
 
 <script>
 // ✅ Dropdown toggle
 const menuButton = document.getElementById("menuButton");
 const dropdownMenu = document.getElementById("dropdownMenu");
-
-menuButton.addEventListener("click", () => {
-  dropdownMenu.classList.toggle("show");
-});
-
-// ✅ Optional: close dropdown when clicking outside
+menuButton.addEventListener("click", () => dropdownMenu.classList.toggle("show"));
 window.addEventListener("click", (e) => {
-  if (!e.target.matches("#menuButton")) {
-    if (dropdownMenu.classList.contains("show")) {
-      dropdownMenu.classList.remove("show");
-    }
-  }
+  if (!e.target.matches("#menuButton")) dropdownMenu.classList.remove("show");
 });
 
-/* ✅ Existing appointment script below */
+// ✅ Generate time slots
 const timeGrid = document.getElementById('time-grid');
-const start = 8*60, end = 17*60;
-for (let t=start; t<end; t+=10){
-  const h=Math.floor(t/60), m=t%60, nh=Math.floor((t+10)/60), nm=(t+10)%60;
-  function fmt(h,m){const s=h>=12?'PM':'AM';const hr=h%12||12;return hr+':'+String(m).padStart(2,'0')+' '+s;}
-  const div=document.createElement('div'); div.className='time-slot';
-  div.textContent=fmt(h,m)+' - '+fmt(nh,nm); div.onclick=()=>{document.querySelectorAll('.time-slot').forEach(s=>s.classList.remove('selected'));div.classList.add('selected');};
+const start = 8 * 60, end = 17 * 60;
+for (let t = start; t < end; t += 10) {
+  const h = Math.floor(t / 60), m = t % 60;
+  const nh = Math.floor((t + 10) / 60), nm = (t + 10) % 60;
+  function fmt(h, m) {
+    const s = h >= 12 ? 'PM' : 'AM';
+    const hr = h % 12 || 12;
+    return hr + ':' + String(m).padStart(2, '0') + ' ' + s;
+  }
+  const div = document.createElement('div');
+  div.className = 'time-slot';
+  div.textContent = fmt(h, m) + ' - ' + fmt(nh, nm);
+  div.onclick = () => {
+    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+    div.classList.add('selected');
+  };
   timeGrid.appendChild(div);
 }
 
-let selectedService='';
-document.querySelectorAll('.service-card').forEach(card=>card.addEventListener('click',()=>{
-  document.querySelectorAll('.service-card').forEach(c=>c.classList.remove('selected'));
-  card.classList.add('selected'); selectedService=card.dataset.service;
-}));
+// ✅ Select service
+let selectedService = '';
+document.querySelectorAll('.service-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedService = card.dataset.service;
+  });
+});
 
-document.getElementById('submitBtn').addEventListener('click', ()=>{
+// ✅ Submit appointment to PHP (server-side)
+document.getElementById('submitBtn').addEventListener('click', () => {
   const date = document.getElementById('appt_date').value;
   const selected = document.querySelector('.time-slot.selected');
-  if (!selectedService || !date || !selected) { alert('Please select service, date and time.'); return; }
-  let appts = JSON.parse(localStorage.getItem('appointments'))||[];
-  appts.push({service:selectedService, date, time:selected.textContent, status:'Pending'});
-  localStorage.setItem('appointments', JSON.stringify(appts));
-  alert('Appointment booked (client-side). Redirecting to My Appointment.');
-  window.location='my_appointment.html';
+  if (!selectedService || !date || !selected) {
+    alert('Please select service, date and time.');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('service', selectedService);
+  formData.append('date', date);
+  formData.append('time_slot', selected.textContent);
+
+  fetch('php/book_appointment.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'success') {
+      alert('Appointment booked successfully!');
+      window.location = 'my_appointment.html';
+    } else {
+      alert('Error: ' + data.message);
+    }
+  })
+  .catch(err => {
+    alert('Server error. Please try again.');
+    console.error(err);
+  });
 });
+
+fetch('php/fetch_appointments.php')
+  .then(res => res.json())
+  .then(data => {
+    const tbody = document.getElementById('apptBody');
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4">No appointments yet.</td></tr>';
+      return;
+    }
+    data.forEach(a => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${a.service}</td><td>${a.date}</td><td>${a.time_slot}</td><td>${a.status}</td>`;
+      tbody.appendChild(tr);
+    });
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Failed to load appointments.');
+  });
+
 </script>
+
 </body>
 </html>
