@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ilaya Health Center Services</title>
-  <link rel="stylesheet" href="css/new services.css" />
+  <link rel="stylesheet" href="css/services.css" />
 </head>
 <body>
 
+  <!-- MAIN NAV -->
   <header class="navbar">
     <div class="logo">
       <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
@@ -15,20 +16,12 @@
     </div>
     <nav>
       <ul>
-        <li><a href="index.html">HOME</a></li>
-        <li><a href="new about us.html">ABOUT US</a></li>
-        <li><a href="new services.html" class="active">SERVICES</a></li>
-        <li class="dropdown">
-          <button class="dropbtn" id="menuButton">MENU ▼</button>
-          <div class="dropdown-content" id="dropdownMenu">
-            <a href="book appointment.html">Book Appointment</a>
-            <a href="my_appointment.html">My Appointment</a>
-            <a href="inbox.html">Inbox</a>
-            <a href="account.php">Account</a>
-          </div>
-        </li>
-        <li><a href="landing_page.html" class="logout-btn">LOG OUT</a></li>
-      </ul>
+  <li><a href="landing_page.html">HOME</a></li>
+  <li><a href="about us.html">ABOUT US</a></li>
+  <li><a href="services.html">SERVICES</a></li>
+  <li><a href="login.php" class="login-btn">LOG IN</a></li>
+  <li><a href="signup.html" class="signup-btn">SIGN UP</a></li>
+</ul>
     </nav>
   </header>
 
@@ -140,13 +133,5 @@
 
   </section>
 
-  <script>
-    const menuButton = document.getElementById('menuButton');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    menuButton.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
-    window.addEventListener('click', (e) => {
-      if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) dropdownMenu.classList.remove('show');
-    });
-  </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$dbname = "barangay_ilaya"; // make sure this matches your phpMyAdmin database name
+$dbname = "ilaya_healthcenter";
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);

@@ -2,36 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>About Us – Barangay Ilaya Health Center</title>
-  <link rel="stylesheet" href="css/new about us.css" />
+  <link rel="stylesheet" href="css/about us.css" />
 </head>
 <body>
-
+  <!-- Navbar (pareho sa iba mo pages) -->
   <header class="navbar">
     <div class="logo">
-      <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
+      <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo" />
       <h1>BARANGAY ILAYA HEALTH CENTER</h1>
     </div>
     <nav>
       <ul>
-        <li><a href="index.html">HOME</a></li>
-        <li><a href="new about us.html" class="active">ABOUT US</a></li>
-        <li><a href="new services.html">SERVICES</a></li>
-        <li class="dropdown">
-          <button class="dropbtn" id="menuButton">MENU ▼</button>
-          <div class="dropdown-content" id="dropdownMenu">
-            <a href="book appointment.html">Book Appointment</a>
-            <a href="my_appointment.html">My Appointment</a>
-            <a href="inbox.html">Inbox</a>
-            <a href="account.php">Account</a>
-          </div>
-        </li>
-        <li><a href="landing_page.html" class="logout-btn">LOG OUT</a></li>
-      </ul>
+  <li><a href="landing_page.html">HOME</a></li>
+  <li><a href="about us.html">ABOUT US</a></li>
+  <li><a href="services.html">SERVICES</a></li>
+  <li><a href="login.php" class="login-btn">LOG IN</a></li>
+  <li><a href="signup.html" class="signup-btn">SIGN UP</a></li>
+</ul>
     </nav>
   </header>
 
+  <!-- About Section -->
   <section class="about-section centered">
     <h2>About Us</h2>
 
@@ -89,14 +82,6 @@
       </div>
     </div>
   </section>
-
-  <script>
-    const menuButton = document.getElementById('menuButton');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    menuButton.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
-    window.addEventListener('click', (e) => {
-      if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) dropdownMenu.classList.remove('show');
-    });
-  </script>
 </body>
 </html>
+

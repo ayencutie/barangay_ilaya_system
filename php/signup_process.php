@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ':password' => $hashed_password
         ]);
 
-        echo "<script>alert('Account created successfully!'); window.location='../login.html';</script>";
+        echo "<script>alert('Account created successfully!'); window.location='../index.html';</script>";
     } catch (PDOException $e) {
         if ($e->getCode() == 23000) { // duplicate email or account_id
             echo "<script>alert('Email already registered!'); window.history.back();</script>";

@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inbox – Barangay Ilaya Health Center</title>
-  <link rel="stylesheet" href="css/inbox.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Appointment – Barangay Ilaya Health Center</title>
+  <link rel="stylesheet" href="css/book appointment.css" />
 </head>
 <body>
 
-  <!-- NAVBAR -->
   <header class="navbar">
     <div class="logo">
       <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
@@ -22,98 +21,90 @@
         <li class="dropdown">
           <button class="dropbtn" id="menuButton">MENU ▼</button>
           <div class="dropdown-content" id="dropdownMenu">
-            <a href="book appointment.html">Book Appointment</a>
+            <a href="book appointment.html" class="active">Book Appointment</a>
             <a href="my_appointment.html">My Appointment</a>
-            <a href="inbox.html" class="active">Inbox</a>
+            <a href="inbox.html">Inbox</a>
             <a href="account.html">Account</a>
           </div>
         </li>
-        <li><a href="login.html" class="logout-btn">LOG OUT</a></li>
+        <li><a href="landing_page.html" class="logout-btn">LOG OUT</a></li>
       </ul>
     </nav>
   </header>
 
-  <!-- MAIN CONTENT -->
-  <main class="content">
-    <div class="inbox-wrapper form-card">
-      <h1>Inbox</h1>
-      <div class="tabs">
-        <button class="tab active" data-tab="inbox">Inbox</button>
-        <button class="tab" data-tab="reminders">Reminders</button>
-        <button class="tab" data-tab="archive">Archive</button>
+  <section class="content">
+    <div class="booking-container">
+      <h1>BOOK AN APPOINTMENT</h1>
+      <p>Select a service and available time slot below.</p>
+
+      <h3>Select a Service</h3>
+      <div class="services-grid" id="services">
+        <div class="service-card" data-service="Immunization"><h4>Immunization</h4><p>Free vaccines for all.</p></div>
+        <div class="service-card" data-service="Medical Certificate"><h4>Medical Certificate</h4><p>Certified medical documentation.</p></div>
+        <div class="service-card" data-service="Pre Natal / Post Natal"><h4>Pre Natal / Post Natal</h4><p>Care before and after childbirth.</p></div>
+        <div class="service-card" data-service="Diagnostic"><h4>Diagnostic</h4><p>Basic diagnostic tests.</p></div>
+        <div class="service-card" data-service="Outpatient Consultation"><h4>Outpatient Consultation</h4><p>Consultations for illnesses.</p></div>
+        <div class="service-card" data-service="Death Certificate / Burial"><h4>Death Certificate / Burial</h4><p>Processing and certification.</p></div>
+        <div class="service-card" data-service="Greencard / Hospitalization"><h4>Greencard / Hospitalization</h4><p>Assistance in applying programs.</p></div>
+        <div class="service-card" data-service="Dental Care"><h4>Dental Care</h4><p>Free checkups and extractions.</p></div>
+        <div class="service-card" data-service="Family Planning"><h4>Family Planning</h4><p>Modern family planning services.</p></div>
       </div>
 
-      <div id="list" class="message-list"></div>
+      <h3>Choose Date</h3>
+      <input id="appt_date" type="date" min="<?= date('Y-m-d') ?>">
 
-      <hr>
-      <h3>Contact Admin</h3>
-      <form id="contactForm">
-        <input id="subject" placeholder="Subject" required>
-        <textarea id="msgBody" placeholder="Type your message here..." required></textarea>
-        <button type="submit" class="btn">Send to Admin</button>
-      </form>
+      <h3>Available Time Slots</h3>
+      <div id="time-grid" class="time-grid"></div>
+
+      <button id="submitBtn" class="btn">Submit Appointment</button>
     </div>
-  </main>
+  </section>
 
-  <!-- JS SCRIPTS -->
-  <script>
-    // Dropdown Menu
-    const menuButton = document.getElementById('menuButton');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    menuButton.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
-    window.addEventListener('click', (e) => {
-      if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
-        dropdownMenu.classList.remove('show');
-      }
-    });
+<script>
+// ✅ Dropdown toggle
+const menuButton = document.getElementById("menuButton");
+const dropdownMenu = document.getElementById("dropdownMenu");
 
-    // Inbox/Reminders/Archive Logic
-    const key='ilaya_messages';
-    if(!localStorage.getItem(key)){
-      localStorage.setItem(key, JSON.stringify([
-        {id:1,type:'Inbox',subject:'Welcome',body:'Welcome to Ilaya Health Center online services.',created_at:new Date().toLocaleString(),archived:false},
-        {id:2,type:'Reminder',subject:'Vaccine',body:'You have a vaccine next week.',created_at:new Date().toLocaleString(),archived:false}
-      ]));
+menuButton.addEventListener("click", () => {
+  dropdownMenu.classList.toggle("show");
+});
+
+// ✅ Optional: close dropdown when clicking outside
+window.addEventListener("click", (e) => {
+  if (!e.target.matches("#menuButton")) {
+    if (dropdownMenu.classList.contains("show")) {
+      dropdownMenu.classList.remove("show");
     }
+  }
+});
 
-    let tab='inbox';
-    function render(){
-      const all=JSON.parse(localStorage.getItem(key));
-      let items=all.filter(m=> (tab==='inbox'? m.type==='Inbox' && !m.archived : tab==='reminders'? m.type==='Reminder' && !m.archived : m.archived));
-      const list=document.getElementById('list'); list.innerHTML='';
-      if(!items.length) list.innerHTML='<p>No messages.</p>';
-      items.forEach(m=>{
-        const div=document.createElement('div'); div.className='msg-card';
-        div.innerHTML=`<div class="hdr"><strong>${m.subject}</strong><span>${m.created_at}</span></div><p>${m.body}</p>
-          <div class="controls"><button onclick="reply(${m.id})">Reply</button><button onclick="toggleArchive(${m.id})">${m.archived?'Unarchive':'Archive'}</button></div>`;
-        list.appendChild(div);
-      });
-    }
+/* ✅ Existing appointment script below */
+const timeGrid = document.getElementById('time-grid');
+const start = 8*60, end = 17*60;
+for (let t=start; t<end; t+=10){
+  const h=Math.floor(t/60), m=t%60, nh=Math.floor((t+10)/60), nm=(t+10)%60;
+  function fmt(h,m){const s=h>=12?'PM':'AM';const hr=h%12||12;return hr+':'+String(m).padStart(2,'0')+' '+s;}
+  const div=document.createElement('div'); div.className='time-slot';
+  div.textContent=fmt(h,m)+' - '+fmt(nh,nm); div.onclick=()=>{document.querySelectorAll('.time-slot').forEach(s=>s.classList.remove('selected'));div.classList.add('selected');};
+  timeGrid.appendChild(div);
+}
 
-    function reply(id){ const t=prompt('Reply to admin:'); if(t) alert('Reply sent (simulated).'); }
-    function toggleArchive(id){ const all=JSON.parse(localStorage.getItem(key)); const idx=all.findIndex(x=>x.id===id); if(idx>-1){ all[idx].archived=!all[idx].archived; localStorage.setItem(key,JSON.stringify(all)); render(); } }
+let selectedService='';
+document.querySelectorAll('.service-card').forEach(card=>card.addEventListener('click',()=>{
+  document.querySelectorAll('.service-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected'); selectedService=card.dataset.service;
+}));
 
-    document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click', ()=>{
-      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); 
-      b.classList.add('active'); 
-      tab=b.dataset.tab; 
-      render(); 
-    }));
-
-    document.getElementById('contactForm').addEventListener('submit',(e)=>{
-      e.preventDefault(); 
-      const subj=document.getElementById('subject').value; 
-      const body=document.getElementById('msgBody').value; 
-      const all=JSON.parse(localStorage.getItem(key)); 
-      const id=all.length? all[all.length-1].id+1:1; 
-      all.push({id,type:'Inbox',subject:subj,body,created_at:new Date().toLocaleString(),archived:false}); 
-      localStorage.setItem(key,JSON.stringify(all)); 
-      alert('Message sent to admin (simulated).'); 
-      e.target.reset(); 
-      render(); 
-    });
-
-    render();
-  </script>
+document.getElementById('submitBtn').addEventListener('click', ()=>{
+  const date = document.getElementById('appt_date').value;
+  const selected = document.querySelector('.time-slot.selected');
+  if (!selectedService || !date || !selected) { alert('Please select service, date and time.'); return; }
+  let appts = JSON.parse(localStorage.getItem('appointments'))||[];
+  appts.push({service:selectedService, date, time:selected.textContent, status:'Pending'});
+  localStorage.setItem('appointments', JSON.stringify(appts));
+  alert('Appointment booked (client-side). Redirecting to My Appointment.');
+  window.location='my_appointment.html';
+});
+</script>
 </body>
 </html>

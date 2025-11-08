@@ -1,0 +1,179 @@
+/* Base reset and font for page */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #fff;
+  color: #1a3d17; /* dark green text */
+}
+
+/* Navbar styles (you can replace with your main CSS or keep it here) */
+.navbar {
+  background-color: #009900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 60px;
+}
+
+.navbar .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar .logo img {
+  width: 40px;
+  height: 40px;
+}
+
+.navbar h1 {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  padding: 8px 14px;
+  border-radius: 5px;
+}
+
+nav ul li a:hover {
+  background-color: #006600;
+  color: #e0e0e0;
+}
+
+nav ul li .login-btn {
+  border: 2px solid #fff;
+}
+
+nav ul li .signup-btn {
+  background-color: #fff;
+  color: #009900;
+  font-weight: 700;
+}
+
+nav ul li .signup-btn:hover,
+nav ul li .login-btn:hover {
+  background-color: #006600;
+  color: #fff;
+  border-color: #006600;
+}
+
+/* About Section Centered with Design */
+.about-section.centered {
+  max-width: 800px;
+  margin: 60px auto 100px;
+  padding: 40px 30px;
+  background: #f0f9f0; /* soft greenish background */
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 153, 51, 0.1);
+  text-align: center;
+  color: #1a3d17; /* dark green */
+}
+
+.about-section.centered h2 {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 50px;
+  color: #007a00;
+  text-shadow: 1px 1px 4px rgba(0, 119, 0, 0.3);
+}
+
+.about-section.centered .about-content > div {
+  margin-bottom: 40px;
+  padding: 0 20px;
+}
+
+.about-section.centered h3 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  font-weight: 800;
+  color: #005500;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px;
+  border-bottom: 3px solid #009900;
+}
+
+.about-section.centered p,
+.about-section.centered ul {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  max-width: 700px;
+  margin: 0 auto;
+  color: #2f4f2f;
+}
+
+.about-section.centered ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 15px;
+}
+
+.about-section.centered ul li {
+  position: relative;
+  padding-left: 30px;
+  margin-bottom: 12px;
+  text-align: left;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Custom checkmark before each li */
+.about-section.centered ul li::before {
+  content: "✔";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  color: #009900;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* Contact section strong text color */
+.about-section.centered .contact p strong {
+  color: #004d00;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .about-section.centered {
+    padding: 30px 20px;
+    margin: 40px 15px 60px;
+  }
+
+  .about-section.centered h2 {
+    font-size: 2.4rem;
+  }
+
+  .about-section.centered h3 {
+    font-size: 1.4rem;
+  }
+
+  .about-section.centered p,
+  .about-section.centered ul li {
+    font-size: 1rem;
+    max-width: 100%;
+  }
+
+  .about-section.centered ul li {
+    text-align: left;
+  }
+}

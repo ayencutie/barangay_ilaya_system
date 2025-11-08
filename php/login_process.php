@@ -1,39 +1,40 @@
 <?php
 session_start();
-include 'db.php';
+include 'db.php'; // path relative to this file
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
 
-    if (!isset($_SESSION['login_attempts'])) {
-        $_SESSION['login_attempts'] = 0;
-    }
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
+        $stmt->execute([':email' => $email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $sql = "SELECT * FROM users WHERE email='$email'";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-
-        if (password_verify($password, $row['password'])) {
-            $_SESSION['user_id'] = $row['id'];
-            $_SESSION['fullname'] = $row['fullname'];
-            $_SESSION['account_id'] = $row['account_id'];
-            $_SESSION['login_attempts'] = 0;
-            header("Location: ../index.html");
-            exit();
-        } else {
-            $_SESSION['login_attempts']++;
+        if (!$user) {
+            $_SESSION['login_error'] = "Account not found.";
+            header("Location: ../login.php");
+            exit;
         }
-    } else {
-        $_SESSION['login_attempts']++;
-    }
 
-    if ($_SESSION['login_attempts'] >= 3) {
-        echo "<script>alert('Your account is locked. Please contact the admin.'); window.location.href='../login.html';</script>";
-    } else {
-        echo "<script>alert('Invalid login. Attempts left: " . (3 - $_SESSION['login_attempts']) . "'); window.location.href='../login.html';</script>";
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['account_id'] = $user['account_id'];
+            $_SESSION['first_name'] = $user['first_name'];
+            $_SESSION['last_name'] = $user['last_name'];
+
+            unset($_SESSION['login_error']);
+            header("Location: ../index.html"); // redirect to dashboard
+            exit;
+        } else {
+            $_SESSION['login_error'] = "Wrong password.";
+            header("Location: ../login.php");
+            exit;
+        }
+
+    } catch (PDOException $e) {
+        $_SESSION['login_error'] = "Database error: " . $e->getMessage();
+        header("Location: ../login.php");
+        exit;
     }
 }
-?>

@@ -1,19 +1,32 @@
 <?php
 session_start();
-include 'db.php';
+require 'db.php'; // siguraduhing tama ang path
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!isset($_SESSION['user_id'])) {
+        echo "Error: User not logged in.";
+        exit();
+    }
+
     $sender_id = $_SESSION['user_id'];
-    $message = $_POST['message'];
-    $type = $_POST['type']; // inbox, reminder, etc.
+    $message = trim($_POST['message']);
+    $type = isset($_POST['type']) ? $_POST['type'] : 'inbox'; // default inbox
 
-    $sql = "INSERT INTO messages (sender_id, content, type, created_at)
-            VALUES ('$sender_id', '$message', '$type', NOW())";
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO messages (sender_id, content, type, created_at)
+            VALUES (:sender_id, :content, :type, NOW())
+        ");
 
-    if ($conn->query($sql) === TRUE) {
-        echo "Message sent successfully.";
-    } else {
-        echo "Error: " . $conn->error;
+        $stmt->execute([
+            ':sender_id' => $sender_id,
+            ':content' => $message,
+            ':type' => $type
+        ]);
+
+        echo "<script>alert('Message sent successfully!'); window.location.href='inbox.php';</script>";
+    } catch (PDOException $e) {
+        echo "Database Error: " . $e->getMessage();
     }
 }
 ?>

@@ -215,3 +215,23 @@ nav ul li a:hover,
   }
   nav ul { flex-wrap: wrap; gap: 10px; }
 }
+
+/* Messages */
+.error-message {
+    background-color: #ffbaba;
+    color: #d8000c;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+}
+.success-message {
+    background-color: #dff2bf;
+    color: #4f8a10;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+}
