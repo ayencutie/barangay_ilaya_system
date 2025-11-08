@@ -10,7 +10,7 @@
   <div class="container">
     <h2>Create an Account</h2>
 
-    <form action="php/signup_process.php" method="POST">
+    <form action="php/signup_process.php" method="POST" id="signupForm">
 
       <div class="row name-row">
         <div class="field">
@@ -43,14 +43,17 @@
           <div class="gender-group">
             <label><input type="radio" name="gender" value="Male" required> Male</label>
             <label><input type="radio" name="gender" value="Female" required> Female</label>
-            <label><input type="radio" name="gender" value="Custom" required id="customRadio"> Custom</label>
+            <label><input type="radio" name="gender" value="Custom" id="customRadio" required> Custom</label>
           </div>
           <input type="text" id="customGender" name="customGender" placeholder="Enter gender" style="display:none;">
         </div>
 
         <div class="field">
           <label for="phone">Phone Number</label>
-          <input type="tel" id="phone" name="phone" pattern="[0-9]{11}" title="Enter 11-digit number" required>
+          <input type="tel" id="phone" name="phone"
+                 pattern="^09\d{9}$"
+                 title="Phone number must start with 09 and be 11 digits only"
+                 required>
         </div>
       </div>
 
@@ -77,6 +80,7 @@
   </div>
 
   <script>
+    // Show custom gender input when "Custom" is selected
     const customRadio = document.getElementById("customRadio");
     const customInput = document.getElementById("customGender");
     const genderRadios = document.querySelectorAll('input[name="gender"]');
@@ -85,6 +89,24 @@
       r.addEventListener("change", () => {
         customInput.style.display = customRadio.checked ? "block" : "none";
       });
+    });
+
+    // ✅ Phone number validation
+    document.getElementById("signupForm").addEventListener("submit", function(e) {
+      const phone = document.getElementById("phone").value.trim();
+      const pattern = /^09\d{9}$/;
+      if (!pattern.test(phone)) {
+        e.preventDefault();
+        alert("Invalid phone number! It must start with 09 and be 11 digits.");
+      }
+
+      // ✅ Password match check (front-end)
+      const pass = document.getElementById("password").value;
+      const confirm = document.getElementById("confirm_password").value;
+      if (pass !== confirm) {
+        e.preventDefault();
+        alert("Passwords do not match!");
+      }
     });
   </script>
 </body>
