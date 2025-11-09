@@ -18,13 +18,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         if (password_verify($password, $user['password'])) {
+            // Set session variables
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['account_id'] = $user['account_id'];
             $_SESSION['first_name'] = $user['first_name'];
             $_SESSION['last_name'] = $user['last_name'];
 
+            // --- Admin side: store user role ---
+            $_SESSION['user_role'] = $user['user_role']; // Make sure 'user_role' column exists in your users table
+
             unset($_SESSION['login_error']);
-            header("Location: ../index.html"); // redirect to dashboard
+
+            // --- Redirect based on role ---
+            if ($user['user_role'] === 'admin') {
+                header("Location: ../admin/dashboard.php"); // Admin goes to admin dashboard
+            } else {
+                header("Location: ../index.html"); // redirect to dashboard
+            }
             exit;
         } else {
             $_SESSION['login_error'] = "Wrong password.";
