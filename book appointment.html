@@ -19,18 +19,15 @@
         <li><a href="new landing page.html">HOME</a></li>
         <li><a href="new about us.html">ABOUT US</a></li>
         <li><a href="new services.html">SERVICES</a></li>
-
-        <!-- MENU DROPDOWN -->
         <li class="dropdown">
           <button class="dropbtn" id="menuButton">MENU ▼</button>
           <div class="dropdown-content" id="dropdownMenu">
-            <a href="book appointment.html" class="active">Book Appointment</a>
+            <a href="book_appointment.html" class="active">Book Appointment</a>
             <a href="my_appointment.html">My Appointment</a>
             <a href="inbox.html">Inbox</a>
             <a href="account.html">Account</a>
           </div>
         </li>
-
         <li><a href="landing_page.html" class="logout-btn">LOG OUT</a></li>
       </ul>
     </nav>
@@ -42,53 +39,35 @@
       <h1>BOOK AN APPOINTMENT</h1>
       <p>Select a service and available time slot below.</p>
 
-      <!-- SERVICES GRID -->
-      <h3>Select a Service</h3>
-      <div class="services-grid" id="services">
-        <div class="service-card" data-service="Immunization">
-          <h4>Immunization</h4>
-          <p>Free vaccines for all.</p>
+      <div class="booking-sections">
+        <!-- SERVICE SELECT DROPDOWN -->
+        <div class="services-container">
+          <h3>Select a Service</h3>
+          <div class="service-dropdown" id="serviceDropdown">
+            <button id="serviceButton">-- Select Service -- ▼</button>
+            <div class="services-list" id="servicesList">
+              <div class="service-item" data-service="Immunization">Immunization</div>
+              <div class="service-item" data-service="Medical Certificate">Medical Certificate</div>
+              <div class="service-item" data-service="Pre Natal / Post Natal">Pre Natal / Post Natal</div>
+              <div class="service-item" data-service="Diagnostic">Diagnostic</div>
+              <div class="service-item" data-service="Outpatient Consultation">Outpatient Consultation</div>
+              <div class="service-item" data-service="Death Certificate / Burial">Death Certificate / Burial</div>
+              <div class="service-item" data-service="Greencard / Hospitalization">Greencard / Hospitalization</div>
+              <div class="service-item" data-service="Dental Care">Dental Care</div>
+              <div class="service-item" data-service="Family Planning">Family Planning</div>
+            </div>
+          </div>
         </div>
-        <div class="service-card" data-service="Medical Certificate">
-          <h4>Medical Certificate</h4>
-          <p>Certified medical documentation.</p>
-        </div>
-        <div class="service-card" data-service="Pre Natal / Post Natal">
-          <h4>Pre Natal / Post Natal</h4>
-          <p>Care before and after childbirth.</p>
-        </div>
-        <div class="service-card" data-service="Diagnostic">
-          <h4>Diagnostic</h4>
-          <p>Basic diagnostic tests.</p>
-        </div>
-        <div class="service-card" data-service="Outpatient Consultation">
-          <h4>Outpatient Consultation</h4>
-          <p>Consultations for illnesses.</p>
-        </div>
-        <div class="service-card" data-service="Death Certificate / Burial">
-          <h4>Death Certificate / Burial</h4>
-          <p>Processing and certification.</p>
-        </div>
-        <div class="service-card" data-service="Greencard / Hospitalization">
-          <h4>Greencard / Hospitalization</h4>
-          <p>Assistance in applying programs.</p>
-        </div>
-        <div class="service-card" data-service="Dental Care">
-          <h4>Dental Care</h4>
-          <p>Free checkups and extractions.</p>
-        </div>
-        <div class="service-card" data-service="Family Planning">
-          <h4>Family Planning</h4>
-          <p>Modern family planning services.</p>
-        </div>
-      </div>
 
-      <!-- DATE PICKER -->
-      <h3>Choose Date</h3>
-      <div class="date-picker">
-        <select id="month"></select>
-        <select id="day"></select>
-        <select id="year"></select>
+        <!-- DATE PICKER -->
+        <div class="date-container">
+          <h3>Choose Date</h3>
+          <div class="date-picker">
+            <select id="month"></select>
+            <select id="day"></select>
+            <select id="year"></select>
+          </div>
+        </div>
       </div>
 
       <!-- TIME SLOTS -->
@@ -113,123 +92,90 @@
       }
     });
 
-    // TIME SLOTS GENERATION (8AM - 5PM every 10 min)
-    const timeGrid = document.getElementById("time-grid");
-    const start = 8 * 60, end = 17 * 60;
-    for (let t = start; t < end; t += 10) {
-      const h = Math.floor(t / 60), m = t % 60;
-      const nh = Math.floor((t + 10) / 60), nm = (t + 10) % 60;
-      const fmt = (h, m) => {
-        const s = h >= 12 ? "PM" : "AM";
-        const hr = h % 12 || 12;
-        return `${hr}:${m.toString().padStart(2, "0")} ${s}`;
-      };
-      const div = document.createElement("div");
-      div.className = "time-slot";
-      div.textContent = `${fmt(h, m)} - ${fmt(nh, nm)}`;
-      div.onclick = () => selectTime(div);
-      timeGrid.appendChild(div);
-    }
-
-    // SERVICE SELECTION
+    // SERVICE DROPDOWN
+    const serviceButton = document.getElementById("serviceButton");
+    const servicesList = document.getElementById("servicesList");
     let selectedService = "";
-    document.querySelectorAll(".service-card").forEach(card => {
-      card.addEventListener("click", () => {
-        document.querySelectorAll(".service-card").forEach(c => c.classList.remove("selected"));
-        card.classList.add("selected");
-        selectedService = card.getAttribute("data-service");
+
+    serviceButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      servicesList.classList.toggle("show");
+    });
+
+    document.querySelectorAll(".service-item").forEach(item => {
+      item.addEventListener("click", () => {
+        selectedService = item.getAttribute("data-service");
+        serviceButton.textContent = selectedService + " ▼";
+        servicesList.classList.remove("show");
       });
     });
 
-    // TIME SLOT SELECTION
+    // Close service dropdown if clicked outside
+    window.addEventListener("click", () => {
+      servicesList.classList.remove("show");
+    });
+
+    // TIME SLOTS GENERATION
+    const timeGrid = document.getElementById("time-grid");
+    const start = 8*60, end = 17*60;
+    for(let t=start; t<end; t+=10){
+      const h=Math.floor(t/60), m=t%60;
+      const nh=Math.floor((t+10)/60), nm=(t+10)%60;
+      const fmt=(h,m)=> { const s=h>=12?"PM":"AM"; const hr=h%12||12; return `${hr}:${m.toString().padStart(2,"0")} ${s}`; };
+      const div=document.createElement("div");
+      div.className="time-slot";
+      div.textContent=`${fmt(h,m)} - ${fmt(nh,nm)}`;
+      div.onclick=()=>selectTime(div);
+      timeGrid.appendChild(div);
+    }
+
     let selectedTime = "";
-    function selectTime(slot) {
-      document.querySelectorAll(".time-slot").forEach(s => s.classList.remove("selected"));
+    function selectTime(slot){
+      document.querySelectorAll(".time-slot").forEach(s=>s.classList.remove("selected"));
       slot.classList.add("selected");
       selectedTime = slot.textContent;
     }
 
-    // DATE PICKER GENERATION
-    const monthSelect = document.getElementById("month");
-    const daySelect = document.getElementById("day");
-    const yearSelect = document.getElementById("year");
+    // DATE PICKER
+    const monthSelect=document.getElementById("month");
+    const daySelect=document.getElementById("day");
+    const yearSelect=document.getElementById("year");
+    const today=new Date();
+    const thisYear=today.getFullYear();
 
-    const today = new Date();
-    const thisYear = today.getFullYear();
+    const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+    months.forEach((m,i)=>{ const opt=document.createElement("option"); opt.value=i+1; opt.text=m; monthSelect.appendChild(opt); });
 
-    // Fill months
-    const months = [
-      "January","February","March","April","May","June",
-      "July","August","September","October","November","December"
-    ];
-    months.forEach((m, i) => {
-      const option = document.createElement("option");
-      option.value = i + 1;
-      option.text = m;
-      monthSelect.appendChild(option);
-    });
+    for(let y=thisYear; y<=thisYear+2; y++){ const opt=document.createElement("option"); opt.value=y; opt.text=y; yearSelect.appendChild(opt); }
 
-    // Fill years (current year + next 2 years)
-    for (let y = thisYear; y <= thisYear + 2; y++) {
-      const option = document.createElement("option");
-      option.value = y;
-      option.text = y;
-      yearSelect.appendChild(option);
-    }
-
-    function updateDays() {
-      const month = parseInt(monthSelect.value);
-      const year = parseInt(yearSelect.value);
-      const daysInMonth = new Date(year, month, 0).getDate();
-      daySelect.innerHTML = "";
-      for (let d = 1; d <= daysInMonth; d++) {
-        const option = document.createElement("option");
-        option.value = d;
-        option.text = d;
-        daySelect.appendChild(option);
+    function updateDays(){
+      const month=parseInt(monthSelect.value);
+      const year=parseInt(yearSelect.value);
+      const daysInMonth=new Date(year, month,0).getDate();
+      daySelect.innerHTML="";
+      for(let d=1; d<=daysInMonth; d++){
+        const opt=document.createElement("option");
+        opt.value=d;
+        opt.text=d;
+        daySelect.appendChild(opt);
       }
     }
 
     monthSelect.addEventListener("change", updateDays);
     yearSelect.addEventListener("change", updateDays);
-
-    // Initialize days
-    monthSelect.value = today.getMonth() + 1;
-    yearSelect.value = thisYear;
+    monthSelect.value = today.getMonth()+1;
+    yearSelect.value=thisYear;
     updateDays();
-    daySelect.value = today.getDate();
+    daySelect.value=today.getDate();
 
-    // SUBMIT APPOINTMENT
-    document.getElementById("submitBtn").addEventListener("click", () => {
-      const date = `${yearSelect.value}-${monthSelect.value.toString().padStart(2,"0")}-${daySelect.value.toString().padStart(2,"0")}`;
-      if (!selectedService || !selectedTime || !date) {
+    // SUBMIT
+    document.getElementById("submitBtn").addEventListener("click", ()=>{
+      const date=`${yearSelect.value}-${monthSelect.value.toString().padStart(2,"0")}-${daySelect.value.toString().padStart(2,"0")}`;
+      if(!selectedService || !selectedTime || !date){
         alert("⚠️ Please select a service, date, and time slot.");
         return;
       }
-
-      const formData = new FormData();
-      formData.append("service", selectedService);
-      formData.append("date", date);
-      formData.append("time_slot", selectedTime);
-
-      fetch("php/book_appointment.php", {
-        method: "POST",
-        body: formData,
-        credentials: "include"
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "success") {
-          alert("✅ Appointment booked successfully!");
-          window.location.href = "my_appointment.html";
-        } else {
-          alert("❌ " + data.message);
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert("⚠️ Server error. Please try again later.");
-      });
+      alert(`Service: ${selectedService}\nDate: ${date}\nTime: ${selectedTime}`);
     });
   </script>
 
