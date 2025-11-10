@@ -22,7 +22,7 @@
         <li class="dropdown">
           <button class="dropbtn" id="menuButton">MENU ▼</button>
           <div class="dropdown-content" id="dropdownMenu">
-            <a href="book appointment.html" class="active">Book Appointment</a>
+            <a href="book_appointment.html" class="active">Book Appointment</a>
             <a href="my_appointment.html">My Appointment</a>
             <a href="inbox.html">Inbox</a>
             <a href="account.html">Account</a>
@@ -41,33 +41,38 @@
 
       <form id="bookingForm" action="php/book_appointment.php" method="POST">
 
-        <!-- SERVICE -->
-        <div class="services-container">
-          <h3>Select a Service</h3>
-          <div class="service-dropdown" id="serviceDropdown">
-            <button type="button" id="serviceButton">-- Select Service -- ▼</button>
-            <div class="services-list" id="servicesList">
-              <div class="service-item" data-service="Immunization">Immunization</div>
-              <div class="service-item" data-service="Medical Certificate">Medical Certificate</div>
-              <div class="service-item" data-service="Pre Natal / Post Natal">Pre Natal / Post Natal</div>
-              <div class="service-item" data-service="Diagnostic">Diagnostic</div>
-              <div class="service-item" data-service="Outpatient Consultation">Outpatient Consultation</div>
-              <div class="service-item" data-service="Death Certificate / Burial">Death Certificate / Burial</div>
-              <div class="service-item" data-service="Greencard / Hospitalization">Greencard / Hospitalization</div>
-              <div class="service-item" data-service="Dental Care">Dental Care</div>
-              <div class="service-item" data-service="Family Planning">Family Planning</div>
+        <!-- SERVICE AND DATE -->
+        <div class="booking-sections">
+
+          <!-- SERVICE -->
+          <div class="services-container">
+            <h3>Select a Service</h3>
+            <div class="service-dropdown" id="serviceDropdown">
+              <button type="button" id="serviceButton">-- Select Service -- ▼</button>
+              <div class="services-list" id="servicesList">
+                <div class="service-item" data-service="Immunization">Immunization</div>
+                <div class="service-item" data-service="Medical Certificate">Medical Certificate</div>
+                <div class="service-item" data-service="Pre Natal / Post Natal">Pre Natal / Post Natal</div>
+                <div class="service-item" data-service="Diagnostic">Diagnostic</div>
+                <div class="service-item" data-service="Outpatient Consultation">Outpatient Consultation</div>
+                <div class="service-item" data-service="Death Certificate / Burial">Death Certificate / Burial</div>
+                <div class="service-item" data-service="Greencard / Hospitalization">Greencard / Hospitalization</div>
+                <div class="service-item" data-service="Dental Care">Dental Care</div>
+                <div class="service-item" data-service="Family Planning">Family Planning</div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- DATE PICKER -->
-        <div class="date-container">
-          <h3>Choose Date</h3>
-          <div class="date-picker">
-            <select id="month" required></select>
-            <select id="day" required></select>
-            <select id="year" required></select>
+          <!-- DATE -->
+          <div class="date-container">
+            <h3>Choose Date</h3>
+            <div class="date-picker">
+              <select id="month" required></select>
+              <select id="day" required></select>
+              <select id="year" required></select>
+            </div>
           </div>
+
         </div>
 
         <!-- TIME SLOTS -->
@@ -96,7 +101,7 @@
       }
     });
 
-    // SERVICE DROPDOWN
+    // SERVICE SELECTION
     const serviceButton = document.getElementById("serviceButton");
     const servicesList = document.getElementById("servicesList");
     let selectedService = "";
@@ -116,49 +121,7 @@
 
     window.addEventListener("click", () => servicesList.classList.remove("show"));
 
-    // DATE PICKER
-    const monthSelect = document.getElementById("month");
-    const daySelect = document.getElementById("day");
-    const yearSelect = document.getElementById("year");
-    const today = new Date();
-    const thisYear = today.getFullYear();
-    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-
-    months.forEach((m,i)=> {
-      const opt = document.createElement("option");
-      opt.value = i+1;
-      opt.text = m;
-      monthSelect.appendChild(opt);
-    });
-
-    for(let y=thisYear; y<=thisYear+2; y++){
-      const opt = document.createElement("option");
-      opt.value = y;
-      opt.text = y;
-      yearSelect.appendChild(opt);
-    }
-
-    function updateDays(){
-      const month = parseInt(monthSelect.value);
-      const year = parseInt(yearSelect.value);
-      const daysInMonth = new Date(year, month, 0).getDate();
-      daySelect.innerHTML = "";
-      for(let d=1; d<=daysInMonth; d++){
-        const opt = document.createElement("option");
-        opt.value = d;
-        opt.text = d;
-        daySelect.appendChild(opt);
-      }
-    }
-
-    monthSelect.addEventListener("change", updateDays);
-    yearSelect.addEventListener("change", updateDays);
-    monthSelect.value = today.getMonth()+1;
-    yearSelect.value = thisYear;
-    updateDays();
-    daySelect.value = today.getDate();
-
-    // TIME GRID
+    // TIME SLOTS
     const timeGrid = document.getElementById("time-grid");
     const start = 8*60, end = 17*60;
     let selectedTime = "";
@@ -178,7 +141,38 @@
       selectedTime = slot.textContent;
     }
 
-    // FORM SUBMISSION
+    // DATE PICKER
+    const monthSelect=document.getElementById("month");
+    const daySelect=document.getElementById("day");
+    const yearSelect=document.getElementById("year");
+    const today=new Date();
+    const thisYear=today.getFullYear();
+    const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+    months.forEach((m,i)=>{ const opt=document.createElement("option"); opt.value=i+1; opt.text=m; monthSelect.appendChild(opt); });
+
+    for(let y=thisYear; y<=thisYear+2; y++){ const opt=document.createElement("option"); opt.value=y; opt.text=y; yearSelect.appendChild(opt); }
+
+    function updateDays(){
+      const month=parseInt(monthSelect.value);
+      const year=parseInt(yearSelect.value);
+      const daysInMonth=new Date(year, month,0).getDate();
+      daySelect.innerHTML="";
+      for(let d=1; d<=daysInMonth; d++){
+        const opt=document.createElement("option");
+        opt.value=d;
+        opt.text=d;
+        daySelect.appendChild(opt);
+      }
+    }
+
+    monthSelect.addEventListener("change", updateDays);
+    yearSelect.addEventListener("change", updateDays);
+    monthSelect.value = today.getMonth()+1;
+    yearSelect.value=thisYear;
+    updateDays();
+    daySelect.value=today.getDate();
+
+    // FORM SUBMIT
     document.getElementById("bookingForm").addEventListener("submit", function(e){
       if(!selectedService || !selectedTime){
         e.preventDefault();

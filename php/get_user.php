@@ -2,14 +2,15 @@
 session_start();
 require 'db.php';
 
-if(!isset($_SESSION['user_id'])){
+if(!isset($_SESSION['account_id'])){
     echo json_encode(['error'=>'Not logged in']);
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
-$stmt = $pdo->prepare("SELECT account_id, first_name, last_name, address, email, phone FROM users WHERE id=:id");
-$stmt->execute([':id'=>$user_id]);
+$account_id = $_SESSION['account_id']; // Use account_id from session
+
+$stmt = $pdo->prepare("SELECT account_id, first_name, last_name, address, email, phone FROM users WHERE account_id=:account_id");
+$stmt->execute([':account_id'=>$account_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if(!$user){
@@ -18,3 +19,4 @@ if(!$user){
 }
 
 echo json_encode($user);
+?>
