@@ -39,12 +39,13 @@
       <h1>BOOK AN APPOINTMENT</h1>
       <p>Select a service and available time slot below.</p>
 
-      <div class="booking-sections">
-        <!-- SERVICE SELECT DROPDOWN -->
+      <form id="bookingForm" action="php/book_appointment.php" method="POST">
+
+        <!-- SERVICE -->
         <div class="services-container">
           <h3>Select a Service</h3>
           <div class="service-dropdown" id="serviceDropdown">
-            <button id="serviceButton">-- Select Service -- ▼</button>
+            <button type="button" id="serviceButton">-- Select Service -- ▼</button>
             <div class="services-list" id="servicesList">
               <div class="service-item" data-service="Immunization">Immunization</div>
               <div class="service-item" data-service="Medical Certificate">Medical Certificate</div>
@@ -63,29 +64,32 @@
         <div class="date-container">
           <h3>Choose Date</h3>
           <div class="date-picker">
-            <select id="month"></select>
-            <select id="day"></select>
-            <select id="year"></select>
+            <select id="month" required></select>
+            <select id="day" required></select>
+            <select id="year" required></select>
           </div>
         </div>
-      </div>
 
-      <!-- TIME SLOTS -->
-      <h3>Available Time Slots</h3>
-      <div id="time-grid" class="time-grid"></div>
+        <!-- TIME SLOTS -->
+        <h3>Available Time Slots</h3>
+        <div id="time-grid" class="time-grid"></div>
 
-      <button id="submitBtn" class="submit-btn">Submit Appointment</button>
+        <!-- HIDDEN INPUTS -->
+        <input type="hidden" name="service" id="serviceInput">
+        <input type="hidden" name="date" id="dateInput">
+        <input type="hidden" name="time_slot" id="timeInput">
+
+        <button type="submit" class="submit-btn">Submit Appointment</button>
+      </form>
     </div>
   </section>
 
   <!-- SCRIPT -->
   <script>
-    // MENU DROPDOWN
+    // NAVBAR DROPDOWN
     const menuButton = document.getElementById("menuButton");
     const dropdownMenu = document.getElementById("dropdownMenu");
-    menuButton.addEventListener("click", () => {
-      dropdownMenu.classList.toggle("show");
-    });
+    menuButton.addEventListener("click", () => dropdownMenu.classList.toggle("show"));
     window.addEventListener("click", (e) => {
       if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
         dropdownMenu.classList.remove("show");
@@ -110,14 +114,54 @@
       });
     });
 
-    // Close service dropdown if clicked outside
-    window.addEventListener("click", () => {
-      servicesList.classList.remove("show");
+    window.addEventListener("click", () => servicesList.classList.remove("show"));
+
+    // DATE PICKER
+    const monthSelect = document.getElementById("month");
+    const daySelect = document.getElementById("day");
+    const yearSelect = document.getElementById("year");
+    const today = new Date();
+    const thisYear = today.getFullYear();
+    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+    months.forEach((m,i)=> {
+      const opt = document.createElement("option");
+      opt.value = i+1;
+      opt.text = m;
+      monthSelect.appendChild(opt);
     });
 
-    // TIME SLOTS GENERATION
+    for(let y=thisYear; y<=thisYear+2; y++){
+      const opt = document.createElement("option");
+      opt.value = y;
+      opt.text = y;
+      yearSelect.appendChild(opt);
+    }
+
+    function updateDays(){
+      const month = parseInt(monthSelect.value);
+      const year = parseInt(yearSelect.value);
+      const daysInMonth = new Date(year, month, 0).getDate();
+      daySelect.innerHTML = "";
+      for(let d=1; d<=daysInMonth; d++){
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.text = d;
+        daySelect.appendChild(opt);
+      }
+    }
+
+    monthSelect.addEventListener("change", updateDays);
+    yearSelect.addEventListener("change", updateDays);
+    monthSelect.value = today.getMonth()+1;
+    yearSelect.value = thisYear;
+    updateDays();
+    daySelect.value = today.getDate();
+
+    // TIME GRID
     const timeGrid = document.getElementById("time-grid");
     const start = 8*60, end = 17*60;
+    let selectedTime = "";
     for(let t=start; t<end; t+=10){
       const h=Math.floor(t/60), m=t%60;
       const nh=Math.floor((t+10)/60), nm=(t+10)%60;
@@ -128,54 +172,23 @@
       div.onclick=()=>selectTime(div);
       timeGrid.appendChild(div);
     }
-
-    let selectedTime = "";
     function selectTime(slot){
       document.querySelectorAll(".time-slot").forEach(s=>s.classList.remove("selected"));
       slot.classList.add("selected");
       selectedTime = slot.textContent;
     }
 
-    // DATE PICKER
-    const monthSelect=document.getElementById("month");
-    const daySelect=document.getElementById("day");
-    const yearSelect=document.getElementById("year");
-    const today=new Date();
-    const thisYear=today.getFullYear();
-
-    const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-    months.forEach((m,i)=>{ const opt=document.createElement("option"); opt.value=i+1; opt.text=m; monthSelect.appendChild(opt); });
-
-    for(let y=thisYear; y<=thisYear+2; y++){ const opt=document.createElement("option"); opt.value=y; opt.text=y; yearSelect.appendChild(opt); }
-
-    function updateDays(){
-      const month=parseInt(monthSelect.value);
-      const year=parseInt(yearSelect.value);
-      const daysInMonth=new Date(year, month,0).getDate();
-      daySelect.innerHTML="";
-      for(let d=1; d<=daysInMonth; d++){
-        const opt=document.createElement("option");
-        opt.value=d;
-        opt.text=d;
-        daySelect.appendChild(opt);
-      }
-    }
-
-    monthSelect.addEventListener("change", updateDays);
-    yearSelect.addEventListener("change", updateDays);
-    monthSelect.value = today.getMonth()+1;
-    yearSelect.value=thisYear;
-    updateDays();
-    daySelect.value=today.getDate();
-
-    // SUBMIT
-    document.getElementById("submitBtn").addEventListener("click", ()=>{
-      const date=`${yearSelect.value}-${monthSelect.value.toString().padStart(2,"0")}-${daySelect.value.toString().padStart(2,"0")}`;
-      if(!selectedService || !selectedTime || !date){
-        alert("⚠️ Please select a service, date, and time slot.");
+    // FORM SUBMISSION
+    document.getElementById("bookingForm").addEventListener("submit", function(e){
+      if(!selectedService || !selectedTime){
+        e.preventDefault();
+        alert("⚠️ Please select a service and time slot.");
         return;
       }
-      alert(`Service: ${selectedService}\nDate: ${date}\nTime: ${selectedTime}`);
+      document.getElementById("serviceInput").value = selectedService;
+      document.getElementById("timeInput").value = selectedTime;
+      const date = `${yearSelect.value}-${monthSelect.value.toString().padStart(2,"0")}-${daySelect.value.toString().padStart(2,"0")}`;
+      document.getElementById("dateInput").value = date;
     });
   </script>
 

@@ -3,31 +3,31 @@ session_start();
 require 'db.php';
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user_id'])) {
+if(!isset($_SESSION['account_id'])){
     echo json_encode(['status'=>'error','message'=>'Not logged in']);
     exit();
 }
 
-// Read JSON input
-$input = json_decode(file_get_contents('php://input'), true);
-if(!$input || !isset($input['id'], $input['service'], $input['date'], $input['time_slot'])){
+$data = json_decode(file_get_contents("php://input"), true);
+
+if(!$data || !isset($data['appointment_id'], $data['service'], $data['date'], $data['time_slot'])){
     echo json_encode(['status'=>'error','message'=>'Invalid data']);
     exit();
 }
 
-$id = intval($input['id']);
-$service = $input['service'];
-$date = $input['date'];
-$time_slot = $input['time_slot'];
+$appointment_id = intval($data['appointment_id']);
+$service = $data['service'];
+$date = $data['date'];
+$time_slot = $data['time_slot'];
 
 try {
-    $stmt = $pdo->prepare("UPDATE appointments SET service=:service, date=:date, time_slot=:time_slot WHERE id=:id AND user_id=:user_id");
+    $stmt = $pdo->prepare("UPDATE appointments SET service=:service, date=:date, time_slot=:time_slot WHERE appointment_id=:appointment_id AND account_id=:account_id");
     $stmt->execute([
         ':service'=>$service,
         ':date'=>$date,
         ':time_slot'=>$time_slot,
-        ':id'=>$id,
-        ':user_id'=>$_SESSION['user_id']
+        ':appointment_id'=>$appointment_id,
+        ':account_id'=>$_SESSION['account_id']
     ]);
 
     echo json_encode(['status'=>'success']);
