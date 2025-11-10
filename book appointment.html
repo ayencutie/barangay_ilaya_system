@@ -85,7 +85,11 @@
 
       <!-- DATE PICKER -->
       <h3>Choose Date</h3>
-      <input id="appt_date" type="date" min="<?= date('Y-m-d') ?>" />
+      <div class="date-picker">
+        <select id="month"></select>
+        <select id="day"></select>
+        <select id="year"></select>
+      </div>
 
       <!-- TIME SLOTS -->
       <h3>Available Time Slots</h3>
@@ -145,9 +149,59 @@
       selectedTime = slot.textContent;
     }
 
-    // SUBMIT APPOINTMENT TO PHP
+    // DATE PICKER GENERATION
+    const monthSelect = document.getElementById("month");
+    const daySelect = document.getElementById("day");
+    const yearSelect = document.getElementById("year");
+
+    const today = new Date();
+    const thisYear = today.getFullYear();
+
+    // Fill months
+    const months = [
+      "January","February","March","April","May","June",
+      "July","August","September","October","November","December"
+    ];
+    months.forEach((m, i) => {
+      const option = document.createElement("option");
+      option.value = i + 1;
+      option.text = m;
+      monthSelect.appendChild(option);
+    });
+
+    // Fill years (current year + next 2 years)
+    for (let y = thisYear; y <= thisYear + 2; y++) {
+      const option = document.createElement("option");
+      option.value = y;
+      option.text = y;
+      yearSelect.appendChild(option);
+    }
+
+    function updateDays() {
+      const month = parseInt(monthSelect.value);
+      const year = parseInt(yearSelect.value);
+      const daysInMonth = new Date(year, month, 0).getDate();
+      daySelect.innerHTML = "";
+      for (let d = 1; d <= daysInMonth; d++) {
+        const option = document.createElement("option");
+        option.value = d;
+        option.text = d;
+        daySelect.appendChild(option);
+      }
+    }
+
+    monthSelect.addEventListener("change", updateDays);
+    yearSelect.addEventListener("change", updateDays);
+
+    // Initialize days
+    monthSelect.value = today.getMonth() + 1;
+    yearSelect.value = thisYear;
+    updateDays();
+    daySelect.value = today.getDate();
+
+    // SUBMIT APPOINTMENT
     document.getElementById("submitBtn").addEventListener("click", () => {
-      const date = document.getElementById("appt_date").value;
+      const date = `${yearSelect.value}-${monthSelect.value.toString().padStart(2,"0")}-${daySelect.value.toString().padStart(2,"0")}`;
       if (!selectedService || !selectedTime || !date) {
         alert("⚠️ Please select a service, date, and time slot.");
         return;
@@ -161,7 +215,7 @@
       fetch("php/book_appointment.php", {
         method: "POST",
         body: formData,
-        credentials: "include" // ✅ THIS IS THE FIX
+        credentials: "include"
       })
       .then(res => res.json())
       .then(data => {
