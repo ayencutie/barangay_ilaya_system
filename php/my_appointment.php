@@ -1,26 +1,22 @@
 <?php
 session_start();
-require 'db.php';
+require 'db.php'; // make sure this sets $pdo as PDO instance
+header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Not logged in']);
+    echo json_encode(['status' => 'error', 'message' => 'Not logged in']);
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
 
 try {
-    $stmt = $pdo->prepare("SELECT id, service, date, time_slot, status 
-                           FROM appointments 
-                           WHERE user_id = :user_id 
-                           ORDER BY date DESC");
+    $stmt = $pdo->prepare("SELECT * FROM appointments WHERE user_id = :user_id ORDER BY date DESC, time_slot ASC");
     $stmt->execute([':user_id' => $user_id]);
     $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    echo json_encode($appointments);
+    echo json_encode(['status' => 'success', 'appointments' => $appointments]);
 } catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Database error']);
+    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
 ?>
