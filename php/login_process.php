@@ -31,9 +31,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             // --- Redirect based on role ---
             if ($user['user_role'] === 'admin') {
-                header("Location: ../admin/dashboard.php"); // Admin goes to admin dashboard
+                header("Location: /myphp/barangay_ilaya_system/admin/dashboard.php"); // Admin goes to admin dashboard
             } else {
-                header("Location: ../index.html"); // redirect to dashboard
+                header("Location: /myphp/barangay_ilaya_system/index.html"); // redirect to dashboard
             }
             exit;
         } else {

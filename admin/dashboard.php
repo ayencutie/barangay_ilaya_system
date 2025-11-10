@@ -1,8 +1,10 @@
 <?php
+// Start session at the very top
 session_start();
 
 // Optional: Check if the user is an admin
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+    // Redirect non-admin users to landing page
     header("Location: ../landing_page.html");
     exit();
 }
@@ -18,6 +20,7 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
 </head>
 <body>
 
+<!-- Include the admin navbar -->
 <?php include 'includes/admin_nav.php'; ?>
 
 <main class="admin-content">
