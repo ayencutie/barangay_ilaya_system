@@ -7,9 +7,9 @@ if(!isset($_SESSION['account_id'])){
     exit;
 }
 
-$account_id = $_SESSION['account_id']; // Use account_id from session
+$account_id = $_SESSION['account_id'];
 
-$stmt = $pdo->prepare("SELECT account_id, first_name, last_name, address, email, phone FROM users WHERE account_id=:account_id");
+$stmt = $pdo->prepare("SELECT account_id, first_name, last_name, address, birthdate, email, phone FROM users WHERE account_id=:account_id");
 $stmt->execute([':account_id'=>$account_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 

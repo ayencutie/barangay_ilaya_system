@@ -1,4 +1,4 @@
-/* === GLOBAL STYLE === */
+/* ================== RESET + BASE ================== */
 * {
   margin: 0;
   padding: 0;
@@ -7,17 +7,18 @@
 }
 
 body {
-  background-color: #ffffff;
+  background-color: #f4f9f4;
   color: #222;
 }
 
-/* === NAVBAR (Same as Landing Page) === */
+/* ================== NAVBAR ================== */
 .navbar {
   background-color: #009900;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 15px 60px;
+  flex-wrap: wrap;
 }
 
 .navbar .logo {
@@ -64,6 +65,10 @@ nav ul li a:hover,
   color: #e0e0e0;
 }
 
+nav ul li a.active {
+  background-color: #007a00;
+}
+
 .dropdown {
   position: relative;
 }
@@ -72,12 +77,12 @@ nav ul li a:hover,
   display: none;
   position: absolute;
   background-color: #fff;
-  min-width: 200px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  min-width: 180px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   border-radius: 8px;
-  top: 45px;
-  right: 0;
-  z-index: 999;
+  top: 100%;
+  left: 0;
+  z-index: 10;
 }
 
 .dropdown-content a {
@@ -98,7 +103,6 @@ nav ul li a:hover,
   display: block;
 }
 
-/* === LOGOUT BUTTON === */
 .logout-btn {
   border: 2px solid #fff;
   border-radius: 6px;
@@ -110,152 +114,154 @@ nav ul li a:hover,
   border-color: #007a00;
 }
 
-/* === CONTENT AREA === */
+/* ================== MAIN CONTENT ================== */
 .content {
-  padding: 50px 20px;
+  padding: 40px 20px;
+  min-height: calc(100vh - 90px);
+}
+
+.inbox-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 12px 25px rgba(0, 153, 51, 0.15);
+  transition: all 0.3s ease;
+}
+
+.inbox-container h2 {
+  text-align: center;
+  font-size: 28px;
+  color: #1b5e20;
+  margin-bottom: 20px;
+}
+
+/* ================== TABS ================== */
+.inbox-tabs {
   display: flex;
   justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
-.inbox-wrapper {
-  background: #f0f9f0;
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0, 153, 51, 0.1);
-  padding: 30px;
-  width: 100%;
-  max-width: 800px;
-}
-
-.inbox-wrapper h1 {
-  color: #1b5e20;
-  margin-bottom: 15px;
-}
-
-.tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.tab {
-  flex: 1;
-  background: #fff;
-  border: 2px solid #009900;
-  color: #009900;
-  padding: 10px;
-  font-weight: 600;
-  border-radius: 8px;
+.tab-btn {
+  padding: 10px 20px;
+  background: #d9f2d9;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  transition: 0.3s;
+  font-weight: 600;
+  color: #007a00;
+  transition: all 0.3s ease;
 }
 
-.tab.active,
-.tab:hover {
+.tab-btn:hover {
+  background: #b2e0b2;
+}
+
+.tab-btn.active {
   background: #009900;
   color: #fff;
 }
 
-/* === MESSAGE LIST === */
-.message-list {
-  background: #fff;
-  border-radius: 8px;
+/* ================== MESSAGES AREA ================== */
+.messages-area {
+  min-height: 300px;
+  max-height: 450px;
+  overflow-y: auto;
+  border: 1px solid #bdbdbd;
+  border-radius: 12px;
   padding: 15px;
-  min-height: 150px;
-  border: 1px solid #ccc;
+  background-color: #f4fff4;
 }
 
-.msg-card {
-  background: #eafbea;
-  border: 1px solid #b2dfb2;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 10px;
+.tab-content {
+  display: none;
 }
 
-.msg-card .hdr {
+.tab-content.active {
+  display: block;
+}
+
+.message-card {
+  background: #d9f2d9;
+  border-radius: 12px;
+  padding: 10px 15px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
-  font-weight: 600;
-  color: #1b5e20;
-  margin-bottom: 8px;
-}
-
-.msg-card p {
-  color: #333;
+  align-items: flex-start;
   font-size: 14px;
-  margin-bottom: 8px;
+  transition: all 0.3s ease;
 }
 
-.controls {
-  display: flex;
-  gap: 10px;
+.message-card strong {
+  color: #007a00;
 }
 
-.controls button {
-  background: #009900;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 10px;
-  cursor: pointer;
-  transition: 0.3s;
+.message-card span {
+  font-size: 12px;
+  color: #555;
+  margin-left: 10px;
 }
 
-.controls button:hover {
-  background: #007a00;
-}
-
-/* === CONTACT FORM === */
-form {
-  margin-top: 20px;
+/* ================== CONTACT ADMIN ================== */
+.message-form {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-top: 20px;
 }
 
-form input,
-form textarea {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+.message-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #bdbdbd;
+  resize: none;
   font-size: 14px;
 }
 
-form textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-form .btn {
-  background: #009900;
+.message-form .book-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  background: linear-gradient(135deg, #00c853, #009900);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 15px;
-  font-weight: 600;
+  border-radius: 12px;
   cursor: pointer;
-  transition: 0.3s;
+  font-weight: 700;
+  transition: all 0.3s ease;
 }
 
-form .btn:hover {
-  background: #007a00;
+.message-form .book-btn:hover {
+  background: linear-gradient(135deg, #009900, #007a00);
+  transform: translateY(-2px);
 }
 
-/* === RESPONSIVE === */
-@media (max-width: 700px) {
+/* ================== SCROLLBAR ================== */
+.messages-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messages-area::-webkit-scrollbar-thumb {
+  background-color: #009900;
+  border-radius: 4px;
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 768px) {
   .navbar {
+    padding: 12px 25px;
+  }
+
+  .inbox-tabs {
     flex-direction: column;
-    align-items: flex-start;
-    padding: 15px 20px;
+    align-items: center;
   }
 
-  nav ul {
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .inbox-wrapper {
-    padding: 20px;
+  .message-form .book-btn {
+    width: 100%;
   }
 }

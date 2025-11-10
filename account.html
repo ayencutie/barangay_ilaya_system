@@ -41,6 +41,7 @@
       <div class="profile-item"><label>Account ID</label><div id="acct"></div></div>
       <div class="profile-item"><label>Full Name</label><div id="name"></div></div>
       <div class="profile-item"><label>Address</label><div id="address"></div></div>
+      <div class="profile-item"><label>Birthdate</label><div id="birthdate"></div></div>
       <div class="profile-item"><label>Email</label><div id="email"></div></div>
       <div class="profile-item"><label>Phone</label><div id="phone"></div></div>
     </div>
@@ -79,6 +80,11 @@ window.addEventListener('click', e => {
     dropdownMenu.classList.remove('show');
 });
 
+// --- Capitalize Function ---
+function capitalizeWords(str) {
+  return str.replace(/\b\w/g, char => char.toUpperCase());
+}
+
 // --- Fetch user data ---
 function loadUser(){
   fetch('php/get_user.php')
@@ -90,8 +96,13 @@ function loadUser(){
       return;
     }
     document.getElementById('acct').textContent = data.account_id;
-    document.getElementById('name').textContent = data.first_name + ' ' + data.last_name;
-    document.getElementById('address').textContent = data.address;
+    document.getElementById('name').textContent = capitalizeWords(data.first_name + ' ' + data.last_name);
+    document.getElementById('address').textContent = capitalizeWords(data.address);
+    document.getElementById('birthdate').textContent = new Date(data.birthdate).toLocaleDateString('en-PH', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
     document.getElementById('email').textContent = data.email;
     document.getElementById('phone').textContent = data.phone;
   });
@@ -103,17 +114,13 @@ const pwdForm = document.getElementById('pwdForm');
 const phoneForm = document.getElementById('phoneForm');
 
 document.getElementById('chgPassword').addEventListener('click', ()=> {
-  // Toggle password form
   pwdForm.style.display = pwdForm.style.display === 'none' ? 'flex' : 'none';
-  // Hide phone form if open
   phoneForm.style.display = 'none';
   pwdForm.scrollIntoView({behavior:'smooth'});
 });
 
 document.getElementById('chgPhone').addEventListener('click', ()=> {
-  // Toggle phone form
   phoneForm.style.display = phoneForm.style.display === 'none' ? 'flex' : 'none';
-  // Hide password form if open
   pwdForm.style.display = 'none';
   phoneForm.scrollIntoView({behavior:'smooth'});
 });
