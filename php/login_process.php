@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if ($user['user_role'] === 'admin') {
                 header("Location: /myphp/barangay_ilaya_system/admin/dashboard.php"); // Admin goes to admin dashboard
             } else {
-                header("Location: /myphp/barangay_ilaya_system/index.html"); // redirect to dashboard
+                header("Location: /barangay_ilaya_system/index.html"); // redirect to dashboard
             }
             exit;
         } else {
