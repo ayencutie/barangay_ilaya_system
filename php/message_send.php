@@ -3,12 +3,12 @@ session_start();
 require 'db.php'; // siguraduhing tama ang path
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!isset($_SESSION['user_id'])) {
+    if (!isset($_SESSION['patient_id'])) {
         echo "Error: User not logged in.";
         exit();
     }
 
-    $sender_id = $_SESSION['user_id'];
+    $sender_id = $_SESSION['patient_id'];
     $message = trim($_POST['message']);
     $type = isset($_POST['type']) ? $_POST['type'] : 'inbox'; // default inbox
 

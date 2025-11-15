@@ -38,7 +38,7 @@
     <div id="messages"></div>
 
     <div class="profile-list">
-      <div class="profile-item"><label>Account ID</label><div id="acct"></div></div>
+      <div class="profile-item"><label>Patient ID</label><div id="patientId"></div></div>
       <div class="profile-item"><label>Full Name</label><div id="name"></div></div>
       <div class="profile-item"><label>Address</label><div id="address"></div></div>
       <div class="profile-item"><label>Birthdate</label><div id="birthdate"></div></div>
@@ -95,7 +95,7 @@ function loadUser(){
       window.location.href='login.php';
       return;
     }
-    document.getElementById('acct').textContent = data.account_id;
+    document.getElementById('patientId').textContent = data.patient_id;
     document.getElementById('name').textContent = capitalizeWords(data.first_name + ' ' + data.last_name);
     document.getElementById('address').textContent = capitalizeWords(data.address);
     document.getElementById('birthdate').textContent = new Date(data.birthdate).toLocaleDateString('en-PH', {

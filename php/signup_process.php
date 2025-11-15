@@ -31,33 +31,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     try {
         // check email
-        $stmt = $pdo->prepare("SELECT account_id FROM users WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT patient_id FROM users WHERE email = ?");
         $stmt->execute([$email]);
         if ($stmt->fetch()) { 
             echo "<script>alert('Email already registered!'); window.history.back();</script>"; exit(); 
         }
 
         // check phone
-        $stmt = $pdo->prepare("SELECT account_id FROM users WHERE phone = ?");
+        $stmt = $pdo->prepare("SELECT patient_id FROM users WHERE phone = ?");
         $stmt->execute([$phone]);
         if ($stmt->fetch()) { 
             echo "<script>alert('Phone number already registered!'); window.history.back();</script>"; exit(); 
         }
 
-        // generate account_id
-        $stmt = $pdo->query("SELECT account_id FROM users ORDER BY account_id DESC LIMIT 1");
-        $lastAccount = $stmt->fetchColumn();
-        $nextNum = $lastAccount ? intval($lastAccount) + 1 : 1;
-        $account_id = str_pad($nextNum, 4, "0", STR_PAD_LEFT);
+        // generate patient_id
+        $stmt = $pdo->query("SELECT patient_id FROM users ORDER BY patient_id DESC LIMIT 1");
+        $lastPatient = $stmt->fetchColumn();
+        $nextNum = $lastPatient ? intval($lastPatient) + 1 : 1;
+        $patient_id = str_pad($nextNum, 4, "0", STR_PAD_LEFT);
 
         // insert
         $sql = "INSERT INTO users 
-                (account_id, first_name, middle_initial, last_name, address, birthdate, gender, phone, email, password)
+                (patient_id, first_name, middle_initial, last_name, address, birthdate, gender, phone, email, password)
                 VALUES 
-                (:account_id, :first_name, :middle_initial, :last_name, :address, :birthdate, :gender, :phone, :email, :password)";
+                (:patient_id, :first_name, :middle_initial, :last_name, :address, :birthdate, :gender, :phone, :email, :password)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':account_id'=>$account_id,
+            ':patient_id'=>$patient_id,
             ':first_name'=>$first_name,
             ':middle_initial'=>$middle_initial,
             ':last_name'=>$last_name,
@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ':password'=>$hashed_password
         ]);
 
-        echo "<script>alert('Account created successfully!'); window.location='../index.html';</script>";
+        echo "<script>alert('Account created successfully!'); window.location='../login.php';</script>";
 
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();

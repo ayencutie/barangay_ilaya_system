@@ -17,7 +17,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     if (password_verify($password, $user['password'])) {
-        $_SESSION['account_id'] = $user['account_id'];
+        // ✅ store patient_id instead of account_id
+        $_SESSION['patient_id'] = $user['patient_id'];
         $_SESSION['first_name'] = $user['first_name'];
         $_SESSION['last_name'] = $user['last_name'];
         $_SESSION['user_role'] = $user['user_role'];
