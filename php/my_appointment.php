@@ -3,11 +3,7 @@ session_start();
 require 'db.php';
 header('Content-Type: application/json');
 
-/* ---------------------------------------
-   FIX 1: Use correct session key
-   Your login uses account_id
---------------------------------------- */
-if (!isset($_SESSION['account_id'])) {
+if (!isset($_SESSION['patient_id'])) {
     echo json_encode([
         "status" => "error",
         "message" => "You must be logged in."
@@ -15,12 +11,8 @@ if (!isset($_SESSION['account_id'])) {
     exit();
 }
 
-$patient_id = $_SESSION['account_id']; // Your actual patient ID (0001,0002,...)
+$patient_id = $_SESSION['patient_id'];
 
-/* ---------------------------------------
-   FIX 2: Use correct column name
-   appointment_id instead of id
---------------------------------------- */
 try {
     $stmt = $pdo->prepare("
         SELECT 
@@ -33,9 +25,13 @@ try {
         WHERE patient_id = :patient_id
         ORDER BY date DESC
     ");
-
     $stmt->execute([':patient_id' => $patient_id]);
     $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Add 'id' key for JS compatibility
+    foreach ($appointments as &$appt) {
+        $appt['id'] = $appt['appointment_id'];
+    }
 
     echo json_encode([
         "status" => "success",
