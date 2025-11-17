@@ -3,8 +3,8 @@ header('Content-Type: application/json');
 session_start();
 require __DIR__ . '/../db.php';
 
-// ADMIN ONLY
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+// ADMIN ONLY (FIXED)
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     http_response_code(403);
     echo json_encode(['status'=>'error','message'=>'forbidden']);
     exit;
@@ -33,7 +33,7 @@ try {
         ':id'     => $id
     ]);
 
-    // 2. GET APPOINTMENT + USER INFO (FIXED JOIN)
+    // 2. GET APPOINTMENT INFO
     $stmt2 = $pdo->prepare("
         SELECT 
             a.appointment_id,
@@ -57,30 +57,21 @@ try {
         exit;
     }
 
-    // IF COMPLETED → create folder + file
+    // 3. CREATE RECORD FILE IF COMPLETED
     if ($status === 'Completed') {
 
-        // folder name: PTN-0001_Florence_T_Ayen
         $nameClean = preg_replace('/[^A-Za-z0-9_\- ]/', '', $appt['full_name']);
         $folderName = $appt['patient_id'] . "_" . str_replace(" ", "_", $nameClean);
 
         $baseDir = dirname(__DIR__) . '/patient_records';
-
-        if (!is_dir($baseDir)) {
-            mkdir($baseDir, 0777, true);
-        }
+        if (!is_dir($baseDir)) mkdir($baseDir, 0777, true);
 
         $patientDir = $baseDir . '/' . $folderName;
+        if (!is_dir($patientDir)) mkdir($patientDir, 0777, true);
 
-        if (!is_dir($patientDir)) {
-            mkdir($patientDir, 0777, true);
-        }
-
-        // file path
         $txtPath = $patientDir . "/appointment_" . $appt['appointment_id'] . ".txt";
 
-        // txt content
-        $content = 
+        $content =
 "===== COMPLETED APPOINTMENT =====
 Appointment ID : {$appt['appointment_id']}
 Patient ID     : {$appt['patient_id']}
