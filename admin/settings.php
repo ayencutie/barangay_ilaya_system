@@ -15,7 +15,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Settings — Barangay Ilaya</title>
 
-    <link rel="stylesheet" href="css/theme.css">
+
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/settings.css">
