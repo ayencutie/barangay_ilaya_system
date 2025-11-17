@@ -1,0 +1,93 @@
+/* ============================================
+   FIXED COLOR VARIABLES (NO DARK MODE)
+============================================ */
+:root {
+  --sidebar-bg: #009900;
+  --sidebar-text: #ffffff;
+  --sidebar-hover: rgba(0, 0, 0, 0.20);
+  --sidebar-active: rgba(0, 0, 0, 0.30);
+
+  --bg: #ffffff;
+  --text: #222;
+}
+
+
+/* ============================================
+   SIDEBAR CONTAINER
+============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100vh;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  color: var(--sidebar-text);
+  font-family: "Segoe UI", sans-serif;
+}
+
+
+/* ============================================
+   SIDEBAR TITLE / LOGO
+============================================ */
+.sidebar h2 {
+  text-align: center;
+  width: 100%;
+  margin: 10px 0 25px;
+  font-size: 23px;
+  font-weight: 700;
+  color: var(--sidebar-text);
+}
+
+
+/* ============================================
+   MENU LIST
+============================================ */
+.sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar ul li {
+  width: 100%;
+}
+
+.sidebar ul li a {
+  display: block;
+  padding: 14px 28px;
+  font-size: 17px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--sidebar-text);
+  transition: 0.25s ease;
+}
+
+
+/* Hover */
+.sidebar ul li a:hover {
+  background: var(--sidebar-hover);
+  padding-left: 38px; /* slight slide effect */
+}
+
+
+/* Active Page */
+.sidebar ul li a.active {
+  background: var(--sidebar-active);
+  font-weight: 700;
+}
+
+
+/* ============================================
+   MAIN CONTENT PUSH RIGHT
+============================================ */
+.main,
+.main-content,
+.settings-wrapper {
+  margin-left: 250px !important;
+}

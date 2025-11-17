@@ -9,17 +9,21 @@ if (!isset($_SESSION['patient_id'])) {
 }
 
 $input = json_decode(file_get_contents('php://input'), true);
-$id = $input['id'] ?? null;
+$appointment_id = $input['id'] ?? null;
 
-if(!$id){
+if(!$appointment_id){
     echo json_encode(["status"=>"error","message"=>"Invalid request."]);
     exit();
 }
 
 try {
-    $stmt = $pdo->prepare("UPDATE appointments SET status='Cancelled' WHERE id=:id AND patient_id=:pid");
+    $stmt = $pdo->prepare("
+        UPDATE appointments 
+        SET status='Cancelled' 
+        WHERE appointment_id=:appointment_id AND patient_id=:pid
+    ");
     $stmt->execute([
-        ':id'=>$id,
+        ':appointment_id'=>$appointment_id,
         ':pid'=>$_SESSION['patient_id']
     ]);
 

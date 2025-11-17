@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 5
+Patient ID     : PTN-0002
+Patient Name   : Jackie Ayen
+Service        : Family Planning
+Date           : 2025-11-17
+Time           : 4:30 PM - 4:40 PM
+Status         : Completed
+=================================

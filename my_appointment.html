@@ -81,236 +81,263 @@
     </div>
   </div>
 
-  <script>
-    // NAVBAR DROPDOWN
-    const menuButton = document.getElementById('menuButton');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    menuButton.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
-    window.addEventListener('click', (e) => {
-      if(!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)){
-        dropdownMenu.classList.remove('show');
-      }
-    });
-
-    // GLOBAL VARIABLES
-    let appointments = [];
-    let editingAppointmentId = null;
-    let selectedTimeSlot = "";
-
-    const servicesList = [
-      "Immunization",
-      "Medical Certificate",
-      "Pre Natal / Post Natal",
-      "Diagnostic",
-      "Outpatient Consultation",
-      "Death Certificate / Burial",
-      "Greencard / Hospitalization",
-      "Dental Care",
-      "Family Planning"
-    ];
-
-    const editService = document.getElementById('editService');
-    const editDay = document.getElementById('editDay');
-    const editMonth = document.getElementById('editMonth');
-    const editYear = document.getElementById('editYear');
-    const editTimeGrid = document.getElementById('editTimeGrid');
-    const editModal = document.getElementById('editModal');
-    const saveEditBtn = document.getElementById('saveEditBtn');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-
-    // FILL SERVICE SELECT
-    servicesList.forEach(s => {
-      const option = document.createElement('option');
-      option.value = s;
-      option.textContent = s;
-      editService.appendChild(option);
-    });
-
-    // DATE SELECTORS
-    const today = new Date();
-    const currentDay = today.getDate();
-    const currentMonth = today.getMonth() + 1;
-    const currentYear = today.getFullYear();
-
-    // Day (1-31)
-    for(let d=1; d<=31; d++){
-      const opt = document.createElement('option');
-      opt.value = d;
-      opt.textContent = d;
-      if(d === currentDay) opt.selected = true;
-      editDay.appendChild(opt);
+<script>
+  // NAVBAR DROPDOWN
+  const menuButton = document.getElementById('menuButton');
+  const dropdownMenu = document.getElementById('dropdownMenu');
+  menuButton.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
+  window.addEventListener('click', (e) => {
+    if(!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)){
+      dropdownMenu.classList.remove('show');
     }
+  });
 
-    // Month (1-12)
-    const months = [
-      "January","February","March","April","May","June",
-      "July","August","September","October","November","December"
-    ];
-    months.forEach((m,i)=>{
-      const opt = document.createElement('option');
-      opt.value = i+1;
-      opt.textContent = m;
-      if(i+1 === currentMonth) opt.selected = true;
-      editMonth.appendChild(opt);
-    });
+  // GLOBAL VARIABLES
+  let appointments = [];
+  let editingAppointmentId = null;
+  let selectedTimeSlot = "";
 
-    // Year (current year only)
-    const optYear = document.createElement('option');
-    optYear.value = currentYear;
-    optYear.textContent = currentYear;
-    editYear.appendChild(optYear);
-    editYear.value = currentYear;
+  const servicesList = [
+    "Immunization",
+    "Medical Certificate",
+    "Pre Natal / Post Natal",
+    "Diagnostic",
+    "Outpatient Consultation",
+    "Death Certificate / Burial",
+    "Greencard / Hospitalization",
+    "Dental Care",
+    "Family Planning"
+  ];
 
-    // TIME SLOT GRID GENERATOR
-    function generateTimeGrid(container, selected="") {
-      container.innerHTML = '';
-      const start = 8*60, end = 17*60; // 8:00 AM to 5:00 PM
-      for(let t=start; t<end; t+=10){
-        const h = Math.floor(t/60), m = t%60;
-        const nh = Math.floor((t+10)/60), nm = (t+10)%60;
-        const fmt = (h,m)=>{
-          const s = h>=12?"PM":"AM";
-          const hr = h%12||12;
-          return `${hr}:${m.toString().padStart(2,"0")} ${s}`;
-        };
-        const div = document.createElement('div');
-        div.className = "time-slot";
-        div.textContent = `${fmt(h,m)} - ${fmt(nh,nm)}`;
-        if(div.textContent === selected) div.classList.add('selected');
-        div.addEventListener('click', () => {
-          container.querySelectorAll('.time-slot').forEach(ts=>ts.classList.remove('selected'));
-          div.classList.add('selected');
-          selectedTimeSlot = div.textContent;
-        });
-        container.appendChild(div);
-      }
+  const editService = document.getElementById('editService');
+  const editDay = document.getElementById('editDay');
+  const editMonth = document.getElementById('editMonth');
+  const editYear = document.getElementById('editYear');
+  const editTimeGrid = document.getElementById('editTimeGrid');
+  const editModal = document.getElementById('editModal');
+  const saveEditBtn = document.getElementById('saveEditBtn');
+  const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+  // FILL SERVICE SELECT
+  servicesList.forEach(s => {
+    const option = document.createElement('option');
+    option.value = s;
+    option.textContent = s;
+    editService.appendChild(option);
+  });
+
+  // DATE SELECTORS
+  const today = new Date();
+  const currentDay = today.getDate();
+  const currentMonth = today.getMonth() + 1;
+  const currentYear = today.getFullYear();
+
+  for(let d=1; d<=31; d++){
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = d;
+    if(d === currentDay) opt.selected = true;
+    editDay.appendChild(opt);
+  }
+
+  const months = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+  ];
+  months.forEach((m,i)=>{
+    const opt = document.createElement('option');
+    opt.value = i+1;
+    opt.textContent = m;
+    if(i+1 === currentMonth) opt.selected = true;
+    editMonth.appendChild(opt);
+  });
+
+  const optYear = document.createElement('option');
+  optYear.value = currentYear;
+  optYear.textContent = currentYear;
+  editYear.appendChild(optYear);
+  editYear.value = currentYear;
+
+  // TIME SLOT GRID
+  function generateTimeGrid(container, selected="") {
+    container.innerHTML = '';
+    const start = 8*60, end = 17*60;
+    for(let t=start; t<end; t+=10){
+      const h = Math.floor(t/60), m = t%60;
+      const nh = Math.floor((t+10)/60), nm = (t+10)%60;
+      const fmt = (h,m)=> {
+        const s = h>=12?"PM":"AM";
+        const hr = h%12||12;
+        return `${hr}:${m.toString().padStart(2,"0")} ${s}`;
+      };
+      const div = document.createElement('div');
+      div.className = "time-slot";
+      div.textContent = `${fmt(h,m)} - ${fmt(nh,nm)}`;
+      if(div.textContent === selected) div.classList.add('selected');
+      div.addEventListener('click', () => {
+        container.querySelectorAll('.time-slot').forEach(ts=>ts.classList.remove('selected'));
+        div.classList.add('selected');
+        selectedTimeSlot = div.textContent;
+      });
+      container.appendChild(div);
     }
+  }
 
-    // LOAD APPOINTMENTS
-    async function loadAppointments() {
-      const tbody = document.querySelector('#appointmentsTable tbody');
-      tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
-      try {
-        const res = await fetch('php/my_appointment.php');
-        const data = await res.json();
-        if(data.status !== 'success'){
-          tbody.innerHTML = `<tr><td colspan="5">${data.message || 'Failed to load appointments.'}</td></tr>`;
-          return;
-        }
-        appointments = data.appointments;
-        if(!appointments.length){
-          tbody.innerHTML = '<tr><td colspan="5">No appointments booked yet.</td></tr>';
-          return;
-        }
-        tbody.innerHTML = '';
-        appointments.forEach(a => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${a.service}</td>
-            <td>${a.date}</td>
-            <td>${a.time_slot}</td>
-            <td data-status="${a.status}">${a.status}</td>
-            <td></td>
-          `;
-          tbody.appendChild(tr);
-          const actionsTd = tr.querySelector('td:last-child');
-          if(a.status !== 'Cancelled'){
-            const editBtn = document.createElement('button');
-            editBtn.textContent = "Edit";
-            editBtn.classList.add('edit-btn');
-            editBtn.addEventListener('click', () => openEditModal(a.id));
-            const cancelBtn = document.createElement('button');
-            cancelBtn.textContent = "Cancel";
-            cancelBtn.classList.add('cancel-btn');
-            cancelBtn.addEventListener('click', () => cancelAppointment(a.id));
-            actionsTd.appendChild(editBtn);
-            actionsTd.appendChild(cancelBtn);
-          }
-        });
-      } catch(err){
-        console.error(err);
-        tbody.innerHTML = '<tr><td colspan="5">⚠️ Error loading appointments.</td></tr>';
-      }
-    }
-
-    loadAppointments();
-
-    // OPEN EDIT MODAL
-    function openEditModal(id){
-      editingAppointmentId = id;
-      const appt = appointments.find(a => a.id === id);
-      if(!appt) return;
-
-      editService.value = appt.service;
-
-      // Set date selectors
-      const [year, month, day] = appt.date.split('-').map(Number);
-      editYear.value = year;
-      editMonth.value = month;
-      editDay.value = day;
-
-      selectedTimeSlot = appt.time_slot;
-      generateTimeGrid(editTimeGrid, selectedTimeSlot);
-      editModal.style.display = 'flex';
-    }
-
-    // SAVE EDIT
-    saveEditBtn.addEventListener('click', async () => {
-      if(!editingAppointmentId || !selectedTimeSlot || !editService.value || !editDay.value || !editMonth.value || !editYear.value){
-        alert("Please select service, date, and time slot.");
+  // LOAD APPOINTMENTS
+  async function loadAppointments() {
+    const tbody = document.querySelector('#appointmentsTable tbody');
+    tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+    try {
+      const res = await fetch('php/my_appointment.php');
+      const data = await res.json();
+      if(data.status !== 'success'){
+        tbody.innerHTML = `<tr><td colspan="5">${data.message || 'Failed to load appointments.'}</td></tr>`;
         return;
       }
-      const formattedDate = `${editYear.value}-${String(editMonth.value).padStart(2,'0')}-${String(editDay.value).padStart(2,'0')}`;
-      const payload = {
-        id: editingAppointmentId,
-        service: editService.value,
-        date: formattedDate,
-        time_slot: selectedTimeSlot
-      };
-      try {
-        const res = await fetch('php/edit_appointment.php', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if(data.status === 'success'){
-          alert("✅ Appointment updated!");
-          editModal.style.display = 'none';
-          loadAppointments();
-        } else {
-          alert("❌ "+data.message);
-        }
-      } catch(err){
-        console.error(err);
-        alert("⚠️ Server error.");
+      appointments = data.appointments;
+      if(!appointments.length){
+        tbody.innerHTML = '<tr><td colspan="5">No appointments booked yet.</td></tr>';
+        return;
       }
-    });
+      tbody.innerHTML = '';
+      appointments.forEach(a => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${a.service}</td>
+          <td>${a.date}</td>
+          <td>${a.time_slot}</td>
+          <td data-status="${a.status}">${a.status}</td>
+          <td></td>
+        `;
+        tbody.appendChild(tr);
+        const actionsTd = tr.querySelector('td:last-child');
 
-    // CLOSE MODAL
-    cancelEditBtn.addEventListener('click', () => editModal.style.display='none');
-
-    // CANCEL APPOINTMENT
-    async function cancelAppointment(id){
-      if(!confirm("Are you sure you want to cancel this appointment?")) return;
-      try {
-        const res = await fetch('php/cancel_appointment.php', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({id})
-        });
-        const data = await res.json();
-        if(data.status === 'success'){
-          alert("✅ Appointment cancelled!");
-          loadAppointments();
-        } else {
-          alert("❌ "+data.message);
+        // STATUS COLOR
+        const statusTd = tr.querySelector('td[data-status]');
+        switch(a.status){
+          case 'Pending': statusTd.style.color='orange'; break;
+          case 'Approved': statusTd.style.color='green'; break;
+          case 'Completed': statusTd.style.color='blue'; break;
+          case 'Cancelled': statusTd.style.color='red'; break;
+          case 'Missed': statusTd.style.color='gray'; break;
         }
-      } catch(err){
-        console.error(err);
-        alert("⚠️ Server error.");
-      }
+
+        // EDIT BUTTON
+        const editBtn = document.createElement('button');
+        editBtn.textContent = "Edit";
+        editBtn.classList.add('edit-btn');
+        if(['Completed','Cancelled','Missed'].includes(a.status)){
+          editBtn.disabled = true;
+          editBtn.style.opacity = 0.5;
+          editBtn.title = "Cannot edit this appointment";
+        } else {
+          editBtn.addEventListener('click', () => openEditModal(a.id));
+        }
+
+        // CANCEL BUTTON
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = "Cancel";
+        cancelBtn.classList.add('cancel-btn');
+        if(!['Completed','Cancelled','Missed'].includes(a.status)){
+          cancelBtn.addEventListener('click', () => cancelAppointment(a.id));
+        } else {
+          cancelBtn.disabled = true;
+          cancelBtn.style.opacity = 0.5;
+        }
+
+        actionsTd.appendChild(editBtn);
+        actionsTd.appendChild(cancelBtn);
+      });
+    } catch(err){
+      console.error(err);
+      tbody.innerHTML = '<tr><td colspan="5">⚠️ Error loading appointments.</td></tr>';
     }
-  </script>
+  }
+
+  loadAppointments();
+
+  // OPEN EDIT MODAL
+  function openEditModal(id){
+    const appt = appointments.find(a => a.id === id);
+    if(!appt) return;
+    // Double check: do not allow edit if Completed, Cancelled, Missed
+    if(['Completed','Cancelled','Missed'].includes(appt.status)){
+      alert("❌ Cannot edit this appointment.");
+      return;
+    }
+
+    editingAppointmentId = id;
+    editService.value = appt.service;
+
+    const [year, month, day] = appt.date.split('-').map(Number);
+    editYear.value = year;
+    editMonth.value = month;
+    editDay.value = day;
+
+    selectedTimeSlot = appt.time_slot;
+    generateTimeGrid(editTimeGrid, selectedTimeSlot);
+    editModal.style.display = 'flex';
+  }
+
+  // SAVE EDIT
+  saveEditBtn.addEventListener('click', async () => {
+    if(!editingAppointmentId || !selectedTimeSlot || !editService.value || !editDay.value || !editMonth.value || !editYear.value){
+      alert("Please select service, date, and time slot.");
+      return;
+    }
+    const formattedDate = `${editYear.value}-${String(editMonth.value).padStart(2,'0')}-${String(editDay.value).padStart(2,'0')}`;
+    const payload = {
+      id: editingAppointmentId,
+      service: editService.value,
+      date: formattedDate,
+      time_slot: selectedTimeSlot,
+      status: 'Pending' // reset status to Pending
+    };
+    try {
+      const res = await fetch('php/edit_appointment.php', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if(data.status === 'success'){
+        alert("✅ Appointment updated! Status reset to Pending.");
+        editModal.style.display = 'none';
+        loadAppointments();
+      } else {
+        alert("❌ "+data.message);
+      }
+    } catch(err){
+      console.error(err);
+      alert("⚠️ Server error.");
+    }
+  });
+
+  // CLOSE MODAL
+  cancelEditBtn.addEventListener('click', () => editModal.style.display='none');
+
+  // CANCEL APPOINTMENT
+  async function cancelAppointment(id){
+    if(!confirm("Are you sure you want to cancel this appointment?")) return;
+    try {
+      const res = await fetch('php/cancel_appointment.php', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({id})
+      });
+      const data = await res.json();
+      if(data.status === 'success'){
+        alert("✅ Appointment cancelled!");
+        loadAppointments();
+      } else {
+        alert("❌ "+data.message);
+      }
+    } catch(err){
+      console.error(err);
+      alert("⚠️ Server error.");
+    }
+  }
+</script>
+
 </body>
 </html>

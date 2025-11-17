@@ -9,25 +9,27 @@ if (!isset($_SESSION['patient_id'])) {
 }
 
 $input = json_decode(file_get_contents('php://input'), true);
-$id = $input['id'] ?? null;
+$appointment_id = $input['id'] ?? null; // <-- rename
 $service = trim($input['service'] ?? '');
 $date = $input['date'] ?? '';
 $time_slot = trim($input['time_slot'] ?? '');
 
-if(!$id || !$service || !$date || !$time_slot){
+if(!$appointment_id || !$service || !$date || !$time_slot){
     echo json_encode(["status"=>"error","message"=>"All fields are required."]);
     exit();
 }
 
 try {
-    $stmt = $pdo->prepare("UPDATE appointments 
-                           SET service=:service, date=:date, time_slot=:time_slot 
-                           WHERE id=:id AND patient_id=:pid AND status!='Cancelled'");
+    $stmt = $pdo->prepare("
+        UPDATE appointments 
+        SET service=:service, date=:date, time_slot=:time_slot, status='Pending'
+        WHERE appointment_id=:appointment_id AND patient_id=:pid AND status!='Cancelled'
+    ");
     $stmt->execute([
         ':service'=>$service,
         ':date'=>$date,
         ':time_slot'=>$time_slot,
-        ':id'=>$id,
+        ':appointment_id'=>$appointment_id,
         ':pid'=>$_SESSION['patient_id']
     ]);
 

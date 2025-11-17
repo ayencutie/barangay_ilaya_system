@@ -1,0 +1,251 @@
+/* admin/css/reports.css - professional, print-friendly */
+:root{
+  --accent:#0b7b5c;
+  --muted:#666;
+  --card-bg:#fff;
+  --shadow:0 6px 20px rgba(11,123,92,0.08);
+  --soft:#f6f7fb;
+  --accent-2:#1aa37a;
+  --danger:#e74c3c;
+  --radius:12px;
+  --mono:"Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;
+}
+
+*{box-sizing:border-box;}
+body{
+  font-family:var(--mono);
+  margin:0;
+  background:var(--soft);
+  color:#222;
+}
+
+/* main layout */
+.main{
+  margin-left:230px;
+  padding:28px 32px;
+  min-height:100vh;
+}
+
+/* header */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  margin-bottom:18px;
+}
+.header h1{
+  margin:0;
+  color:var(--accent);
+  font-size:22px;
+}
+.header-controls{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.search{
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid #e6e6e6;
+  width:320px;
+}
+
+/* summary grid */
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;
+  margin-bottom:18px;
+}
+.card.summary{
+  background:var(--card-bg);
+  padding:18px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.card.summary h4{
+  margin:0;
+  font-size:13px;
+  color:var(--muted);
+  font-weight:700;
+}
+.card .big{
+  font-size:32px;
+  color:var(--accent);
+  font-weight:800;
+  margin-top:8px;
+}
+.card .meta{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:13px;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+/* print selection */
+.print-selection{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+}
+.print-selection label{
+  font-size:13px;
+  color:#333;
+}
+
+/* report sections */
+.report-section{
+  background:var(--card-bg);
+  padding:16px;
+  border-radius:12px;
+  box-shadow:var(--shadow);
+  margin-bottom:18px;
+}
+.report-section h2{
+  margin:0 0 12px 0;
+  color:#0b7b5c;
+}
+
+/* tables */
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+  background:#fff;
+}
+table.striped thead th{
+  background:#f9f9f9;
+  font-weight:700;
+  padding:10px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+}
+table.striped tbody td{
+  padding:10px;
+  border-bottom:1px solid #f3f3f3;
+}
+table.striped tbody tr:nth-child(even){
+  background:#fcfdfc;
+}
+
+/* demographics */
+.demographics{
+  display:flex;
+  gap:16px;
+}
+.dem-box{
+  flex:1;
+}
+.small{
+  font-size:13px;
+}
+
+/* buttons */
+.btn{
+  background:var(--accent-2);
+  color:#fff;
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+}
+.btn:hover{
+  opacity:.95;
+}
+
+/* PRINT HEADER (HIDDEN ON SCREEN) */
+.print-header{
+  display:none;
+  text-align:center;
+  margin-bottom:18px;
+}
+.print-header img{
+  width:110px;
+  margin-bottom:6px;
+}
+.print-header-text h2{
+  margin:0;
+  font-size:20px;
+  font-weight:700;
+}
+.print-header-text p{
+  margin:0;
+  font-size:13px;
+  color:#444;
+}
+
+/* responsive */
+@media(max-width:900px){
+  .main{
+    margin-left:0;
+    padding:16px;
+  }
+  .demographics{
+    flex-direction:column;
+  }
+  .header-controls{
+    flex-direction:column;
+    gap:8px;
+  }
+}
+
+/* =============================== */
+/* PRINT MODE — PROFESSIONAL STYLE */
+/* =============================== */
+@media print{
+
+  body{
+    background:#fff !important;
+  }
+
+  /* show header only on print */
+  .print-header{
+    display:block !important;
+  }
+
+  /* hide UI */
+  .sidebar,
+  .header-controls,
+  .print-selection,
+  .btn{
+    display:none !important;
+  }
+
+  /* main */
+  .main{
+    margin:0 !important;
+    padding:12mm !important;
+    width:100% !important;
+  }
+
+  /* MS WORD style table */
+  table{
+    font-size:12pt !important;
+    border:1px solid #000 !important;
+  }
+  table th, table td{
+    border:1px solid #000 !important;
+    padding:6px !important;
+  }
+  table th{
+    background:#e6e6e6 !important;
+  }
+
+  .summary-grid,
+  .report-section{
+    box-shadow:none !important;
+    border-radius:0 !important;
+    page-break-inside:avoid;
+  }
+
+  @page{
+    size:A4;
+    margin:12mm;
+  }
+}

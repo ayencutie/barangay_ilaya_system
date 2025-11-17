@@ -4,6 +4,7 @@ ini_set('display_errors', 1);
 require 'db.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
     $last_name = trim($_POST['last_name']);
     $first_name = trim($_POST['first_name']);
     $middle_initial = trim($_POST['middle_initial']);
@@ -17,11 +18,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
+    // --- Capitalize names automatically ---
+    $first_name = ucfirst(strtolower($first_name));
+    $last_name = ucwords(strtolower($last_name)); // capitalize all words, e.g., "De la Cruz"
+    $middle_initial = strtoupper($middle_initial);
+
+    // Validate password match
     if ($password !== $confirm_password) {
         echo "<script>alert('Passwords do not match!'); window.history.back();</script>";
         exit();
     }
 
+    // Validate phone format
     if (!preg_match('/^09\d{9}$/', $phone)) {
         echo "<script>alert('Invalid phone number! Must start with 09 and be 11 digits.'); window.history.back();</script>";
         exit();
@@ -30,46 +38,56 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
     try {
-        // check email
+        // Check for duplicate email
         $stmt = $pdo->prepare("SELECT patient_id FROM users WHERE email = ?");
         $stmt->execute([$email]);
-        if ($stmt->fetch()) { 
-            echo "<script>alert('Email already registered!'); window.history.back();</script>"; exit(); 
+        if ($stmt->fetch()) {
+            echo "<script>alert('Email already registered!'); window.history.back();</script>";
+            exit();
         }
 
-        // check phone
+        // Check for duplicate phone
         $stmt = $pdo->prepare("SELECT patient_id FROM users WHERE phone = ?");
         $stmt->execute([$phone]);
-        if ($stmt->fetch()) { 
-            echo "<script>alert('Phone number already registered!'); window.history.back();</script>"; exit(); 
+        if ($stmt->fetch()) {
+            echo "<script>alert('Phone number already registered!'); window.history.back();</script>";
+            exit();
         }
 
-        // generate patient_id
-        $stmt = $pdo->query("SELECT patient_id FROM users ORDER BY patient_id DESC LIMIT 1");
+        // Check for duplicate full name
+        $stmt = $pdo->prepare("SELECT patient_id FROM users WHERE first_name=? AND middle_initial=? AND last_name=?");
+        $stmt->execute([$first_name, $middle_initial, $last_name]);
+        if ($stmt->fetch()) {
+            echo "<script>alert('Full name already registered!'); window.history.back();</script>";
+            exit();
+        }
+
+        // Generate patient_id automatically: PTN-0001, PTN-0002, ...
+        $stmt = $pdo->query("SELECT MAX(CAST(SUBSTRING(patient_id, 5) AS UNSIGNED)) FROM users");
         $lastPatient = $stmt->fetchColumn();
         $nextNum = $lastPatient ? intval($lastPatient) + 1 : 1;
-        $patient_id = str_pad($nextNum, 4, "0", STR_PAD_LEFT);
+        $patient_id = 'PTN-' . str_pad($nextNum, 4, "0", STR_PAD_LEFT);
 
-        // insert
+        // Insert new user
         $sql = "INSERT INTO users 
                 (patient_id, first_name, middle_initial, last_name, address, birthdate, gender, phone, email, password)
                 VALUES 
                 (:patient_id, :first_name, :middle_initial, :last_name, :address, :birthdate, :gender, :phone, :email, :password)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':patient_id'=>$patient_id,
-            ':first_name'=>$first_name,
-            ':middle_initial'=>$middle_initial,
-            ':last_name'=>$last_name,
-            ':address'=>$address,
-            ':birthdate'=>$birthdate,
-            ':gender'=>$gender,
-            ':phone'=>$phone,
-            ':email'=>$email,
-            ':password'=>$hashed_password
+            ':patient_id' => $patient_id,
+            ':first_name' => $first_name,
+            ':middle_initial' => $middle_initial,
+            ':last_name' => $last_name,
+            ':address' => $address,
+            ':birthdate' => $birthdate,
+            ':gender' => $gender,
+            ':phone' => $phone,
+            ':email' => $email,
+            ':password' => $hashed_password
         ]);
 
-        echo "<script>alert('Account created successfully!'); window.location='../login.php';</script>";
+        echo "<script>alert('Account created successfully! Your Patient ID is $patient_id'); window.location='../login.php';</script>";
 
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
