@@ -118,8 +118,8 @@ td, tr {
 }
 
 .status-Pending { background: #fff4e5; color: #f39c12; }
-.status-Approved { background: #e9fff2; color: #0b7b5c; }
-.status-Completed { background: #dff0ff; color: #0b7b5c; }
+.status-Approved { background: #e9fff2; color: #009900; }
+.status-Completed { background: #dff0ff; color: #009900; }
 .status-Missed { background: #fff0f0; color: #d35400; }
 .status-Cancelled { background: #ffecec; color: #b30000; }
 

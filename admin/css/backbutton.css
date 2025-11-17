@@ -1,0 +1,17 @@
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 16px;
+    background: #0b7d32;
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.back-link:hover {
+    background: #096428;
+    transform: translateX(-3px);
+}

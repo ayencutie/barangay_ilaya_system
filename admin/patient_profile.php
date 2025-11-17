@@ -9,7 +9,7 @@ if (!$patient_id) {
     exit; 
 }
 
-// Fetch patient using patient_id (NOT user_id)
+// Fetch patient info
 $stmt = $pdo->prepare("
     SELECT patient_id, first_name, middle_initial, last_name, user_role
     FROM users 
@@ -19,7 +19,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$patient_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Redirect if no user OR user role is not patient
+// Redirect if invalid patient
 if (!$user || $user['user_role'] !== 'patient') {
     header('Location: patients.php');
     exit;
@@ -33,10 +33,9 @@ $full_name = trim(
     $user['last_name']
 );
 
-// BASE directory for saved records
+// ----------- LOAD SAVED FILES (Completed Appointments Only) -----------
 $base = dirname(__DIR__) . '/patient_records';
 
-// Find folder with pattern: patientID_*
 $folder = null;
 foreach (glob($base . '/' . $patient_id . '_*') as $dir) {
     if (is_dir($dir)) {
@@ -49,13 +48,23 @@ $files = [];
 if ($folder && is_dir($folder)) {
     $raw = array_diff(scandir($folder), ['.','..']);
 
-    // Sort by newest
     usort($raw, function($a, $b) use ($folder){
         return filemtime("$folder/$b") - filemtime("$folder/$a");
     });
 
     $files = $raw;
 }
+
+// ----------- LOAD COMPLETED APPOINTMENTS ONLY -----------
+$appt = $pdo->prepare("
+    SELECT appointment_id, service, date, time_slot, status
+    FROM appointments
+    WHERE patient_id = ?
+      AND status = 'completed'
+    ORDER BY appointment_id DESC
+");
+$appt->execute([$patient_id]);
+$appointments = $appt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!doctype html>
 <html lang="en">
@@ -63,9 +72,25 @@ if ($folder && is_dir($folder)) {
   <meta charset="utf-8" />
   <title>Patient Profile — <?= htmlspecialchars($patient_id) ?></title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="css/backbutton.css">
   <link rel="stylesheet" href="css/sidebar.css">
   <link rel="stylesheet" href="css/patients.css">
+
+  <style>
+    .appt-table { width:100%; border-collapse: collapse; margin-top:20px; }
+    .appt-table th, .appt-table td {
+        padding:12px; border-bottom:1px solid #ddd;
+        text-align:left; font-size:15px;
+    }
+    .status-badge {
+        padding:5px 10px; border-radius:5px;
+        font-weight:bold; font-size:12px;
+        color:#fff;
+    }
+    .completed { background:#2980b9; }
+  </style>
 </head>
+
 <body>
   <aside class="sidebar">
     <h2>Barangay Ilaya</h2>
@@ -82,7 +107,7 @@ if ($folder && is_dir($folder)) {
 
   <main class="main">
     <div class="record" style="padding:28px;">
-      <a href="patients.php">← Back to Patients</a>
+      <a href="patients.php" class="back-link">← Back to Patients</a>
 
       <div class="profile-card">
         <h2>Patient</h2>
@@ -90,25 +115,39 @@ if ($folder && is_dir($folder)) {
         <p><strong>Patient ID:</strong> <?= htmlspecialchars($user['patient_id']) ?></p>
       </div>
 
-      <div class="profile-card files-list">
-        <h3>Completed Appointments (Saved Files)</h3>
-        
-        <?php if (count($files)): ?>
-          <ul>
-            <?php foreach($files as $f): ?>
-              <li>
-                <span><?= htmlspecialchars($f) ?></span>
-                <span class="file-actions">
-                  <a href="../php/admin/serve_patient_file.php?patient=<?= urlencode($patient_id) ?>&file=<?= urlencode($f) ?>" target="_blank">View</a>
-                  <a href="../php/admin/serve_patient_file.php?patient=<?= urlencode($patient_id) ?>&file=<?= urlencode($f) ?>&download=1">Download</a>
-                </span>
-              </li>
+
+
+      <!-- COMPLETED APPOINTMENT HISTORY -->
+      <div class="profile-card">
+        <h3>Completed Appointment History</h3>
+
+        <?php if (count($appointments)): ?>
+          <table class="appt-table">
+            <tr>
+              <th>Service</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+            </tr>
+
+            <?php foreach ($appointments as $a): ?>
+              <tr>
+                <td><?= htmlspecialchars($a['service']) ?></td>
+                <td><?= htmlspecialchars($a['date']) ?></td>
+                <td><?= htmlspecialchars($a['time_slot']) ?></td>
+                <td>
+                  <span class="status-badge completed">
+                    Completed
+                  </span>
+                </td>
+              </tr>
             <?php endforeach; ?>
-          </ul>
+          </table>
         <?php else: ?>
-          <p><em>No completed appointment files yet.</em></p>
+          <p><em>No completed appointments yet.</em></p>
         <?php endif; ?>
       </div>
+
     </div>
   </main>
 </body>

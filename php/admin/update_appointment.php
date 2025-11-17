@@ -3,26 +3,32 @@ header('Content-Type: application/json');
 session_start();
 require __DIR__ . '/../db.php';
 
-// ADMIN ONLY (FIXED)
+// ================================
+// ADMIN AUTH CHECK
+// ================================
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     http_response_code(403);
-    echo json_encode(['status'=>'error','message'=>'forbidden']);
+    echo json_encode(['status' => 'error', 'message' => 'forbidden']);
     exit;
 }
 
-// GET JSON INPUT 
-$input  = json_decode(file_get_contents("php://input"), true);
+// ================================
+// READ JSON INPUT
+// ================================
+$input = json_decode(file_get_contents("php://input"), true);
 $id     = $input['id'] ?? null;
 $status = $input['status'] ?? null;
 
 if (!$id || !$status) {
-    echo json_encode(['status'=>'error','message'=>'missing fields']);
+    echo json_encode(['status' => 'error', 'message' => 'missing fields']);
     exit;
 }
 
 try {
 
-    // 1. UPDATE STATUS
+    // ============================
+    // 1. UPDATE APPOINTMENT STATUS
+    // ============================
     $stmt = $pdo->prepare("
         UPDATE appointments 
         SET status = :status
@@ -33,7 +39,9 @@ try {
         ':id'     => $id
     ]);
 
-    // 2. GET APPOINTMENT INFO
+    // ============================
+    // 2. FETCH FULL DETAILS
+    // ============================
     $stmt2 = $pdo->prepare("
         SELECT 
             a.appointment_id,
@@ -44,33 +52,50 @@ try {
             u.first_name,
             u.middle_initial,
             u.last_name,
-            CONCAT(u.first_name, ' ', u.last_name) AS full_name
+            CONCAT(
+                u.first_name, 
+                ' ',
+                u.middle_initial,
+                CASE WHEN u.middle_initial != '' AND u.middle_initial IS NOT NULL THEN '. ' ELSE '' END,
+                u.last_name
+            ) AS full_name
         FROM appointments a
         JOIN users u ON a.patient_id = u.patient_id
         WHERE a.appointment_id = :id
     ");
+
     $stmt2->execute([':id' => $id]);
     $appt = $stmt2->fetch(PDO::FETCH_ASSOC);
 
     if (!$appt) {
-        echo json_encode(['status'=>'error','message'=>'appointment not found']);
+        echo json_encode(['status' => 'error', 'message' => 'appointment not found']);
         exit;
     }
 
-    // 3. CREATE RECORD FILE IF COMPLETED
+    // ============================
+    // 3. CREATE RECORD FILE (IF COMPLETED)
+    // ============================
     if ($status === 'Completed') {
 
-        $nameClean = preg_replace('/[^A-Za-z0-9_\- ]/', '', $appt['full_name']);
-        $folderName = $appt['patient_id'] . "_" . str_replace(" ", "_", $nameClean);
+        // Clean full name
+        $cleanName = preg_replace('/[^A-Za-z0-9_\- ]/', '', $appt['full_name']);
 
+        // FINAL FOLDER NAME:
+        // EXAMPLE → PTN-0001_Florence_T_Ayen
+        $folderName = $appt['patient_id'] . "_" . str_replace(" ", "_", $cleanName);
+
+        // Directory base
         $baseDir = dirname(__DIR__) . '/patient_records';
         if (!is_dir($baseDir)) mkdir($baseDir, 0777, true);
 
+        // Create unique patient folder
         $patientDir = $baseDir . '/' . $folderName;
         if (!is_dir($patientDir)) mkdir($patientDir, 0777, true);
 
+        // File path
         $txtPath = $patientDir . "/appointment_" . $appt['appointment_id'] . ".txt";
 
+        // File content
         $content =
 "===== COMPLETED APPOINTMENT =====
 Appointment ID : {$appt['appointment_id']}
@@ -86,9 +111,15 @@ Status         : Completed
         file_put_contents($txtPath, $content);
     }
 
-    echo json_encode(['status'=>'success']);
+    // ============================
+    // SUCCESS RESPONSE
+    // ============================
+    echo json_encode(['status' => 'success']);
 
 } catch (Exception $e) {
-    echo json_encode(['status'=>'error','message'=>$e->getMessage()]);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => $e->getMessage()
+    ]);
 }
 ?>
