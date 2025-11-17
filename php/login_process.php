@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $dbPassword = $user['password'];
     $isValid = false;
 
-    // Bcrypt
+    // Bcrypt verify
     if (substr($dbPassword, 0, 4) === '$2y$') {
         if (password_verify($password, $dbPassword)) {
             $isValid = true;
@@ -45,19 +45,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    // 👉 SET CORRECT SESSION VARIABLES
-    $_SESSION['user_id'] = $user['patient_id'];  // used by _auth_admin.php
-    $_SESSION['role'] = $user['user_role'];       // used by _auth_admin.php
+    // ===========================================
+    // ✅ CORRECT SESSION VARIABLES
+    // ===========================================
+    $_SESSION['patient_id'] = $user['patient_id'];  // REQUIRED by patient pages
+    $_SESSION['user_id']    = $user['patient_id'];  // compatibility with admin auth
+    $_SESSION['role']       = $user['user_role'];
     $_SESSION['first_name'] = $user['first_name'];
-    $_SESSION['last_name'] = $user['last_name'];
+    $_SESSION['last_name']  = $user['last_name'];
 
-    // Admin redirect
+    // ===========================================
+    // Redirect Based on Role
+    // ===========================================
     if ($user['user_role'] === 'admin') {
         header("Location: ../admin/dashboard.php");
         exit;
     }
 
-    // Patient redirect
     header("Location: ../index.html");
     exit;
 }

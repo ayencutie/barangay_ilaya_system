@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 10
+Patient ID     : PTN-0003
+Patient Name   : Joshua P. Cardenas
+Service        : Greencard / Hospitalization
+Date           : 2025-11-18
+Time           : 8:20 AM - 8:30 AM
+Status         : Completed
+=================================
