@@ -320,6 +320,18 @@ pwdForm.addEventListener('submit', e=>{
     }
   });
 });
+
+// --- Navbar profile dropdown & dark-mode toggle (matches index.html behavior) ---
+(function(){
+  const btn = document.getElementById('navProfileBtn');
+  const dd = document.getElementById('navProfileDropdown');
+  btn && btn.addEventListener('click', function(e){ e.stopPropagation(); const open = dd ? dd.hidden : true; if(dd) dd.hidden = !open; btn.setAttribute('aria-expanded', String(!open)); });
+  window.addEventListener('click', ()=>{ if(dd) dd.hidden = true; btn && btn.setAttribute('aria-expanded','false'); });
+
+  // dark mode toggle (local only)
+  const toggle = document.getElementById('toggleDark');
+  toggle && toggle.addEventListener('click', ()=>{ document.body.classList.toggle('dark-mode'); });
+})();
 </script>
 </body>
 </html>
