@@ -38,13 +38,44 @@
     <h2>Account Settings</h2>
     <div id="messages"></div>
 
-    <div class="profile-list">
-      <div class="profile-item"><label>Patient ID</label><div id="patientId"></div></div>
-      <div class="profile-item"><label>Full Name</label><div id="name"></div></div>
-      <div class="profile-item"><label>Address</label><div id="address"></div></div>
-      <div class="profile-item"><label>Birthdate</label><div id="birthdate"></div></div>
-      <div class="profile-item"><label>Email</label><div id="email"></div></div>
-      <div class="profile-item"><label>Phone</label><div id="phone"></div></div>
+    <!-- PROFILE PICTURE SECTION -->
+    <div class="profile-picture-container">
+      <img id="profileImage" class="profile-picture" src="uploads/default_profile.png" alt="Profile Picture">
+      <div class="profile-picture-actions">
+        <button class="btn" onclick="document.getElementById('profileInput').click()">Change</button>
+        <button class="btn alt" id="removePic">Remove</button>
+      </div>
+      <form id="uploadProfileForm" enctype="multipart/form-data" style="display:none;">
+        <input type="file" id="profileInput" name="profile" accept="image/*">
+      </form>
+    </div>
+
+    <div class="profile-grid">
+      <div class="grid-row">
+        <div class="grid-col name-col">
+          <label class="field-label">Full Name <span id="patientId" class="patient-id-small"></span></label>
+          <div id="name" class="profile-value"></div>
+        </div>
+        <div class="grid-col address-col">
+          <label class="field-label">Address</label>
+          <div id="address" class="profile-value"></div>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-col">
+          <label class="field-label">Email</label>
+          <div id="email" class="profile-value"></div>
+        </div>
+        <div class="info-col">
+          <label class="field-label">Birthdate</label>
+          <div id="birthdate" class="profile-value"></div>
+        </div>
+        <div class="info-col">
+          <label class="field-label">Phone</label>
+          <div id="phone" class="profile-value"></div>
+        </div>
+      </div>
     </div>
 
     <div class="action-buttons">
@@ -52,22 +83,32 @@
       <button id="chgPassword" class="btn">Change Password</button>
     </div>
 
-    <!-- PHONE FORM -->
-    <form id="phoneForm" class="password-form" style="display:none;">
-      <h3>Change Phone Number</h3>
-      <input type="text" id="newPhone" placeholder="Enter new phone number" maxlength="11" required>
-      <input type="password" id="pwdForPhone" placeholder="Enter your password" required>
-      <button type="submit" class="btn">Save Phone</button>
-    </form>
+    <!-- Floating panels for change phone and change password (hidden by default) -->
+    <!-- Backdrop -->
+    <div id="panelBackdrop" class="panel-backdrop" style="display:none;"></div>
 
-    <!-- PASSWORD FORM -->
-    <form id="pwdForm" class="password-form" style="display:none;">
+    <!-- Phone Panel -->
+    <div id="phonePanel" class="floating-panel" style="display:none;" aria-hidden="true">
+      <button class="close-panel" id="closePhone" aria-label="Close">×</button>
+      <h3>Change Phone Number</h3>
+      <form id="phoneForm" class="password-form">
+        <input type="text" id="newPhone" placeholder="Enter new phone number" maxlength="11" required>
+        <input type="password" id="pwdForPhone" placeholder="Enter your password" required>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;"><button type="submit" class="btn">Save Phone</button></div>
+      </form>
+    </div>
+
+    <!-- Password Panel -->
+    <div id="pwdPanel" class="floating-panel" style="display:none;" aria-hidden="true">
+      <button class="close-panel" id="closePwd" aria-label="Close">×</button>
       <h3>Change Password</h3>
-      <input type="password" id="oldpwd" placeholder="Old password" required>
-      <input type="password" id="newpwd" placeholder="New password" required>
-      <input type="password" id="confirmpwd" placeholder="Confirm new password" required>
-      <button type="submit" class="btn">Save Password</button>
-    </form>
+      <form id="pwdForm" class="password-form">
+        <input type="password" id="oldpwd" placeholder="Old password" required>
+        <input type="password" id="newpwd" placeholder="New password" required>
+        <input type="password" id="confirmpwd" placeholder="Confirm new password" required>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;"><button type="submit" class="btn">Save Password</button></div>
+      </form>
+    </div>
   </div>
 </main>
 
@@ -106,25 +147,98 @@ function loadUser(){
     });
     document.getElementById('email').textContent = data.email;
     document.getElementById('phone').textContent = data.phone;
+    
+      // PROFILE PICTURE: use stored path if present, otherwise gender-based default
+      const picEl = document.getElementById('profileImage');
+      const pic = data.profile_pic && data.profile_pic.trim() !== '' ? data.profile_pic : null;
+      if (pic) {
+        picEl.src = pic.indexOf('?') === -1 ? pic + '?v=' + Date.now() : pic;
+      } else if (data.gender && data.gender.toLowerCase().startsWith('m')) {
+        picEl.src = 'uploads/default_male.svg';
+      } else if (data.gender && data.gender.toLowerCase().startsWith('f')) {
+        picEl.src = 'uploads/default_female.svg';
+      } else {
+        picEl.src = 'uploads/default_profile.png';
+      }
   });
 }
 loadUser();
 
-// --- Show/Hide Forms ---
+// === Profile upload/remove handlers ===
+const profileInput = document.getElementById('profileInput');
+if (profileInput) {
+  profileInput.addEventListener('change', () => {
+    const file = profileInput.files[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append('profile', file);
+
+    fetch('php/upload_profile.php', { method: 'POST', body: fd })
+      .then(r => r.json())
+      .then(j => {
+        const msgDiv = document.getElementById('messages');
+        if (j.status === 'success') {
+          msgDiv.innerHTML = '<div class="success-message">Profile picture updated.</div>';
+        } else {
+          msgDiv.innerHTML = '<div class="error-message">' + (j.message || 'Upload failed') + '</div>';
+        }
+        loadUser();
+      })
+      .catch(err => {
+        document.getElementById('messages').innerHTML = '<div class="error-message">Upload failed (network)</div>';
+        console.error(err);
+      });
+  });
+}
+
+const removeBtn = document.getElementById('removePic');
+if (removeBtn) {
+  removeBtn.addEventListener('click', ()=>{
+    if (!confirm('Remove profile picture?')) return;
+    fetch('php/remove_profile.php', { method: 'POST' })
+      .then(r => r.json())
+      .then(j => {
+        const msgDiv = document.getElementById('messages');
+        if (j.status === 'success') msgDiv.innerHTML = '<div class="success-message">Profile removed.</div>';
+        else msgDiv.innerHTML = '<div class="error-message">' + (j.message || 'Remove failed') + '</div>';
+        loadUser();
+      })
+      .catch(err => {
+        document.getElementById('messages').innerHTML = '<div class="error-message">Request failed</div>';
+      });
+  });
+}
+
+// --- Floating panels behavior ---
 const pwdForm = document.getElementById('pwdForm');
 const phoneForm = document.getElementById('phoneForm');
+const panelBackdrop = document.getElementById('panelBackdrop');
+const phonePanel = document.getElementById('phonePanel');
+const pwdPanel = document.getElementById('pwdPanel');
+const closePhone = document.getElementById('closePhone');
+const closePwd = document.getElementById('closePwd');
 
-document.getElementById('chgPassword').addEventListener('click', ()=> {
-  pwdForm.style.display = pwdForm.style.display === 'none' ? 'flex' : 'none';
-  phoneForm.style.display = 'none';
-  pwdForm.scrollIntoView({behavior:'smooth'});
-});
+function openPanel(panel){
+  panelBackdrop.style.display = 'block';
+  panel.style.display = 'block';
+  panel.setAttribute('aria-hidden','false');
+  const first = panel.querySelector('input');
+  if (first) first.focus();
+}
+function closePanels(){
+  panelBackdrop.style.display = 'none';
+  phonePanel.style.display = 'none';
+  pwdPanel.style.display = 'none';
+  phonePanel.setAttribute('aria-hidden','true');
+  pwdPanel.setAttribute('aria-hidden','true');
+}
 
-document.getElementById('chgPhone').addEventListener('click', ()=> {
-  phoneForm.style.display = phoneForm.style.display === 'none' ? 'flex' : 'none';
-  pwdForm.style.display = 'none';
-  phoneForm.scrollIntoView({behavior:'smooth'});
-});
+document.getElementById('chgPassword').addEventListener('click', ()=> openPanel(pwdPanel));
+document.getElementById('chgPhone').addEventListener('click', ()=> openPanel(phonePanel));
+
+closePhone && closePhone.addEventListener('click', closePanels);
+closePwd && closePwd.addEventListener('click', closePanels);
+panelBackdrop && panelBackdrop.addEventListener('click', closePanels);
 
 // --- Update Phone ---
 phoneForm.addEventListener('submit', e=>{
@@ -149,11 +263,12 @@ phoneForm.addEventListener('submit', e=>{
     if(data.includes('success')){
       document.getElementById('phone').textContent = phone;
       phoneForm.reset();
-      phoneForm.style.display = 'none';
+      closePanels();
     }
   });
 });
 
+// --- Update Password ---
 // --- Update Password ---
 pwdForm.addEventListener('submit', e=>{
   e.preventDefault();
@@ -177,7 +292,7 @@ pwdForm.addEventListener('submit', e=>{
     msgDiv.innerHTML = data;
     if(data.includes('success')){
       pwdForm.reset();
-      pwdForm.style.display = 'none';
+      closePanels();
     }
   });
 });

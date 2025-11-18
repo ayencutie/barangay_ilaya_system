@@ -12,7 +12,7 @@ if (!isset($_SESSION['patient_id'])) {
 $patient_id = $_SESSION['patient_id'];
 
 $stmt = $pdo->prepare("
-    SELECT patient_id, first_name, last_name, address, birthdate, email, phone
+         SELECT patient_id, first_name, last_name, address, birthdate, email, phone, profile_pic, gender
     FROM users
     WHERE patient_id = :patient_id
 ");
