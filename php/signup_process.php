@@ -88,7 +88,77 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ':user_role' => 'patient'
         ]);
 
-        echo "<script>alert('Account created successfully! Your Patient ID is $patient_id'); window.location='../login.php';</script>";
+        // Generate verification OTP and send to the user's email
+        try {
+            $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $expires = (new DateTime())->add(new DateInterval('PT15M'))->format('Y-m-d H:i:s');
+            $up = $pdo->prepare("UPDATE users SET otp_code = ?, otp_expires = ?, email_verified = 0 WHERE email = ?");
+            $up->execute([$otp, $expires, $email]);
+
+            // Attempt to send via SMTP/PHPMailer if configured, else fall back to mail()
+            $mailSent = false;
+            $mailError = '';
+            $smtpConfigPath = __DIR__ . '/smtp_config.php';
+            if (file_exists($smtpConfigPath)) {
+                $smtp = @include $smtpConfigPath;
+                if (is_array($smtp) && !empty($smtp['enabled'])) {
+                    try {
+                        $vendor = __DIR__ . '/../vendor/autoload.php';
+                        if (file_exists($vendor)) {
+                            require_once $vendor;
+                            $mailer = new PHPMailer\PHPMailer\PHPMailer(true);
+                            $mailer->isSMTP();
+                            $mailer->Host = $smtp['host'];
+                            $mailer->SMTPAuth = true;
+                            $mailer->Username = $smtp['username'];
+                            $mailer->Password = $smtp['password'];
+                            $mailer->SMTPSecure = $smtp['secure'] ?? 'tls';
+                            $mailer->Port = $smtp['port'] ?? 587;
+                            $mailer->SMTPAutoTLS = $smtp['smtp_auto_tls'] ?? true;
+                            $mailer->setFrom($smtp['from_email'] ?? $smtp['username'], $smtp['from_name'] ?? 'No Reply');
+                            $mailer->addAddress($email);
+                            $mailer->Subject = "Verify your email — Barangay Ilaya";
+                            $mailer->Body = "Your verification code is: $otp\nIt expires in 15 minutes.";
+                            $mailer->AltBody = "Your verification code is: $otp\nIt expires in 15 minutes.";
+                            $mailer->send();
+                            $mailSent = true;
+                        } else {
+                            $mailError = 'PHPMailer not installed.';
+                        }
+                    } catch (Exception $e) {
+                        $mailError = $e->getMessage();
+                    }
+                }
+            }
+
+            if (!$mailSent && empty($mailError)) {
+                $subject = "Verify your email — Barangay Ilaya";
+                $message = "Your verification code is: $otp\nIt expires in 15 minutes.";
+                $headers = "From: no-reply@localhost" . "\r\n" .
+                           "Reply-To: no-reply@localhost" . "\r\n" .
+                           "X-Mailer: PHP/" . phpversion();
+                $mailSent = @mail($email, $subject, $message, $headers);
+                if (!$mailSent) $mailError = 'mail() failed.';
+            }
+
+            if (!$mailSent) {
+                $_SESSION['otp_for_test'] = $otp;
+                $_SESSION['otp_mail_failed'] = true;
+                if ($mailError) $_SESSION['otp_mail_error'] = $mailError;
+            } else {
+                unset($_SESSION['otp_mail_failed']);
+                unset($_SESSION['otp_mail_error']);
+                unset($_SESSION['otp_for_test']);
+            }
+
+            // Redirect to OTP verification page after signup
+            header("Location: ../php/otp_verify.php?email=" . urlencode($email));
+            exit;
+        } catch (Exception $e) {
+            // If sending OTP fails, still finish signup and prompt user to login
+            echo "<script>alert('Account created. Failed to send verification email. Please login and request verification.'); window.location='../login.php';</script>";
+            exit;
+        }
 
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
