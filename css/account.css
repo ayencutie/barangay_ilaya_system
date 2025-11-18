@@ -149,7 +149,7 @@ nav ul li a:hover,
   max-width: 760px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 28px;
   border: 1.5px solid #e0f2e9;
   backdrop-filter: blur(0.5px);
 }
@@ -243,7 +243,7 @@ nav ul li a:hover,
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 420px;
+  width: 460px;
   max-width: calc(100% - 40px);
   background: #fff;
   border-radius: 12px;
@@ -268,17 +268,6 @@ nav ul li a:hover,
   gap: 15px;
   flex-direction: column;
 }
-
-.btn {
-  background: #009900;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s;
-
 .btn {
   background: linear-gradient(90deg, #009900 60%, #00b36b 100%);
   color: #fff;
@@ -306,8 +295,23 @@ nav ul li a:hover,
   background: #ccc;
   color: #111;
 }
-  gap: 10px;
-  margin-top: 10px;
+
+.password-form {
+  gap: 18px;
+  margin-top: 18px;
+  align-items: center;
+  animation: slideDownFade 0.45s cubic-bezier(.33,1.02,.54,.99);
+}
+
+@keyframes slideDownFade {
+  0% {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .password-form h3 {
@@ -318,10 +322,18 @@ nav ul li a:hover,
 }
 
 .password-form input {
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  padding: 13px 12px;
+  border-radius: 7px;
+  border: 1.5px solid #cce5d6;
+  font-size: 15px;
+  background: #f8fff8;
   transition: border-color 0.3s, box-shadow 0.3s;
+  margin-bottom: 10px;
+  box-shadow: 0 1.5px 6px rgba(0,153,51,0.04);
+  width: 100%;
+  max-width: 320px;
+  display: block;
+
 }
 
 .password-form input:focus {
@@ -331,7 +343,9 @@ nav ul li a:hover,
 }
 
 .password-form button {
-  margin-top: 10px;
+  margin-top: 0;
+  align-self: center;
+  min-width: 140px;
 }
 
 /* === MODAL (not used anymore, but kept for reference) === */

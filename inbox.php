@@ -35,10 +35,11 @@ $patient_id = $_SESSION['patient_id'];
           <a href="my_appointment.html">My Appointment</a>
           <a href="inbox.php" class="active">Inbox</a>
           <a href="account.html">Account</a>
+          <a href="php/logout.php" class="logout-btn">Log Out</a>
         </div>
       </li>
 
-      <li><a href="landing_page.html" class="logout-btn">LOG OUT</a></li>
+    
     </ul>
   </nav>
 </header>
