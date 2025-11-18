@@ -50,7 +50,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // ===========================================
     $_SESSION['patient_id'] = $user['patient_id'];  // REQUIRED by patient pages
     $_SESSION['user_id']    = $user['patient_id'];  // compatibility with admin auth
+    // Keep both keys for compatibility across the app
     $_SESSION['role']       = $user['user_role'];
+    $_SESSION['user_role']  = $user['user_role'];
     $_SESSION['first_name'] = $user['first_name'];
     $_SESSION['last_name']  = $user['last_name'];
 

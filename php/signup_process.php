@@ -68,11 +68,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $nextNum = $lastPatient ? intval($lastPatient) + 1 : 1;
         $patient_id = 'PTN-' . str_pad($nextNum, 4, "0", STR_PAD_LEFT);
 
-        // Insert new user
+        // Insert new user and set role to 'patient'
         $sql = "INSERT INTO users 
-                (patient_id, first_name, middle_initial, last_name, address, birthdate, gender, phone, email, password)
-                VALUES 
-                (:patient_id, :first_name, :middle_initial, :last_name, :address, :birthdate, :gender, :phone, :email, :password)";
+            (patient_id, first_name, middle_initial, last_name, address, birthdate, gender, phone, email, password, user_role)
+            VALUES 
+            (:patient_id, :first_name, :middle_initial, :last_name, :address, :birthdate, :gender, :phone, :email, :password, :user_role)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':patient_id' => $patient_id,
@@ -84,7 +84,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ':gender' => $gender,
             ':phone' => $phone,
             ':email' => $email,
-            ':password' => $hashed_password
+            ':password' => $hashed_password,
+            ':user_role' => 'patient'
         ]);
 
         echo "<script>alert('Account created successfully! Your Patient ID is $patient_id'); window.location='../login.php';</script>";

@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 6
+Patient ID     : PTN-0001
+Patient Name   : Justine D. Pulanco
+Service        : Immunization
+Date           : 2025-11-19
+Time           : 8:30 AM - 8:40 AM
+Status         : Completed
+=================================

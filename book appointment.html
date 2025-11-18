@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Book Appointment – Barangay Ilaya Health Center</title>
   <link rel="stylesheet" href="css/book appointment.css" />
@@ -91,6 +94,29 @@
 
   <!-- SCRIPT -->
   <script>
+    // Session check: run on load and on pageshow (back/forward navigation)
+    function checkSessionAndRedirect(){
+      fetch('php/get_session.php', { credentials: 'same-origin' })
+        .then(r => r.json())
+        .then(data => {
+          if (!data.authenticated || (data.user_role && data.user_role !== 'patient')) {
+            // replace history entry so Back won't return here
+            window.location.replace('landing_page.html');
+          }
+        })
+        .catch(() => {
+          window.location.replace('landing_page.html');
+        });
+    }
+
+    // Run on initial load
+    checkSessionAndRedirect();
+
+    // Run again when the page is shown via back/forward (bfcache/pageshow)
+    window.addEventListener('pageshow', function(event){
+      // If the page was persisted from the bfcache or navigated via history, re-check session
+      checkSessionAndRedirect();
+    });
     // NAVBAR DROPDOWN
     const menuButton = document.getElementById("menuButton");
     const dropdownMenu = document.getElementById("dropdownMenu");
