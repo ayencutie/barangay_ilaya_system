@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 11
+Patient ID     : PTN-0004
+Patient Name   : Jvie M. Dela Cruz
+Service        : Outpatient Consultation
+Date           : 2025-11-18
+Time           : 11:40 AM - 11:50 AM
+Status         : Completed
+=================================
