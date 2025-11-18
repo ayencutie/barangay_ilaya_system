@@ -8,106 +8,114 @@ require __DIR__ . '/../php/db.php';
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin Inbox — Barangay Ilaya</title>
+
   <link rel="stylesheet" href="css/sidebar.css">
   <link rel="stylesheet" href="css/admin_inbox.css">
 </head>
 <body>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2>Barangay Ilaya</h2>
-    <ul class="nav">
-      <li><a href="dashboard.php">Dashboard</a></li>
-      <li><a href="appointments.php">Appointments</a></li>
-      <li><a href="patients.php">Patients</a></li>
-      <li><a href="admin_inbox.php" class="active">Inbox</a></li>
-      <li><a href="reports.php">Reports & Analytics</a></li>
-      <li><a href="settings.php">Settings</a></li>
-      <li><a href="../php/logout.php">Logout</a></li>
-    </ul>
-  </aside>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <h2>Barangay Ilaya</h2>
+  <ul class="nav">
+    <li><a href="dashboard.php">Dashboard</a></li>
+    <li><a href="appointments.php">Appointments</a></li>
+    <li><a href="patients.php">Patients</a></li>
+    <li><a href="admin_inbox.php" class="active">Inbox</a></li>
+    <li><a href="reports.php">Reports & Analytics</a></li>
+    <li><a href="settings.php">Settings</a></li>
+    <li><a href="../php/logout.php">Logout</a></li>
+  </ul>
+</aside>
 
-  <!-- MAIN PANEL -->
-  <main class="main">
-    <div class="header">
-      <h1>Inbox</h1>
+<!-- MAIN PANEL -->
+<main class="main">
+  <div class="header">
+    <h1>Inbox</h1>
+  </div>
+
+  <div class="inbox-wrapper">
+
+    <!-- LEFT PANEL -->
+    <div class="users-panel">
+      <input type="text" id="userSearch" placeholder="Search user...">
+      <div id="userList" class="user-list"></div>
     </div>
 
-    <div class="inbox-wrapper">
-
-      <!-- LEFT USER LIST -->
-      <div class="users-panel">
-        <input type="text" id="userSearch" placeholder="Search user...">
-        <div id="userList" class="user-list"></div>
+    <!-- RIGHT CHAT PANEL -->
+    <div class="chat-panel">
+      <div class="chat-header" id="chatHeader">
+        <h3>Select a User</h3>
       </div>
 
-      <!-- RIGHT CHAT WINDOW -->
-      <div class="chat-panel">
-        <div class="chat-header" id="chatHeader">
-          <h3>Select a User</h3>
-        </div>
-        <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-messages" id="chatMessages"></div>
 
-        <div class="chat-input">
-          <input type="text" id="msgInput" placeholder="Type your message...">
-          <button id="sendBtn">Send</button>
-        </div>
+      <div class="chat-input">
+        <input type="text" id="msgInput" placeholder="Type your message...">
+        <button id="sendBtn">Send</button>
       </div>
-
     </div>
-  </main>
+
+  </div>
+</main>
 
 <script>
 let currentUser = null;
 
-// Load all users
-function loadUsers(search=''){
-    fetch('../php/fetch_users.php')
+/* -------------------------
+   LOAD USERS
+-------------------------- */
+function loadUsers(search = "") {
+    fetch("php/chat/fetch_conversations.php")
     .then(r => r.json())
-    .then(data => {
-        const list = document.getElementById('userList');
-        list.innerHTML = '';
-        data
-        .filter(u =>
-            u.first_name.toLowerCase().includes(search.toLowerCase()) ||
-            u.last_name.toLowerCase().includes(search.toLowerCase())
-        )
-        .forEach(user => {
-            const div = document.createElement('div');
-            div.className = 'user';
-            div.textContent = `${user.first_name} ${user.last_name}`;
-            div.dataset.id = user.patient_id;
-            div.onclick = () => selectUser(user.patient_id, `${user.first_name} ${user.last_name}`);
+    .then(users => {
+        const list = document.getElementById("userList");
+        list.innerHTML = "";
+
+        users
+        .filter(u => u.name.toLowerCase().includes(search.toLowerCase()))
+        .forEach(u => {
+            const div = document.createElement("div");
+            div.className = "user";
+            div.textContent = u.name;
+            div.onclick = () => selectUser(u.patient_id, u.name);
             list.appendChild(div);
         });
     });
 }
 
-document.getElementById('userSearch').addEventListener('input', e => {
+document.getElementById("userSearch").addEventListener("input", e => {
     loadUsers(e.target.value);
 });
 
-// Select user
-function selectUser(patient_id, name){
-    currentUser = patient_id;
-    document.getElementById('chatHeader').innerHTML = `<h3>${name}</h3>`;
+/* -------------------------
+   SELECT USER
+-------------------------- */
+function selectUser(pid, name) {
+    currentUser = pid;
+    document.getElementById("chatHeader").innerHTML = `<h3>${name}</h3>`;
     loadMessages();
 }
 
-// Load messages
-function loadMessages(){
+/* -------------------------
+   LOAD MESSAGES
+-------------------------- */
+function loadMessages() {
     if (!currentUser) return;
 
-    fetch(`../php/fetch_messages.php?patient_id=${currentUser}`)
+    fetch(`php/chat/fetch_messages.php?patient_id=${currentUser}`)
     .then(r => r.json())
-    .then(data => {
-        const box = document.getElementById('chatMessages');
-        box.innerHTML = '';
+    .then(msgs => {
+        const box = document.getElementById("chatMessages");
+        box.innerHTML = "";
 
-        data.forEach(msg => {
-            const div = document.createElement('div');
-            div.className = 'message ' + msg.sender_type;
-            div.innerHTML = `<p>${msg.message}</p><span>${msg.created_at}</span>`;
+        msgs.forEach(m => {
+            const div = document.createElement("div");
+            div.className = `message ${m.sender_type}`;
+            div.innerHTML = `
+                <p>${m.message}</p>
+                <span>${m.timestamp}</span>
+            `;
             box.appendChild(div);
         });
 
@@ -115,25 +123,32 @@ function loadMessages(){
     });
 }
 
-// Send message
-document.getElementById('sendBtn').onclick = function(){
-    const msg = document.getElementById('msgInput').value.trim();
+/* -------------------------
+   SEND MESSAGE
+-------------------------- */
+document.getElementById("sendBtn").onclick = function () {
+    const input = document.getElementById("msgInput");
+    const msg = input.value.trim();
+
     if (!msg || !currentUser) return;
 
-    fetch('../php/send_message.php', {
-        method:'POST',
-        headers:{'Content-Type':'application/x-www-form-urlencoded'},
-        body:`patient_id=${currentUser}&message=${encodeURIComponent(msg)}&sender=admin`
-    }).then(() => {
-        document.getElementById('msgInput').value = '';
+    fetch("php/chat/send_message.php", {
+        method: "POST",
+        headers: {"Content-Type":"application/x-www-form-urlencoded"},
+        body: `patient_id=${currentUser}&message=${encodeURIComponent(msg)}&sender=admin`
+    })
+    .then(() => {
+        input.value = "";
         loadMessages();
     });
 };
 
-// Auto refresh messages
-setInterval(loadMessages,1500);
+/* -------------------------
+   AUTO REFRESH
+-------------------------- */
+setInterval(loadMessages, 1200);
 
-// Initial load
+// INIT
 loadUsers();
 </script>
 
