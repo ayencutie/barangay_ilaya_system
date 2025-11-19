@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Account Settings – Barangay Ilaya Health Center</title>
 <link rel="stylesheet" href="css/account.css">
+<link rel="stylesheet" href="css/navbar.css">
 </head>
 <body>
 
@@ -13,23 +14,37 @@
     <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
     <h1>BARANGAY ILAYA HEALTH CENTER</h1>
   </div>
-  <nav>
-    <ul>
-      <li><a href="index.html">HOME</a></li>
-      <li><a href="new about us.html">ABOUT US</a></li>
-      <li><a href="new services.html">SERVICES</a></li>
-      <li class="dropdown">
-        <button class="dropbtn" id="menuButton">MENU ▼</button>
-        <div class="dropdown-content" id="dropdownMenu">
-          <a href="book appointment.html">Book Appointment</a>
-          <a href="my_appointment.html">My Appointment</a>
-          <a href="inbox.php">Inbox</a>
-          
-          <a href="account.html" class="active">Account</a>
-          <a href="php/logout.php" class="logout-btn">Log Out</a>
-        </div>
-      </li>
+  <nav class="nav-main">
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="new about us.html">About Us</a></li>
+      <li><a href="new services.html">Services</a></li>
     </ul>
+
+    <div class="nav-menu">
+      <button id="menuButton" class="dropbtn">Menu ▼</button>
+      <div class="dropdown-content" id="dropdownMenu">
+        <a href="book appointment.html">Book Appointment</a>
+        <a href="my_appointment.html">My Appointment</a>
+        <a href="inbox.php">Inbox</a>
+      </div>
+    </div>
+
+    <div class="nav-profile-wrapper">
+      <button id="navProfileBtn" class="profile-btn" aria-haspopup="true" aria-expanded="false">
+        <img id="navProfileImage" src="uploads/default_profile.png" alt="Profile" class="nav-profile">
+      </button>
+      <div id="navProfileDropdown" class="nav-profile-dropdown" hidden>
+        <div class="nav-profile-info">
+          <strong id="navProfileName">Guest</strong>
+          <div id="navPatientId" class="nav-pid">PTN-0000</div>
+        </div>
+        <hr>
+        <a href="account.html">Account Settings</a>
+        <button id="toggleDark" class="linkish">Toggle Dark Mode</button>
+        <a href="php/logout.php" class="logout-btn">Log Out</a>
+      </div>
+    </div>
   </nav>
 </header>
 
@@ -116,11 +131,13 @@
 // --- Dropdown Menu ---
 const menuButton = document.getElementById('menuButton');
 const dropdownMenu = document.getElementById('dropdownMenu');
-menuButton.addEventListener('click', ()=>dropdownMenu.classList.toggle('show'));
-window.addEventListener('click', e => {
-  if(!menuButton.contains(e.target) && !dropdownMenu.contains(e.target))
-    dropdownMenu.classList.remove('show');
-});
+if (menuButton && dropdownMenu) {
+  menuButton.addEventListener('click', ()=>dropdownMenu.classList.toggle('show'));
+  window.addEventListener('click', e => {
+    if(!menuButton.contains(e.target) && !dropdownMenu.contains(e.target))
+      dropdownMenu.classList.remove('show');
+  });
+}
 
 // --- Capitalize Function ---
 function capitalizeWords(str) {
@@ -160,6 +177,13 @@ function loadUser(){
       } else {
         picEl.src = 'uploads/default_profile.png';
       }
+      // populate nav profile (if navbar present)
+      const navImg = document.getElementById('navProfileImage');
+      const navName = document.getElementById('navProfileName');
+      const navPid = document.getElementById('navPatientId');
+      if (navImg) navImg.src = picEl.src;
+      if (navName) navName.textContent = capitalizeWords(data.first_name + ' ' + data.last_name);
+      if (navPid) navPid.textContent = data.patient_id;
   });
 }
 loadUser();
@@ -296,6 +320,18 @@ pwdForm.addEventListener('submit', e=>{
     }
   });
 });
+
+// --- Navbar profile dropdown & dark-mode toggle (matches index.html behavior) ---
+(function(){
+  const btn = document.getElementById('navProfileBtn');
+  const dd = document.getElementById('navProfileDropdown');
+  btn && btn.addEventListener('click', function(e){ e.stopPropagation(); const open = dd ? dd.hidden : true; if(dd) dd.hidden = !open; btn.setAttribute('aria-expanded', String(!open)); });
+  window.addEventListener('click', ()=>{ if(dd) dd.hidden = true; btn && btn.setAttribute('aria-expanded','false'); });
+
+  // dark mode toggle (local only)
+  const toggle = document.getElementById('toggleDark');
+  toggle && toggle.addEventListener('click', ()=>{ document.body.classList.toggle('dark-mode'); });
+})();
 </script>
 </body>
 </html>

@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Book Appointment – Barangay Ilaya Health Center</title>
   <link rel="stylesheet" href="css/book appointment.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
 </head>
 <body>
 
@@ -17,22 +18,37 @@
       <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo" />
       <h1>BARANGAY ILAYA HEALTH CENTER</h1>
     </div>
-    <nav>
-      <ul>
-        <li><a href="index.html">HOME</a></li>
-        <li><a href="new about us.html">ABOUT US</a></li>
-        <li><a href="new services.html">SERVICES</a></li>
-        <li class="dropdown">
-          <button class="dropbtn" id="menuButton">MENU ▼</button>
-          <div class="dropdown-content" id="dropdownMenu">
-            <a href="book_appointment.html" class="active">Book Appointment</a>
-            <a href="my_appointment.html">My Appointment</a>
-            <a href="inbox.php">Inbox</a>
-            <a href="account.html">Account</a>
-            <a href="php/logout.php" class="logout-btn">Log Out</a>
-          </div>
-        </li>
+    <nav class="nav-main">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="new about us.html">About Us</a></li>
+        <li><a href="new services.html">Services</a></li>
       </ul>
+
+      <div class="nav-menu">
+        <button id="menuButton" class="dropbtn">Menu ▼</button>
+        <div class="dropdown-content" id="dropdownMenu">
+          <a href="book appointment.html">Book Appointment</a>
+          <a href="my_appointment.html">My Appointment</a>
+          <a href="inbox.php">Inbox</a>
+        </div>
+      </div>
+
+      <div class="nav-profile-wrapper">
+        <button id="navProfileBtn" class="profile-btn" aria-haspopup="true" aria-expanded="false">
+          <img id="navProfileImage" src="uploads/default_profile.png" alt="Profile" class="nav-profile">
+        </button>
+        <div id="navProfileDropdown" class="nav-profile-dropdown" hidden>
+          <div class="nav-profile-info">
+            <strong id="navProfileName">Guest</strong>
+            <div id="navPatientId" class="nav-pid">PTN-0000</div>
+          </div>
+          <hr>
+          <a href="account.html">Account Settings</a>
+          <button id="toggleDark" class="linkish">Toggle Dark Mode</button>
+          <a href="php/logout.php" class="logout-btn">Log Out</a>
+        </div>
+      </div>
     </nav>
   </header>
 
@@ -120,12 +136,27 @@
     // NAVBAR DROPDOWN
     const menuButton = document.getElementById("menuButton");
     const dropdownMenu = document.getElementById("dropdownMenu");
-    menuButton.addEventListener("click", () => dropdownMenu.classList.toggle("show"));
-    window.addEventListener("click", (e) => {
-      if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
-        dropdownMenu.classList.remove("show");
-      }
-    });
+    if (menuButton && dropdownMenu) {
+      menuButton.addEventListener("click", () => dropdownMenu.classList.toggle("show"));
+      window.addEventListener("click", (e) => {
+        if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+          dropdownMenu.classList.remove("show");
+        }
+      });
+    }
+
+    // NAVBAR profile dropdown populate
+    (function(){
+      const btn = document.getElementById('navProfileBtn');
+      const dd = document.getElementById('navProfileDropdown');
+      const img = document.getElementById('navProfileImage');
+      const nameEl = document.getElementById('navProfileName');
+      const pidEl = document.getElementById('navPatientId');
+      btn && btn.addEventListener('click', function(e){ e.stopPropagation(); const open = dd.hidden; dd.hidden = !open; btn.setAttribute('aria-expanded', String(!open)); });
+      window.addEventListener('click', ()=>{ if(dd) dd.hidden = true; btn && btn.setAttribute('aria-expanded','false'); });
+      fetch('php/get_user.php').then(r=>r.json()).then(data=>{ if(!data || data.error) return; if(img) img.src = data.profile_pic && data.profile_pic.trim() !== '' ? (data.profile_pic + '?v=' + Date.now()) : (data.gender && data.gender.toLowerCase().startsWith('m') ? 'uploads/default_male.svg' : (data.gender && data.gender.toLowerCase().startsWith('f') ? 'uploads/default_female.svg' : 'uploads/default_profile.png')); if(nameEl) nameEl.textContent = (data.first_name || '') + ' ' + (data.last_name || ''); if(pidEl) pidEl.textContent = data.patient_id || ''; }).catch(()=>{});
+      const toggle = document.getElementById('toggleDark'); toggle && toggle.addEventListener('click', ()=>{ document.body.classList.toggle('dark-mode'); });
+    })();
 
     // SERVICE SELECTION
     const serviceButton = document.getElementById("serviceButton");
