@@ -108,10 +108,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
 
             // If SMTP config exists and is enabled, attempt PHPMailer SMTP send (recommended for Gmail)
-            $smtpConfigPath = __DIR__ . '/smtp_config.php';
-            if (file_exists($smtpConfigPath)) {
-                $smtp = @include $smtpConfigPath;
-                if (is_array($smtp) && !empty($smtp['enabled'])) {
+            // Prefer environment vars via get_smtp_config.php, fall back to php/smtp_config.php
+            $smtp = [];
+            $getCfgPath = __DIR__ . '/get_smtp_config.php';
+            if (file_exists($getCfgPath)) {
+                $smtp = @include $getCfgPath;
+            } else {
+                $smtpConfigPath = __DIR__ . '/smtp_config.php';
+                if (file_exists($smtpConfigPath)) {
+                    $smtp = @include $smtpConfigPath;
+                }
+            }
+
+            if (is_array($smtp) && !empty($smtp['enabled'])) {
                     // attempt to send via PHPMailer (requires composer install: phpmailer/phpmailer)
                     try {
                         $vendor = __DIR__ . '/../vendor/autoload.php';
@@ -140,7 +149,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $mailError = $e->getMessage();
                         $mailSent = false;
                     }
-                }
             }
 
             // If SMTP not used or failed, fall back to PHP mail()

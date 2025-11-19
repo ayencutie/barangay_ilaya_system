@@ -2,14 +2,9 @@
 // test_smtp.php — send a test email using php/smtp_config.php and PHPMailer
 // Usage: open in browser or run `php php/test_smtp.php` from project root
 require __DIR__ . '/db.php';
-$smtpConfigPath = __DIR__ . '/smtp_config.php';
-if (!file_exists($smtpConfigPath)) {
-    echo "smtp_config.php missing. Copy php/smtp_config.php.template and fill credentials.\n";
-    exit;
-}
-$smtp = include $smtpConfigPath;
+$smtp = include __DIR__ . '/get_smtp_config.php';
 if (empty($smtp['enabled'])) {
-    echo "SMTP not enabled in smtp_config.php (set 'enabled' => true).\n";
+    echo "SMTP not enabled. Set environment variables or enable smtp_config.php.\n";
     exit;
 }
 $vendor = __DIR__ . '/../vendor/autoload.php';
