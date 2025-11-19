@@ -2,6 +2,7 @@
 .main {
   margin-left: 250px; /* same width as sidebar */
   padding: 20px;
+  font-family: "Segoe UI", sans-serif; /* Consistent Font */
 }
 
 /* Ensure wrapper fits beside sidebar */
@@ -13,7 +14,8 @@
   box-shadow: 0 3px 15px rgba(0,0,0,0.1);
   overflow: hidden;
   margin-top: 20px;
-  width: calc(100% - 250px);
+  /* ✅ ADJUSTED WIDTH TO FILL MORE SPACE (100% minus 40px padding/margin) */
+  width: calc(100% - 40px); 
 }
 
 /* LEFT PANEL */
@@ -173,4 +175,24 @@
   .chat-panel {
     height: 400px;
   }
+}
+
+/* Styling for Reminder Tag */
+.reminder-tag {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ff8c00; /* Orange color */
+    margin-bottom: 5px;
+    padding: 3px 6px;
+    border: 1px solid #ff8c00;
+    border-radius: 4px;
+    text-align: center;
+    background: #fff8e1;
+}
+
+.message {
+    /* ... Make sure you have the following styles in your .message selector: */
+    display: flex; 
+    flex-direction: column;
 }
