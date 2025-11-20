@@ -114,8 +114,8 @@ button:hover, .button-link:hover {
 }
 
 /* -------------------------------------------
-   🟢 NEW STYLES FOR FORGOT/SIGNUP BUTTON
-   ------------------------------------------- */
+    🟢 NEW STYLES FOR FORGOT/SIGNUP BUTTON
+    ------------------------------------------- */
 
 /* Style for success messages (used after sign up) */
 .success-message {
@@ -153,22 +153,24 @@ button:hover, .button-link:hover {
     text-decoration: underline; /* Keep underline on hover */
 }
 
-/* Create Account button (matches login color, shorter width, no underline) */
+/* Create Account button (Now full width like login button) */
 .create-account-button {
     display: block; 
-    width: 70%;           /* shorter width than login button */
-    max-width: 250px;     
+    /* Changed width to 100% to match login button */
+    width: 100%; 
+    /* Removed max-width */
     padding: 12px;
     text-align: center;
     color: white; 
-    background-color: #2e7d32; /* Same as login button */
+    background-color: #2e7d32; /* Same as login button (already matched) */
     border: none;
     border-radius: 8px;
     font-size: 15px;
     font-weight: 600;
     text-decoration: none !important; /* Remove underline */
     cursor: pointer;
-    margin: 20px auto 0 auto;  
+    /* Changed margin to 20px 0 0 0 for full width alignment */
+    margin: 20px 0 0 0; 
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
@@ -179,8 +181,8 @@ button:hover, .button-link:hover {
 }
 
 /* -------------------------------------------
-   🔴 END: NEW STYLES
-   ------------------------------------------- */
+    🔴 END: NEW STYLES
+    ------------------------------------------- */
 
 /* === ERROR MESSAGE === */
 .error-message {
@@ -227,7 +229,11 @@ a:hover {
         font-size: 20px;
     }
 
+    /* Updated the responsive rule to ensure new button style is maintained */
     input, button, .button-link, .create-account-button {
         font-size: 14px;
+        /* The width change is already handled in the main style, 
+           but adding width: 100% here is a good practice for media queries */
+        width: 100%; 
     }
 }
