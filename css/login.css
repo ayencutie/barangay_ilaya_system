@@ -1,164 +1,233 @@
 /* === GLOBAL RESET === */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
 }
 
 /* === BODY & BACKGROUND === */
 body {
-  min-height: 100vh;          /* full viewport height */
-  display: flex;
-  justify-content: center;     /* horizontal center */
-  align-items: center;         /* vertical center */
-  position: relative;
-  overflow: auto;              /* allows scrolling if screen is small */
-  padding: 20px;
-  background-color: #ffffff;
+    min-height: 100vh;           /* full viewport height */
+    display: flex;
+    justify-content: center;     /* horizontal center */
+    align-items: center;         /* vertical center */
+    position: relative;
+    overflow: auto;              /* allows scrolling if screen is small */
+    padding: 20px;
+    background-color: #ffffff;
 }
 
 /* ✅ Blurred + green-tinted background layer */
 body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background:
-    linear-gradient(rgba(0, 100, 0, 0.35), rgba(0, 153, 51, 0.25)),
-    url('https://i.ibb.co/fdQ620PT/Untitled-design-1.png') no-repeat center center fixed;
-  background-size: cover;
-  filter: blur(10px) brightness(0.9);
-  transform: scale(1.1);
-  z-index: -1;
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(rgba(0, 100, 0, 0.35), rgba(0, 153, 51, 0.25)),
+        url('https://i.ibb.co/fdQ620PT/Untitled-design-1.png') no-repeat center center fixed;
+    background-size: cover;
+    filter: blur(10px) brightness(0.9);
+    transform: scale(1.1);
+    z-index: -1;
 }
 
 /* === MAIN CONTAINER === */
 .container {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 40px 30px;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-  width: 350px;
-  max-width: 100%;
-  text-align: center;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    max-width: 100%;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    margin: 0 auto;
 }
 
 /* === LOGO === */
 .logo {
-  width: 100px;
-  height: 100px;
-  background: #ffffff;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0 auto 20px auto;
-  overflow: hidden;
-  border: 4px solid #2e7d32;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+    width: 100px;
+    height: 100px;
+    background: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px auto;
+    overflow: hidden;
+    border: 4px solid #2e7d32;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
 
 .logo img {
-  width: 90%;
-  height: 90%;
-  object-fit: contain;
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
 }
 
 /* === HEADING === */
 h2 {
-  color: #1b5e20;
-  margin-bottom: 20px;
+    color: #1b5e20;
+    margin-bottom: 20px;
 }
 
 /* === INPUTS === */
 input {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border: 1px solid #b0bec5;
-  border-radius: 8px;
-  outline: none;
-  font-size: 14px;
-  transition: all 0.3s ease;
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #b0bec5;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
 }
 
 input:focus {
-  border-color: #2e7d32;
-  box-shadow: 0 0 6px rgba(46, 125, 50, 0.4);
+    border-color: #2e7d32;
+    box-shadow: 0 0 6px rgba(46, 125, 50, 0.4);
 }
 
 /* === BUTTON === */
 button, .button-link {
-  width: 100%;
-  padding: 12px;
-  background-color: #2e7d32;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    padding: 12px;
+    background-color: #2e7d32; /* Dark Green for login button */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover, .button-link:hover {
-  background-color: #1b5e20;
-  transform: translateY(-2px);
+    background-color: #1b5e20;
+    transform: translateY(-2px);
 }
+
+/* -------------------------------------------
+   🟢 NEW STYLES FOR FORGOT/SIGNUP BUTTON
+   ------------------------------------------- */
+
+/* Style for success messages (used after sign up) */
+.success-message {
+    color: #155724;
+    background-color: #d4edda;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Separator line between Log In section and Create Account button */
+.separator-line {
+    border-top: 1px solid #e0e0e0;
+    margin: 30px 0 0 0;
+}
+
+/* Forgot Password link container */
+.forgot-password-link {
+    text-align: center; /* Center the link */
+    margin-top: 10px;
+    margin-bottom: 20px; /* Space above the separator */
+}
+
+.forgot-password-link a {
+    color: #2e7d32; /* Theme color */
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: text-decoration 0.2s;
+}
+
+.forgot-password-link a:hover {
+    text-decoration: underline; /* Keep underline on hover */
+}
+
+/* Create Account button (matches login color, shorter width, no underline) */
+.create-account-button {
+    display: block; 
+    width: 70%;           /* shorter width than login button */
+    max-width: 250px;     
+    padding: 12px;
+    text-align: center;
+    color: white; 
+    background-color: #2e7d32; /* Same as login button */
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none !important; /* Remove underline */
+    cursor: pointer;
+    margin: 20px auto 0 auto;  
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.create-account-button:hover {
+    background-color: #1b5e20;
+    transform: translateY(-2px);
+    text-decoration: none !important; /* Remove underline on hover */
+}
+
+/* -------------------------------------------
+   🔴 END: NEW STYLES
+   ------------------------------------------- */
 
 /* === ERROR MESSAGE === */
 .error-message {
-  color: #d8000c;
-  background-color: #ffbaba;
-  padding: 12px 15px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  font-weight: 600;
-  text-align: center;
-  animation: fadeIn 0.4s ease-in-out;
+    color: #d8000c;
+    background-color: #ffbaba;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    text-align: center;
+    animation: fadeIn 0.4s ease-in-out;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* === FOOTER TEXT / LINKS === */
 p {
-  margin-top: 15px;
-  font-size: 14px;
-  color: #444;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #444;
 }
 
 a {
-  color: #2e7d32;
-  text-decoration: none;
-  font-weight: 600;
+    color: #2e7d32;
+    text-decoration: none;
+    font-weight: 600;
 }
 
 a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 /* === RESPONSIVE DESIGN === */
 @media (max-width: 480px) {
-  .container {
-    width: 90%;
-    padding: 30px 20px;
-  }
+    .container {
+        width: 90%;
+        padding: 30px 20px;
+    }
 
-  h2 {
-    font-size: 20px;
-  }
+    h2 {
+        font-size: 20px;
+    }
 
-  input, button, .button-link {
-    font-size: 14px;
-  }
+    input, button, .button-link, .create-account-button {
+        font-size: 14px;
+    }
 }
