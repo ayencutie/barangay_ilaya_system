@@ -2,6 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require 'db.php';
+session_start(); // Ensures you can use $_SESSION for the success message
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -68,11 +69,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $nextNum = $lastPatient ? intval($lastPatient) + 1 : 1;
         $patient_id = 'PTN-' . str_pad($nextNum, 4, "0", STR_PAD_LEFT);
 
-        // Insert new user and set role to 'patient'
+        // 🟢 CHANGE 1: Modified INSERT Query 🟢
+        // Set email_verified = 1 and remove otp_code/otp_expires from the INSERT
         $sql = "INSERT INTO users 
-            (patient_id, first_name, middle_initial, last_name, address, birthdate, gender, phone, email, password, user_role)
+            (patient_id, first_name, middle_initial, last_name, address, birthdate, gender, phone, email, password, user_role, email_verified)
             VALUES 
-            (:patient_id, :first_name, :middle_initial, :last_name, :address, :birthdate, :gender, :phone, :email, :password, :user_role)";
+            (:patient_id, :first_name, :middle_initial, :last_name, :address, :birthdate, :gender, :phone, :email, :password, :user_role, 1)"; // <-- 1 means verified
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':patient_id' => $patient_id,
@@ -88,7 +90,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ':user_role' => 'patient'
         ]);
 
-        echo "<script>alert('Account created successfully! Your Patient ID is $patient_id'); window.location='../login.php';</script>";
+        // 🟢 CHANGE 2 & 3: Removed OTP Block and Added Simple Redirect 🟢
+        // This replaces the entire 'try...catch' block that handled OTP generation, DB update, email sending, and redirect to otp_verify.php.
+
+        // Account successfully created. Redirect user to the login page.
+        $_SESSION['signup_success'] = "Registration successful! You may now log in.";
+        header("Location: ../login.php");
+        exit;
 
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
