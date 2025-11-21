@@ -1,67 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Medical City – Make a Booking</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barangay Ilaya Health Center</title>
   <link rel="stylesheet" href="css/landing_page.css">
 </head>
 <body>
-  <!-- MAIN NAV -->
-  <header class="navbar">
-    <div class="logo">
-      <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
-      <h1>BARANGAY ILAYA HEALTH CENTER</h1>
-    </div>
-    <nav>
-<ul>
-  <li><a href="landing_page.html">HOME</a></li>
-  <li><a href="about us.html">ABOUT US</a></li>
-  <li><a href="services.html">SERVICES</a></li>
-  <li><a href="login.php" class="login-btn">LOG IN</a></li>
-  <li><a href="signup.html" class="signup-btn">SIGN UP</a></li>
-</ul>
 
-    </nav>
+  <header class="navbar">
+    <div class="navbar-inner">
+
+      <div class="nav-left">
+        <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" class="nav-logo" alt="logo">
+        <span class="nav-title">BARANGAY ILAYA HEALTH CENTER</span>
+      </div>
+
+      <nav class="nav-center">
+        <a href="landing_page.html">HOME</a>
+        <a href="about us.html">ABOUT US</a>
+        <a href="services.html">SERVICES</a>
+      </nav>
+
+      <div class="nav-right">
+        <a href="login.php"><button class="btn-outline">LOG IN</button></a>
+        <a href="signup.html"><button class="btn-white">SIGN UP</button></a>
+      </div>
+
+    </div>
   </header>
 
-
-
-    <!-- HERO SECTION -->
-  <section class="hero">
-    <div class="overlay">
-      <div class="hero-text">
-        <h2>MAKE A<br><span>BOOKING</span></h2>
-        <p>Now, you can get expert advice and schedule an appointment online.</p>
-
-        <!-- ✅ BOOK APPOINTMENT BUTTON -->
-        <a href="login.php" class="book-btn">BOOK APPOINTMENT</a>
+  <main>
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>BOOK YOUR APPOINTMENT NOW</h1>
+        <p>Your health is our priority. Schedule a consultation easily online.</p>
+        
+        <a href="#" id="openLoginNotice" class="btn-main">BOOK APPOINTMENT</a>
       </div>
-    </div>
-  </section>
-  
-<section class="testimonials">
-  <h2>What Our Patients Say</h2>
-  <div class="testimonial-grid">
-    <div class="testimonial-card">
-      <p class="quote">“Napakadaling magpa-book online, hindi na kailangang pumila.”</p>
-      <p class="author">— Maria L.</p>
-    </div>
 
-    <div class="testimonial-card">
-      <p class="quote">“Mabait at maasikaso ang mga staff. Salamat Barangay Ilaya Health Center!”</p>
-      <p class="author">— Ruel D.</p>
-    </div>
+      <div class="login-card-wrapper">
+        <div class="login-card">
+          <h2>Log In to Proceed</h2>
+          <form action="php/login_process.php" method="POST">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
 
-    <div class="testimonial-card">
-      <p class="quote">“Malinis at maayos ang pasilidad. Highly recommended!”</p>
-      <p class="author">— Ana G.</p>
+            <button type="submit" class="btn-login">Log In</button>
+
+            <a href="#" class="forgot">Forgot password?</a>
+
+            <hr class="divider">
+
+            <a href="signup.html" class="create-btn">Create new account</a>
+
+          </form>
+        </div>
+      </div>
+    </section>
+    
+    </main>
+
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-box">
+      <h3>Please log in first</h3>
+      <p>You need to log in before making an appointment.</p>
+
+      <a href="#login-card-wrapper" id="scrollToLogin" class="modal-btn">Go to Login</a>
+      <button id="closeModal" class="modal-btn-outline">Close</button>
     </div>
   </div>
 
- 
-</section>
+<script>
+  const cta = document.getElementById('openLoginNotice'); 
+  const modal = document.getElementById('loginModal');
+  const closeBtn = document.getElementById('closeModal');
+  const goLogin = document.getElementById('scrollToLogin');
 
+  cta.addEventListener('click', (e) => {
+    e.preventDefault();
+    modal.classList.add('show');
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('show');
+  });
+
+  goLogin.addEventListener('click', (e) => {
+    e.preventDefault();
+    modal.classList.remove('show');
+    // Scroll to the login card smoothly
+    document.querySelector('.login-card-wrapper').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // Close modal when clicking outside
+  modal.addEventListener('click', (e) => {
+    if (e.target.id === 'loginModal') {
+      modal.classList.remove('show');
+    }
+  });
+
+</script>
 
 </body>
 </html>
