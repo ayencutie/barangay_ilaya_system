@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 8
+Patient ID     : PTN-0002
+Patient Name   : Florence T. Ayen
+Service        : Medical Certificate
+Date           : 2025-11-20
+Time           : 8:00 AM - 8:10 AM
+Status         : Completed
+=================================
