@@ -195,7 +195,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 // ignore DB save errors
             }
 
-            $_SESSION['login_error'] = "Too many failed attempts. You are locked out for the next **$delay_minutes minute(s)**.";
+            $_SESSION['login_error'] = "Too many failed attempts. You are locked out for the next $delay_minutes minute(s).";
             
             // Redirect pabalik sa login form para ipakita ang lockout message
             header("Location: ../landing_page.php");
