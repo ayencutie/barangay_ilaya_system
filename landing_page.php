@@ -91,8 +91,6 @@ if (isset($_SESSION['login_error'])) {
   const modal = document.getElementById('loginModal');
   const closeBtn = document.getElementById('closeModal');
   
-  // TINANGGAL: const goLogin = document.getElementById('scrollToLogin'); dahil wala ito sa HTML
-
   cta.addEventListener('click', (e) => {
     e.preventDefault();
     modal.classList.add('show');
