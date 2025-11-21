@@ -73,19 +73,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Forgot Password</title>
+<link rel="stylesheet" href="../css/signup.css"> <style>
+/* --- Custom Overrides for Perfect Alignment ---
+    These styles override the signup.css defaults to create a compact, 
+    perfectly centered form.
+*/
+
+/* 1. Override the Container Width for a compact form */
+.container {
+    max-width: 450px; 
+    padding: 40px 45px; 
+    width: 90%; 
+    /* The 'text-align: center;' is key for centering H2 and P tags */
+    text-align: center; 
+}
+
+/* 2. Styling for the minimal form to ensure vertical stacking and centering */
+.forgot-password-form {
+    display: flex;
+    flex-direction: column;
+    /* Center the form elements (field and button) horizontally */
+    align-items: center; 
+    gap: 15px;
+    width: 100%; 
+}
+
+/* 3. Ensure the input wrapper itself takes full width of the form (needed for the input to fill the space) */
+.field.full {
+    width: 100%;
+}
+
+/* 4. Ensure the button is centered and takes full available width (up to max) */
+.forgot-password-form button {
+    margin: 0 auto; /* Override signup.css margin */
+    width: 100%; 
+    max-width: 357px; 
+}
+
+/* Responsive adjustment for the container */
+@media (max-width: 500px) {
+    .container {
+        max-width: 95%;
+        padding: 30px 20px;
+    }
+}
+</style>
 </head>
 <body>
-<h2>Forgot Password</h2>
-<form method="post" action="">
-    <input type="email" name="email" placeholder="Email Address" required>
-    <button type="submit">Send OTP</button>
-</form>
-<?php
-if (isset($_SESSION['error_message'])) {
-    echo "<p style='color:red'>{$_SESSION['error_message']}</p>";
-    unset($_SESSION['error_message']);
-}
-?>
-<a href="../login.php">Return to Login</a>
+<div class="container">
+    <h2>Forgot Password</h2>
+    
+    <form method="post" action="" class="forgot-password-form">
+        <div class="field full">
+            <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                placeholder="Enter your Email Address" 
+                required
+            >
+        </div>
+        
+        <button type="submit">Send OTP</button>
+    </form>
+    
+    <?php
+    if (isset($_SESSION['error_message'])) {
+        echo "<p style='color:red; font-size: 14px; margin-top: 15px;'>{$_SESSION['error_message']}</p>";
+        unset($_SESSION['error_message']);
+    }
+    ?>
+    <p><a href="../login.php">Return to Log In</a></p>
+
+</div>
 </body>
 </html>
