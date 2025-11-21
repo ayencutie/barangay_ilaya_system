@@ -102,19 +102,6 @@ if (isset($_SESSION['login_error'])) {
     modal.classList.remove('show');
   });
 
-  // Ginamit ang login-card-wrapper para sa scroll to login action
-  // Kung gusto mo ring magkaroon ng "Go to Login" button sa modal, kailangan mo munang idagdag ito sa HTML
-  /*
-  if (goLogin) {
-      goLogin.addEventListener('click', (e) => {
-        e.preventDefault();
-        modal.classList.remove('show');
-        // Scroll to the login card smoothly
-        document.querySelector('.login-card-wrapper').scrollIntoView({ behavior: 'smooth' });
-      });
-  }
-  */
-
   // Close modal when clicking outside
   modal.addEventListener('click', (e) => {
     if (e.target.id === 'loginModal') {

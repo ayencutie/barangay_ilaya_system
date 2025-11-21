@@ -95,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         // Account successfully created. Redirect user to the login page.
         $_SESSION['signup_success'] = "Registration successful! You may now log in.";
-        header("Location: ../login.php");
+        header("Location: ../index.html");
         exit;
 
     } catch (PDOException $e) {

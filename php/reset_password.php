@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         unset($_SESSION['reset_user_id']);
         $_SESSION['success_message'] = "Password successfully updated. You can now login.";
-        header("Location: ../landing_page.html");
+        header("Location: ../landing_page.php");
         exit();
     }
 }

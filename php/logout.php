@@ -20,7 +20,7 @@ session_destroy();
 <script>
 // redirect after 1.5 seconds (adjust as needed)
 setTimeout(function(){
-    window.location.href = "../landing_page.html";
+    window.location.href = "../landing_page.php";
 }, 1500);
 </script>
 </body>
