@@ -2,6 +2,9 @@
 session_start();
 require 'db.php';
 
+// Define the threshold for suggesting a password reset
+const MAX_ATTEMPTS = 3;
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $email = trim($_POST['email']);
@@ -13,20 +16,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
-        $_SESSION['login_error'] = "Account not found.";
+        // IMPORTANT: Use a generic error here to prevent user enumeration
+        $_SESSION['login_error'] = "Invalid email or password."; 
         header("Location: ../login.php");
         exit;
     }
 
     // --- OPTIONAL: Initial Pending OTP Check ---
-    // You can remove this entire block if you want to ensure the login never skips to OTP verification.
     try {
         if (!empty($user['otp_code']) && !empty($user['otp_expires'])) {
             $now = new DateTime();
             $exp = new DateTime($user['otp_expires']);
             if ($exp > $now) {
-                // redirect user to OTP verification if an OTP is pending
-                    header("Location: ../php/otp_verify.php?email=" . urlencode($email));
+                // Set the session attempt count to the DB value before redirecting to inform the user
+                $_SESSION['login_attempts'] = (int)($user['failed_attempts'] ?? 0);
+                header("Location: ../php/otp_verify.php?email=" . urlencode($email));
                 exit;
             }
         }
@@ -60,10 +64,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // =======================================================
     if ($isValid) {
         
-        // 1. CRITICAL FIX: Clear old login error messages from the session
+        // 1. Clear old login error messages from the session
         if (isset($_SESSION['login_error'])) {
             unset($_SESSION['login_error']);
         }
+        // Also clear the attempt counter session variable
+        unset($_SESSION['login_attempts']);
 
         // 2. Clear failed attempts in the database on successful login
         if ((int)($user['failed_attempts'] ?? 0) > 0) {
@@ -92,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // 🔴 START FAILED LOGIN PATH 🔴
     // =======================================================
     else { 
-        // Ensure required columns exist (unchanged)
+        // Ensure required columns exist (unchanged schema check)
         try {
             $colCheck = $pdo->prepare("SHOW COLUMNS FROM users LIKE 'failed_attempts'");
             $colCheck->execute();
@@ -109,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // ignore — we'll still try to continue
         }
 
-        // Increment failed_attempts (unchanged)
+        // Increment failed_attempts and fetch current attempts
         try {
             $inc = $pdo->prepare("UPDATE users SET failed_attempts = COALESCE(failed_attempts,0) + 1 WHERE email = ?");
             $inc->execute([$email]);
@@ -121,29 +127,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $attempts = 0;
         }
 
-        // --- THE MINIMAL FIX: Suggest Reset on 3rd Attempt ---
-        if ($attempts >= 3) {
+        // CRITICAL: Synchronize DB attempt count with session for frontend display
+        $_SESSION['login_attempts'] = $attempts; 
+
+        if ($attempts >= MAX_ATTEMPTS) {
+            // A. Too many attempts: Set specific suggestion error message
+            $_SESSION['login_error'] = "Too many failed attempts. We highly suggest you use the 'Forgot Password' link below.";
             
-            // Set the desired session message to display the "Forgot Password" suggestion.
-            $_SESSION['login_error'] = "Too many failed attempts. Please use the 'Forgot Password' link to reset your password.";
-            
-            // Reset attempts and clear OTP fields in the database.
+            // Optional: Reset attempts in the database since we are suggesting a reset path.
             try {
                 $up = $pdo->prepare("UPDATE users SET otp_code = NULL, otp_expires = NULL, failed_attempts = 0 WHERE email = ?");
                 $up->execute([$email]);
+                // Clear session attempts too if DB is cleared
+                unset($_SESSION['login_attempts']); 
             } catch (Exception $e) {
                 // ignore DB save errors
             }
-            
-            // Redirect back to the login page.
-            header("Location: ../login.php");
-            exit;
+
+        } else {
+            // B. Default error message for attempts 1 and 2
+            $remaining = MAX_ATTEMPTS - $attempts;
+            $_SESSION['login_error'] = "Wrong password. You have $remaining attempt(s) remaining before a reset is suggested.";
         }
 
-        // Default error message for attempts 1 and 2
-        $err = "Wrong password.";
-        if ($attempts > 0) $err .= " Attempts: " . $attempts;
-        $_SESSION['login_error'] = $err;
         header("Location: ../login.php");
         exit;
     }

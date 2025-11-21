@@ -2,66 +2,51 @@
 session_start();
 require 'db.php';
 
-// OTP verification page: shows form and verifies code
-$email = $_GET['email'] ?? $_POST['email'] ?? null;
-$error = '';
+$email = $_SESSION['reset_email'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? null;
-    $code = trim($_POST['otp'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $otp = trim($_POST['otp'] ?? '');
 
-    if (!$email || !$code) {
-        $error = 'Missing email or OTP code.';
+    $stmt = $pdo->prepare("SELECT patient_id, otp_code, otp_expires FROM users WHERE email = ? LIMIT 1");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user || $user['otp_code'] !== $otp) {
+        $_SESSION['error_message'] = "Invalid OTP.";
+    } elseif (new DateTime() > new DateTime($user['otp_expires'])) {
+        $_SESSION['error_message'] = "OTP has expired.";
     } else {
-        $stmt = $pdo->prepare("SELECT otp_code, otp_expires FROM users WHERE email = ? LIMIT 1");
-        $stmt->execute([$email]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row) {
-            $error = 'Account not found.';
-        } else {
-            $now = new DateTime();
-            $exp = $row['otp_expires'] ? new DateTime($row['otp_expires']) : null;
-            if (!$row['otp_code'] || !$exp || $exp < $now) {
-                $error = 'OTP expired or not found. Please request a new code by trying to log in again.';
-            } elseif (hash_equals($row['otp_code'], $code)) {
-                // correct: clear otp, reset failed attempts and allow reset password
-                $up = $pdo->prepare("UPDATE users SET otp_code = NULL, otp_expires = NULL, failed_attempts = 0 WHERE email = ?");
-                $up->execute([$email]);
-
-                // mark session to allow password reset
-                $_SESSION['otp_verified_email'] = $email;
-                header('Location: ../reset_password.php');
-                exit;
-            } else {
-                $error = 'Invalid OTP code.';
-            }
-        }
+        $_SESSION['reset_user_id'] = $user['patient_id'];
+        unset($_SESSION['reset_email']); // clear email after OTP verified
+        header("Location: reset_password.php");
+        exit();
     }
-}
 
+    header("Location: otp_verify.php");
+    exit();
+}
 ?>
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Verify OTP</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enter OTP</title>
 </head>
 <body>
-  <h1>Enter the OTP sent to your email</h1>
-  <?php if ($error): ?>
-    <p style="color:red"><?=htmlspecialchars($error)?></p>
-  <?php endif; ?>
-  <form method="POST">
-    <input type="hidden" name="email" value="<?=htmlspecialchars($email)?>">
-    <label>OTP code: <input type="text" name="otp" maxlength="6" required></label>
-    <button type="submit">Verify</button>
-  </form>
-  <p>If you didn't receive an email, check spam or contact admin.</p>
-  <?php if (!empty($_SESSION['otp_mail_failed'])): ?>
-    <p style="color:orange;"><strong>Note:</strong> We couldn't send the OTP by email. <?=htmlspecialchars($_SESSION['otp_mail_error'] ?? '')?> You can use the code shown below (visible locally) to continue.</p>
-  <?php endif; ?>
-  <?php if (isset($_SESSION['otp_for_test'])): ?>
-    <p><small>Test OTP (visible locally): <?=htmlspecialchars($_SESSION['otp_for_test'])?></small></p>
-  <?php endif; ?>
+<h2>Enter OTP</h2>
+<form method="post" action="">
+    <input type="email" name="email" placeholder="Your Email" value="<?php echo htmlspecialchars($email); ?>" required>
+    <input type="text" name="otp" placeholder="Enter OTP" required>
+    <button type="submit">Verify OTP</button>
+</form>
+<?php
+if (isset($_SESSION['error_message'])) {
+    echo "<p style='color:red'>{$_SESSION['error_message']}</p>";
+    unset($_SESSION['error_message']);
+}
+?>
+<a href="forgot_password.php">Resend OTP</a>
 </body>
 </html>
