@@ -1,3 +1,15 @@
+/* ======================================
+   VARIABLES & GLOBAL SETTINGS
+======================================= */
+:root {
+  --green-main: #1E4D2B;  /* Ang iyong napiling navbar color */
+  --green-dark: #163b20;
+  --white-soft: #F5F8F2;
+  --green-accent: #009900;
+  --card-bg: #ffffff;
+  --text-dark: #333333;
+}
+
 /* === GLOBAL STYLE === */
 * {
   margin: 0;
@@ -7,13 +19,13 @@
 }
 
 body {
-  background-color: #ffffff;
+  background-color: var(--white-soft); /* Gamitin ang variable para consistent */
   color: #222;
 }
 
 /* === MAIN NAVBAR === */
 .navbar {
-  background-color: #009900;
+  background-color: #1E4D2B; /* Ito ang iyong request */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -112,59 +124,74 @@ nav ul li a:hover,
   border-color: #007a00;
 }
 
-/* === HERO SECTION === */
-.hero {
-  text-align: center;
-  padding: 60px 20px 40px;
+/* ================= HERO SECTION ================= */
+.hero-services {
+    /* Background Image at Dark Green Overlay */
+    background:
+        linear-gradient(rgba(30, 77, 43, 0.7), rgba(22, 59, 32, 0.8)),
+        url('https://i.ibb.co/fdQ620PT/Untitled-design-1.png') no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed; /* Parallax effect */
+    
+    color: white;
+    padding: 100px 20px 80px;
+    text-align: center;
+    margin-bottom: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.hero h1 {
-  font-size: 24px;
-  margin-bottom: 10px;
-  color: #1b5e20;
-  font-weight: 700;
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative; 
+    z-index: 2;
 }
 
-.hero p {
-  color: #555;
-  font-size: 15px;
+.hero-services h1 {
+    font-size: 44px;
+    font-weight: 900;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5); 
 }
 
-/* === GRID SECTION === */
+.hero-services p {
+    font-size: 18px;
+    opacity: 0.95;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* ================= SERVICES GRID ================= */
+.services-grid-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 30px 80px;
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 0 20px;
-  background: #f0f9f0;
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0, 153, 51, 0.1);
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  gap: 30px;
 }
 
 .card {
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  background: var(--card-bg); /* White card */
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Soft Shadow */
   display: flex;
   flex-direction: column;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 15px rgba(0, 153, 51, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .card .image {
-  background: #ddd;
-  height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: var(--white-soft);
+  height: 180px;
+  overflow: hidden;
 }
 
 .image img {
@@ -172,37 +199,59 @@ nav ul li a:hover,
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.5s ease;
 }
 
-.card .content {
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.card:hover .image img {
+    transform: scale(1.05);
 }
 
-.card h3 {
+.content {
+    padding: 20px;
+    flex-grow: 1; 
+}
+
+.content h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: var(--green-dark); 
+  border-bottom: 2px solid var(--green-accent);
+  padding-bottom: 5px;
+  display: inline-block;
+}
+
+.content p {
+  color: var(--text-dark);
   font-size: 15px;
-  color: #1b5e20;
-  font-weight: 700;
+  line-height: 1.6;
 }
 
-.card p {
-  font-size: 13px;
-  color: #555;
-  line-height: 1.4;
-}
+/* RESPONSIVENESS */
+@media (max-width: 900px){
+  .nav-center{ display: none; }
 
-/* === RESPONSIVE GRID === */
-@media (max-width: 900px) {
+  .navbar-inner {
+    padding: 15px 20px;
+  }
+  
+  .hero-services h1 {
+      font-size: 36px;
+  }
+  
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr 1fr; /* 2 columns sa tablet */
+      gap: 20px;
   }
 }
 
 @media (max-width: 600px) {
   .grid {
-    grid-template-columns: 1fr;
+      grid-template-columns: 1fr; /* 1 column sa mobile */
+  }
+  
+  .services-grid-wrapper {
+      padding: 0 20px 60px;
   }
 
   .navbar {

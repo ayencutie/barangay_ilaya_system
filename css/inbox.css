@@ -13,7 +13,7 @@ body {
 
 /* --- NAVBAR (same as landing page) --- */
 .navbar {
-  background-color: #009900;
+  background-color: #1E4D2B;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -83,7 +83,7 @@ nav ul li a:hover,
 .dropdown-content a {
   display: block;
   padding: 10px 16px;
-  color: #009900;
+  color: #1E4D2B;
   font-weight: 600;
 }
 
@@ -142,7 +142,7 @@ nav ul li a:hover,
 }
 
 .tab-btn.active {
-  background: #009900;
+  background: #1E4D2B;
   color: #fff;
 }
 
@@ -190,7 +190,7 @@ nav ul li a:hover,
 
 .typing-indicator {
   display: none;
-  color: #007a00;
+  color: #1E4D2B;
   font-style: italic;
 }
 
@@ -210,7 +210,7 @@ nav ul li a:hover,
 }
 
 .msg.user {
-  background: #009900;
+  background: #1E4D2B;
   color: #fff;
   margin-left: auto;
 }
@@ -240,7 +240,7 @@ nav ul li a:hover,
   border: none;
   cursor: pointer;
   font-weight: 600;
-  background: #009900;
+  background: #1E4D2B;
   color: #fff;
 }
 
