@@ -1,179 +1,276 @@
-/* Base reset and font for page */
+/* ======================================
+   GLOBAL RESET & VARIABLES (Matched to landing_page.css)
+======================================= */
+:root {
+  --nav-height: 72px;
+  --green-main: #1E4D2B; /* Darker Green (Navbar color) */
+  --green-dark: #163b20; /* Very Dark Green (Primary text color) */
+  --white-soft: #F5F8F2; /* Soft White (Main background color - Semi Light) */
+  --green-accent: #009900; /* Bright Green Accent */
+  --card-bg: #ffffff; /* Card background */
+  --text-dark: #333333; /* Dark gray text for readability */
+}
+
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
 }
 
+html, body {
+  height: 100%;
+}
+
+/* ========== BODY + BACKGROUND (Soft White/Semi Light Theme) ========== */
 body {
-  background-color: #fff;
-  color: #1a3d17; /* dark green text */
+  /* Ginamit ang soft white/off-white background */
+  background-color: var(--white-soft); 
+  /* Primary text color ay Dark Green para tumugma sa Navbar theme */
+  color: var(--green-dark); 
+  overflow-x: hidden;
 }
 
-/* Navbar styles (you can replace with your main CSS or keep it here) */
+/* ================= NAVBAR (EXACT COPY OF LANDING PAGE THEME) ================= */
 .navbar {
-  background-color: #009900;
+  position: sticky; 
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  background: var(--green-main); /* #1E4D2B */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Medyo malaking shadow para mag-stand out */
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 15px 60px;
+  z-index: 1000; 
 }
 
-.navbar .logo {
+.navbar-inner {
+  width: 100%;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-left {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.navbar .logo img {
+.nav-logo {
+  height: 40px; 
   width: 40px;
-  height: 40px;
 }
 
-.navbar h1 {
-  color: #fff;
-  font-size: 20px;
+.nav-title {
+  font-size: 18px; 
   font-weight: 700;
+  color: white; 
 }
 
-nav ul {
-  list-style: none;
+.nav-center {
   display: flex;
-  align-items: center;
-  gap: 25px;
+  gap: 10px; 
 }
 
-nav ul li a {
-  color: #fff;
+.nav-center a {
+  color: white;
   text-decoration: none;
+  font-size: 16px;
   font-weight: 600;
-  transition: all 0.3s ease;
-  padding: 8px 14px;
-  border-radius: 5px;
+  padding: 10px 15px; 
+  border-radius: 6px;
+  transition: background-color 0.2s;
 }
 
-nav ul li a:hover {
-  background-color: #006600;
-  color: #e0e0e0;
+.nav-center a:hover {
+  background-color: var(--green-dark); /* #163b20 */
 }
 
-nav ul li .login-btn {
-  border: 2px solid #fff;
+.nav-right {
+  display: flex;
+  gap: 15px;
 }
 
-nav ul li .signup-btn {
-  background-color: #fff;
-  color: #009900;
+/* NAV BUTTONS (Matched to landing_page.css) */
+.btn-outline {
+  padding: 8px 16px; 
+  border-radius: 8px;
+  border: 2px solid white;
+  background: transparent;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-white {
+  padding: 10px 18px; 
+  border-radius: 8px;
+  background: white;
+  color: var(--green-main); /* #1E4D2B */
   font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-white:hover {
+    background: #e0e0e0; /* Medyo dark na white */
 }
 
-nav ul li .signup-btn:hover,
-nav ul li .login-btn:hover {
-  background-color: #006600;
-  color: #fff;
-  border-color: #006600;
+
+/* ================= ABOUT US PAGE (ENHANCED LAYOUT) ================= */
+
+.about-wrapper{
+  padding-top: calc(var(--nav-height) + 50px);
+  padding-bottom: 80px;
+  display: flex;
+  justify-content: center;
 }
 
-/* About Section Centered with Design */
-.about-section.centered {
-  max-width: 800px;
-  margin: 60px auto 100px;
-  padding: 40px 30px;
-  background: #f0f9f0; /* soft greenish background */
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0, 153, 51, 0.1);
+.about-section{
+  max-width: 1100px; /* Nilakihan ng konti ang max-width */
+  width: 90%;
+}
+
+.section-title{
   text-align: center;
-  color: #1a3d17; /* dark green */
-}
-
-.about-section.centered h2 {
-  font-size: 3rem;
+  font-size: 44px;
   font-weight: 900;
   margin-bottom: 50px;
-  color: #007a00;
-  text-shadow: 1px 1px 4px rgba(0, 119, 0, 0.3);
+  color: var(--green-main); /* Dark Green para sa main header */
 }
 
-.about-section.centered .about-content > div {
-  margin-bottom: 40px;
-  padding: 0 20px;
+.about-content{
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
-.about-section.centered h3 {
-  font-size: 1.8rem;
-  margin-bottom: 20px;
+/* Base Card Style */
+.card{
+  background: var(--card-bg); /* White background */
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Soft shadow */
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); /* Medyo mas lumalabas sa hover */
+}
+
+.card-title{
+  font-size: 28px;
   font-weight: 800;
-  color: #005500;
+  margin-bottom: 20px;
+  color: var(--green-dark); /* Very Dark Green para sa headings */
   position: relative;
   display: inline-block;
   padding-bottom: 8px;
-  border-bottom: 3px solid #009900;
 }
 
-.about-section.centered p,
-.about-section.centered ul {
-  font-size: 1.15rem;
+/* Accent Line under Headings */
+.card-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 60%;
+    background: var(--green-accent); /* Bright Green Accent */
+    border-radius: 3px;
+}
+
+/* Paragraph and List Text */
+.card p,
+.card li{
+  color: var(--text-dark); /* Dark Gray para sa body text */
   line-height: 1.7;
-  max-width: 700px;
-  margin: 0 auto;
-  color: #2f4f2f;
+  font-size: 16px;
 }
 
-.about-section.centered ul {
+/* Mission & Vision Container (2-Column Grid) */
+.mv-container,
+.features-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+/* List Styling */
+ul{
   list-style: none;
-  padding-left: 0;
+  padding: 0;
   margin-top: 15px;
 }
 
-.about-section.centered ul li {
-  position: relative;
-  padding-left: 30px;
-  margin-bottom: 12px;
-  text-align: left;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
+ul li{
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 10px;
 }
 
-/* Custom checkmark before each li */
-.about-section.centered ul li::before {
-  content: "✔";
+ul li::before{
+  content:"\2713"; /* Checkmark symbol */
+  font-family: 'Inter', system-ui, sans-serif;
+  margin-right: 10px;
+  color: var(--green-accent); /* Bright Green Accent */
+  font-weight: 900;
   position: absolute;
   left: 0;
-  top: 2px;
-  color: #009900;
-  font-weight: bold;
-  font-size: 1.1rem;
+  top: 0;
 }
 
-/* Contact section strong text color */
-.about-section.centered .contact p strong {
-  color: #004d00;
+/* Contact Info Card */
+.contact-info-card {
+    background-color: var(--green-main); /* Dark Green background */
+    color: white;
+    text-align: center;
+    border: none;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .about-section.centered {
-    padding: 30px 20px;
-    margin: 40px 15px 60px;
+.contact-info-card .card-title {
+    color: white;
+}
+
+.contact-info-card .card-title::after {
+    background: white; /* White accent line */
+}
+
+.contact-info-card p,
+.contact-info-card p strong {
+    color: var(--white-soft);
+    font-size: 18px;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 900px){
+  .nav-center{ display: none; }
+
+  .navbar-inner {
+    padding: 15px 20px;
   }
 
-  .about-section.centered h2 {
-    font-size: 2.4rem;
+  .mv-container,
+  .features-container {
+      grid-template-columns: 1fr; /* 1 column sa mobile */
+      gap: 20px;
+  }
+  
+  .section-title {
+      font-size: 36px;
+      margin-bottom: 30px;
   }
 
-  .about-section.centered h3 {
-    font-size: 1.4rem;
-  }
-
-  .about-section.centered p,
-  .about-section.centered ul li {
-    font-size: 1rem;
-    max-width: 100%;
-  }
-
-  .about-section.centered ul li {
-    text-align: left;
+  .about-wrapper{
+    padding-top: calc(var(--nav-height) + 30px);
   }
 }
