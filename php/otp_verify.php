@@ -2,21 +2,22 @@
 session_start();
 require 'db.php';
 
-// Retrieve the email stored during the forgot password request
-$email = $_SESSION['reset_email'] ?? '';
+// 1. KUNIN ANG EMAIL: Unahin ang POST (kung may submit) o Session (kung bagong dating)
+$email = $_POST['user_email'] ?? $_SESSION['reset_email'] ?? '';
 
-// ******************** CHECK: Redirect if email is missing ********************
+// ******************** CRITICAL CHECK: Redirect if email is missing ********************
+// Kapag walang email sa POST o SESSION, ibalik sa forgot_password.php
 if (empty($email)) {
     $_SESSION['error_message'] = "Your session has expired or the email is missing. Please start over.";
     header("Location: forgot_password.php");
     exit();
 }
 
-// Retrieve display variables (set in forgot_password.php)
+// 2. KUNIN ANG DISPLAY VARIABLES: Hindi na kailangan ng buong DB lookup kung valid pa ang session
 $user_name = $_SESSION['reset_user_name'] ?? 'User';
 $masked_email = $_SESSION['reset_masked_email'] ?? 'your email';
-// CRITICAL: Idagdag ang '../' sa path para mag-work ang image mula sa php/ folder
-// Halimbawa: uploads/filename.png?v=time  -->  ../uploads/filename.png?v=time
+
+// CRITICAL: Ayusin ang path ng profile pic para mag-work mula sa php/ folder
 $raw_pic_url = $_SESSION['reset_profile_pic'] ?? 'uploads/default_profile.png'; 
 $profile_pic_url = str_contains($raw_pic_url, '../') ? $raw_pic_url : '../' . $raw_pic_url;
 
@@ -26,38 +27,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     
     $stmt = $pdo->prepare("SELECT patient_id, otp_code, otp_expires FROM users WHERE email = ? LIMIT 1");
+    // Gamitin ang $email variable na nakuha sa taas
     $stmt->execute([$email]); 
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Error handling checks
     if (!$user) {
+        // Hindi dapat mangyari, pero safety net ito.
         $_SESSION['error_message'] = "An error occurred. Please try resetting your password again.";
         header("Location: forgot_password.php");
         exit();
     } elseif ($user['otp_code'] === null || $user['otp_code'] !== $otp) {
+        // Validation Fails: Invalid OTP. Hayaan lang mag-render ang page.
         $_SESSION['error_message'] = "Invalid OTP. Please check the code sent to your email.";
     } elseif (new DateTime() > new DateTime($user['otp_expires'])) {
+        // Validation Fails: Expired OTP. Hayaan lang mag-render ang page.
         $_SESSION['error_message'] = "OTP has expired. Please click 'Resend OTP' to get a new code.";
     } else {
-        // Success: OTP is valid and not expired
-        $_SESSION['reset_patient_id'] = $user['patient_id']; 
+        // **********************************************
+        // SUCCESS: OTP is valid and not expired
+        // **********************************************
         
-        // Clear all session variables related to OTP reset for security
+        // ✅ ITO ANG KRITIKAL NA SOLUSYON! I-set ang session key na HINAHANAP ng reset_password.php
+        $_SESSION['reset_user_id'] = $user['patient_id']; 
+        
+        // Clear unnecessary session variables for security
         unset($_SESSION['reset_email']); 
         unset($_SESSION['reset_user_name']); 
         unset($_SESSION['reset_masked_email']); 
         unset($_SESSION['reset_profile_pic']); 
         
+        // Clear OTP from database
         $clear_otp = $pdo->prepare("UPDATE users SET otp_code = NULL, otp_expires = NULL WHERE patient_id = ?");
         $clear_otp->execute([$user['patient_id']]);
         
+        // ✅ DITO DIRETSO SA reset_password.php
         header("Location: reset_password.php");
         exit();
     }
     
-    // If validation fails, redirect back to show error message 
-    header("Location: otp_verify.php");
-    exit();
+    // TANGGALIN ANG REDIRECT DITO. Kapag may error message, hahayaan na lang mag-render
+    // ang HTML sa ibaba para makita ng user ang error.
 }
 ?>
 <!DOCTYPE html>
@@ -172,6 +182,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
     <form method="post" action="" class="forgot-password-form">
         
+        <?php if (!empty($email)): ?>
+            <input type="hidden" name="user_email" value="<?php echo htmlspecialchars($email); ?>">
+        <?php endif; ?>
+        
         <div class="field full">
             <input 
                 type="text" 
@@ -186,6 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
     
     <?php
+    // Ipakita ang error message kung mayroon man
     if (isset($_SESSION['error_message'])) {
         echo "<p style='color:red; font-size: 14px; margin-top: 15px;'>{$_SESSION['error_message']}</p>";
         unset($_SESSION['error_message']);
