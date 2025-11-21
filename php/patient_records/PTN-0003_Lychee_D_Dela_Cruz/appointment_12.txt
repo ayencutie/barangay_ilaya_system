@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 12
+Patient ID     : PTN-0003
+Patient Name   : Lychee D. Dela Cruz
+Service        : Medical Certificate
+Date           : 2025-11-22
+Time           : 8:00 AM - 8:10 AM
+Status         : Completed
+=================================

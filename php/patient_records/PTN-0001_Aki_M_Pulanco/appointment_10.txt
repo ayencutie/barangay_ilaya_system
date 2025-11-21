@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 10
+Patient ID     : PTN-0001
+Patient Name   : Aki M. Pulanco
+Service        : Immunization
+Date           : 2025-11-25
+Time           : 8:00 AM - 8:10 AM
+Status         : Completed
+=================================

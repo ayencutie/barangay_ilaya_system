@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 7
+Patient ID     : PTN-0001
+Patient Name   : Aki M. Pulanco
+Service        : Medical Certificate
+Date           : 2025-11-20
+Time           : 8:00 AM - 8:10 AM
+Status         : Completed
+=================================
