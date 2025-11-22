@@ -3,61 +3,80 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ilaya Health Center Services</title>
+  <title>Ilaya Health Center — Services</title>
   <link rel="stylesheet" href="css/new services.css" />
-  <link rel="stylesheet" href="css/navbar.css" />
 </head>
 <body>
 
   <header class="navbar">
-    <div class="logo">
+    
+    <div class="nav-left">
       <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
       <h1>BARANGAY ILAYA HEALTH CENTER</h1>
     </div>
-    <nav class="nav-main">
+
+    <div class="nav-center">
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="new about us.html">About Us</a></li>
         <li><a href="new services.html">Services</a></li>
       </ul>
+    </div>
 
-      <div class="dropdown">
-        <button id="menuButton" class="dropbtn" aria-haspopup="true" aria-expanded="false">Menu ▾</button>
-        <div id="dropdownMenu" class="dropdown-content">
+    <div class="nav-right">
+      
+      <a href="inbox.php" class="icon-btn" title="Inbox">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+        </svg>
+        <span id="msgBadge" class="badge">0</span>
+      </a>
+
+      <div class="dropdown-container">
+        <button id="menuButton" class="menu-btn">Menu ▼</button>
+        <div id="menuDropdown" class="dropdown-content">
           <a href="book appointment.html">Book Appointment</a>
           <a href="my_appointment.html">My Appointment</a>
-          <a href="inbox.php">Inbox</a>
+          
         </div>
       </div>
 
-      <div class="nav-profile-wrapper">
-        <button id="navProfileBtn" class="profile-btn" aria-haspopup="true" aria-expanded="false">
-          <img id="navProfileImage" src="uploads/default_profile.png" alt="Profile" class="nav-profile">
+      <div class="profile-container">
+        <button id="profileButton" class="profile-btn" title="Account">
+          <img id="userAvatar" src="uploads/default_profile.png" alt="Profile">
+          <span class="active-dot"></span> 
         </button>
-        <div id="navProfileDropdown" class="nav-profile-dropdown" hidden>
-          <div class="nav-profile-info">
-            <strong id="navProfileName">Guest</strong>
-            <div id="navPatientId" class="nav-pid">PTN-0000</div>
+
+        <div id="profileDropdown" class="profile-card" hidden>
+          <div class="profile-header">
+            <img id="dropdownAvatar" src="uploads/default_profile.png" alt="User">
+            <div class="header-info">
+              <strong id="userName">Guest User</strong>
+              <span id="userId">Patient ID: --</span>
+            </div>
           </div>
-          <hr>
-          <a href="account.html">Account Settings</a>
-          <button id="toggleDark" class="linkish">Toggle Dark Mode</button>
-          <a href="php/logout.php" class="logout-btn">Log Out</a>
+          <hr class="divider">
+          <div class="profile-links">
+            
+            <a href="account.html" class="p-link"><span class="icon"></span> Account Settings</a>
+            <hr class="divider-small">
+            <a href="php/logout.php" class="p-link logout"><span class="icon"></span> Log Out</a>
+          </div>
         </div>
       </div>
-    </nav>
-  </header>
 
+    </div> 
+  </header>
   <section class="hero-services">
     <div class="hero-content">
-      <h1>ILAYA HEALTH CENTER SERVICES</h1>
-      <p>We offer quality and accessible healthcare services for every resident of Barangay Ilaya. Mag-book ng appointment online ngayon!</p>
+      <h1>OUR MEDICAL SERVICES</h1>
+      <p>We provide comprehensive healthcare services to ensure the well-being of our community.</p>
     </div>
   </section>
 
-  <section class="services-grid-wrapper">
+  <div class="services-grid-wrapper">
     <div class="grid">
-
+      
       <div class="card">
       <div class="image">
         <img src="data:image/jpeg;base64,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" alt="Immunization">
@@ -156,32 +175,85 @@
 
       </div>
     </div>
-      
+
     </div>
-  </section>
+  </div>
+
+  <div id="toastBox" class="toast-container"></div>
+  <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
   <script>
-    const menuButton = document.getElementById('menuButton');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    if (menuButton && dropdownMenu) {
-      menuButton.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
-      window.addEventListener('click', (e) => {
-        if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) dropdownMenu.classList.remove('show');
+    // 1. Dropdown Logic
+    const menuBtn = document.getElementById('menuButton');
+    const menuDropdown = document.getElementById('menuDropdown');
+    const profileBtn = document.getElementById('profileButton');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    function closeAll() {
+      if(menuDropdown) menuDropdown.classList.remove('show');
+      if(profileDropdown) profileDropdown.hidden = true;
+    }
+
+    if(menuBtn) {
+      menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = menuDropdown.classList.contains('show');
+        closeAll();
+        if(!isOpen) menuDropdown.classList.add('show');
       });
     }
+
+    if(profileBtn) {
+      profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = !profileDropdown.hidden;
+        closeAll();
+        if(!isOpen) profileDropdown.hidden = false;
+      });
+    }
+
+    window.addEventListener('click', closeAll);
+
+    // 2. User Info Fetcher
+    fetch('php/get_user.php').then(r=>r.json()).then(data => {
+      if(data && !data.error) {
+        const picUrl = data.profile_pic || 'uploads/default_profile.png';
+        
+        if(document.getElementById('userAvatar')) document.getElementById('userAvatar').src = picUrl;
+        if(document.getElementById('dropdownAvatar')) document.getElementById('dropdownAvatar').src = picUrl;
+        
+        if(document.getElementById('userName')) document.getElementById('userName').innerText = data.first_name || 'User';
+        if(document.getElementById('userId')) document.getElementById('userId').innerText = data.patient_id || '';
+      }
+    }).catch(() => {});
+
+    // 3. Notification Function
+    function triggerNotification(message) {
+      const badge = document.getElementById('msgBadge');
+      const toastBox = document.getElementById('toastBox');
+      const audio = document.getElementById('notifSound');
+
+      if(badge) { 
+        badge.style.display = 'flex'; 
+        badge.innerText = '1'; 
+      }
+      
+      if(audio) audio.play().catch(() => {}); 
+
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<div class="toast-icon">📩</div><div class="toast-msg"><h4>New Message</h4><p>${message}</p></div>`;
+      toastBox.appendChild(toast);
+
+      setTimeout(() => toast.classList.add('show'), 100);
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 5000);
+    }
+
+    // === SIMULATION: Trigger notification after 3 seconds ===
+    setTimeout(() => { 
+      triggerNotification("You have a new message from Admin."); 
+    }, 3000);
   </script>
-  <script>
-    (function(){
-      const btn = document.getElementById('navProfileBtn');
-      const dd = document.getElementById('navProfileDropdown');
-      const img = document.getElementById('navProfileImage');
-      const nameEl = document.getElementById('navProfileName');
-      const pidEl = document.getElementById('navPatientId');
-      btn && btn.addEventListener('click', function(e){ e.stopPropagation(); const open = dd.hidden; dd.hidden = !open; btn.setAttribute('aria-expanded', String(!open)); });
-      window.addEventListener('click', ()=>{ if(dd) dd.hidden = true; btn && btn.setAttribute('aria-expanded','false'); });
-      fetch('php/get_user.php').then(r=>r.json()).then(data=>{ if(!data || data.error) return; if(img) img.src = data.profile_pic && data.profile_pic.trim() !== '' ? (data.profile_pic + '?v=' + Date.now()) : (data.gender && data.gender.toLowerCase().startsWith('m') ? 'uploads/default_male.svg' : (data.gender && data.gender.toLowerCase().startsWith('f') ? 'uploads/default_female.svg' : 'uploads/default_profile.png')); if(nameEl) nameEl.textContent = (data.first_name || '') + ' ' + (data.last_name || ''); if(pidEl) pidEl.textContent = data.patient_id || ''; }).catch(()=>{});
-      const toggle = document.getElementById('toggleDark'); toggle && toggle.addEventListener('click', ()=>{ document.body.classList.toggle('dark-mode'); });
-    })();
-  </script>
+
 </body>
 </html>

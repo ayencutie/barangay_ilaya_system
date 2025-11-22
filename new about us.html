@@ -5,129 +5,205 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About Us – Barangay Ilaya Health Center</title>
   <link rel="stylesheet" href="css/new about us.css" />
-  <link rel="stylesheet" href="css/navbar.css" />
 </head>
 <body>
 
   <header class="navbar">
-    <div class="logo">
+    
+    <div class="nav-left">
       <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
       <h1>BARANGAY ILAYA HEALTH CENTER</h1>
     </div>
-    <nav class="nav-main">
+
+    <div class="nav-center">
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
-        <li><a href="new about us.html">About Us</a></li>
+        <li><a href="new about us.html" class="active">About Us</a></li>
         <li><a href="new services.html">Services</a></li>
       </ul>
+    </div>
 
-      <div class="nav-menu">
-        <button id="menuButton" class="dropbtn">Menu ▼</button>
-        <div class="dropdown-content" id="dropdownMenu">
+    <div class="nav-right">
+      
+      <a href="inbox.php" class="icon-btn" title="Inbox">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+        </svg>
+        <span id="msgBadge" class="badge">0</span>
+      </a>
+
+      <div class="dropdown-container">
+        <button id="menuButton" class="menu-btn">Menu ▼</button>
+        <div id="menuDropdown" class="dropdown-content">
           <a href="book appointment.html">Book Appointment</a>
           <a href="my_appointment.html">My Appointment</a>
-          <a href="inbox.php">Inbox</a>
+          
         </div>
       </div>
 
-      <div class="nav-profile-wrapper">
-        <button id="navProfileBtn" class="profile-btn" aria-haspopup="true" aria-expanded="false">
-          <img id="navProfileImage" src="uploads/default_profile.png" alt="Profile" class="nav-profile">
+      <div class="profile-container">
+        <button id="profileButton" class="profile-btn" title="Account">
+          <img id="userAvatar" src="uploads/default_profile.png" alt="Profile">
+          <span class="active-dot"></span> 
         </button>
-        <div id="navProfileDropdown" class="nav-profile-dropdown" hidden>
-          <div class="nav-profile-info">
-            <strong id="navProfileName">Guest</strong>
-            <div id="navPatientId" class="nav-pid">PTN-0000</div>
+
+        <div id="profileDropdown" class="profile-card" hidden>
+          <div class="profile-header">
+            <img id="dropdownAvatar" src="uploads/default_profile.png" alt="User">
+            <div class="header-info">
+              <strong id="userName">Guest User</strong>
+              <span id="userId">Patient ID: --</span>
+            </div>
           </div>
-          <hr>
-          <a href="account.html">Account Settings</a>
-          <button id="toggleDark" class="linkish">Toggle Dark Mode</button>
-          <a href="php/logout.php" class="logout-btn">Log Out</a>
+          <hr class="divider">
+          <div class="profile-links">
+            <a href="account.html" class="p-link"><span class="icon"></span> Account Settings</a>
+            <hr class="divider-small">
+            <a href="php/logout.php" class="p-link logout"><span class="icon"></span> Log Out</a>
+          </div>
         </div>
       </div>
-    </nav>
+
+    </div> 
   </header>
-
-  <section class="about-section centered">
-    <h2>About Us</h2>
-
-    <div class="about-content">
-      <div class="who-we-are">
-        <h3>Who We Are</h3>
-        <p>
-          Barangay Ilaya Health Center is a community-based primary healthcare facility dedicated to providing accessible, equitable, and quality health services to all residents of Barangay Ilaya.
-          Through our <strong>Online Appointment System</strong>, we aim to make healthcare more convenient and efficient by allowing residents to <strong>book consultations, request services, and get updates online</strong> — anytime, anywhere.
-        </p>
-      </div>
-
-      <div class="mission">
-        <h3>Mission</h3>
-        <p>
-          To provide accessible, equitable, and quality primary health care services to all <strong>Las Piñeros</strong> by competent, compassionate, and efficient <strong>frontliners</strong>, ready to serve with fortitude and professionalism using current and holistic approaches, maximizing community participation and multi-sectoral linkages.
-        </p>
-      </div>
-
-      <div class="vision">
-        <h3>Vision</h3>
-        <p>
-          <strong>Ilaya Health Center</strong> is a center of excellence in primary health care which is systematic, self-sufficient, and technologically advanced, aimed at improving the quality of life of all <strong>Las Piñeros</strong>, being an integral part of the community, promoting a healthy and safe environment by year <strong>2030</strong>.
-        </p>
-      </div>
-
-      <div class="goals">
-        <h3>Our Goals</h3>
-        <ul>
-          <li>To make healthcare more accessible through digital appointment scheduling.</li>
-          <li>To reduce long waiting lines and improve service efficiency.</li>
-          <li>To empower the residents of Barangay Ilaya to take an active role in their health and well-being.</li>
-          <li>To enhance coordination between healthcare workers, community leaders, and partner institutions.</li>
-        </ul>
-      </div>
-
-      <div class="why-choose">
-        <h3>Why Choose Our Online Appointment System?</h3>
-        <ul>
-          <li>User-friendly — book anytime, anywhere</li>
-          <li>Real-time schedule updates</li>
-          <li>Reduced waiting time for consultations</li>
-          <li>Safe and secure patient information handling</li>
-          <li>Strengthens community–healthcare connection</li>
-        </ul>
-      </div>
-
-      <div class="contact">
-        <h3>Contact Information</h3>
-        <p>
-          📍 <strong>Address:</strong> Villa Coastal, Madrigal Compound, Ilaya Las Piñas City <br />
-          📧 <strong>Email:</strong> barangayilayahealthcenter@gmail.com <br />
-          🕒 <strong>Clinic Hours:</strong> Monday – Friday | 8:00 AM – 5:00 PM
-        </p>
-      </div>
+  <section class="hero-about">
+    <div class="hero-overlay">
+      <h1>ABOUT US</h1>
+      <p>Committed to providing quality healthcare for every resident of Barangay Ilaya.</p>
     </div>
   </section>
 
+  <div class="about-container">
+    <div class="about-grid">
+
+        <div class="who-we-are box">
+          <h3>Who We Are</h3>
+          <p>
+            Barangay Ilaya Health Center is a community-based primary healthcare facility dedicated to providing accessible, equitable, and quality health services to all residents of Barangay Ilaya.
+            Through our <strong>Online Appointment System</strong>, we aim to make healthcare more convenient and efficient by allowing residents to <strong>book consultations, request services, and get updates online</strong> — anytime, anywhere.
+          </p>
+        </div>
+
+        <div class="mission box">
+          <h3>Mission</h3>
+          <p>
+            To provide accessible, equitable, and quality primary health care services to all <strong>Las Piñeros</strong> by competent, compassionate, and efficient <strong>frontliners</strong>, ready to serve with fortitude and professionalism.
+          </p>
+        </div>
+
+        <div class="vision box">
+          <h3>Vision</h3>
+          <p>
+            <strong>Ilaya Health Center</strong> is a center of excellence in primary health care which is systematic, self-sufficient, and technologically advanced.
+          </p>
+        </div>
+
+        <div class="goals box">
+          <h3>Our Goals</h3>
+          <ul>
+            <li>To make healthcare more accessible through digital appointment scheduling.</li>
+            <li>To reduce long waiting lines and improve service efficiency.</li>
+            <li>To empower the residents of Barangay Ilaya to take an active role in their health and well-being.</li>
+            <li>Enhance coordination with community leaders and institutions.</li>
+          </ul>
+        </div>
+
+        <div class="why-choose box">
+          <h3>Why Choose Our Online Appointment System?</h3>
+          <ul>
+            <li>User-friendly — book anytime, anywhere</li>
+            <li>Real-time schedule updates</li>
+            <li>Reduced waiting time for consultations</li>
+            <li>Safe and secure patient information handling</li>
+            <li>Strengthens community–healthcare connection</li>
+          </ul>
+        </div>
+
+        <div class="contact box">
+          <h3>Contact Information</h3>
+          <p>
+            📍 <strong>Address:</strong> Villa Coastal, Madrigal Compound, Ilaya Las Piñas City <br>
+            📧 <strong>Email:</strong> barangayilayahealthcenter@gmail.com <br>
+            🕒 <strong>Clinic Hours:</strong> Monday – Friday | 8:00 AM – 5:00 PM
+          </p>
+        </div>
+
+    </div>
+  </div>
+
+  <div id="toastBox" class="toast-container"></div>
+  <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
   <script>
-    const menuButton = document.getElementById('menuButton');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    if (menuButton && dropdownMenu) {
-      menuButton.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
-      window.addEventListener('click', (e) => {
-        if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) dropdownMenu.classList.remove('show');
+    // 1. Dropdown Logic
+    const menuBtn = document.getElementById('menuButton');
+    const menuDropdown = document.getElementById('menuDropdown');
+    const profileBtn = document.getElementById('profileButton');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    function closeAll() {
+      if(menuDropdown) menuDropdown.classList.remove('show');
+      if(profileDropdown) profileDropdown.hidden = true;
+    }
+
+    if(menuBtn) {
+      menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = menuDropdown.classList.contains('show');
+        closeAll();
+        if(!isOpen) menuDropdown.classList.add('show');
       });
     }
+
+    if(profileBtn) {
+      profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = !profileDropdown.hidden;
+        closeAll();
+        if(!isOpen) profileDropdown.hidden = false;
+      });
+    }
+
+    window.addEventListener('click', closeAll);
+
+    // 2. User Info Fetcher
+    fetch('php/get_user.php').then(r=>r.json()).then(data => {
+      if(data && !data.error) {
+        const picUrl = data.profile_pic || 'uploads/default_profile.png';
+        if(document.getElementById('userAvatar')) document.getElementById('userAvatar').src = picUrl;
+        if(document.getElementById('dropdownAvatar')) document.getElementById('dropdownAvatar').src = picUrl;
+        if(document.getElementById('userName')) document.getElementById('userName').innerText = data.first_name || 'User';
+        if(document.getElementById('userId')) document.getElementById('userId').innerText = data.patient_id || '';
+      }
+    }).catch(() => {});
+
+    // 3. Notification Logic
+    function triggerNotification(message) {
+      const badge = document.getElementById('msgBadge');
+      const toastBox = document.getElementById('toastBox');
+      const audio = document.getElementById('notifSound');
+
+      if(badge) { 
+        badge.style.display = 'flex'; 
+        badge.innerText = '1'; 
+      }
+      
+      if(audio) audio.play().catch(() => {}); 
+
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<div class="toast-icon">📩</div><div class="toast-msg"><h4>New Message</h4><p>${message}</p></div>`;
+      toastBox.appendChild(toast);
+
+      setTimeout(() => toast.classList.add('show'), 100);
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 5000);
+    }
+
+    // === SIMULATION: Trigger after 3 seconds ===
+    setTimeout(() => { 
+      triggerNotification("You have a new message from Admin."); 
+    }, 3000);
   </script>
-  <script>
-    (function(){
-      const btn = document.getElementById('navProfileBtn');
-      const dd = document.getElementById('navProfileDropdown');
-      const img = document.getElementById('navProfileImage');
-      const nameEl = document.getElementById('navProfileName');
-      const pidEl = document.getElementById('navPatientId');
-      btn && btn.addEventListener('click', function(e){ e.stopPropagation(); const open = dd.hidden; dd.hidden = !open; btn.setAttribute('aria-expanded', String(!open)); });
-      window.addEventListener('click', ()=>{ if(dd) dd.hidden = true; btn && btn.setAttribute('aria-expanded','false'); });
-      fetch('php/get_user.php').then(r=>r.json()).then(data=>{ if(!data || data.error) return; if(img) img.src = data.profile_pic && data.profile_pic.trim() !== '' ? (data.profile_pic + '?v=' + Date.now()) : (data.gender && data.gender.toLowerCase().startsWith('m') ? 'uploads/default_male.svg' : (data.gender && data.gender.toLowerCase().startsWith('f') ? 'uploads/default_female.svg' : 'uploads/default_profile.png')); if(nameEl) nameEl.textContent = (data.first_name || '') + ' ' + (data.last_name || ''); if(pidEl) pidEl.textContent = data.patient_id || ''; }).catch(()=>{});
-      const toggle = document.getElementById('toggleDark'); toggle && toggle.addEventListener('click', ()=>{ document.body.classList.toggle('dark-mode'); });
-    })();
-  </script>
+
 </body>
 </html>

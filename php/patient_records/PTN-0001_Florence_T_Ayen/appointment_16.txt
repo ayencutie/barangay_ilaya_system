@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 16
+Patient ID     : PTN-0001
+Patient Name   : Florence T. Ayen
+Service        : Greencard / Hospitalization
+Date           : 2025-11-22
+Time           : 9:00 AM - 9:10 AM
+Status         : Completed
+=================================

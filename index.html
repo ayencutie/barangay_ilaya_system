@@ -5,46 +5,74 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Barangay Ilaya Health Center — Home</title>
   <link rel="stylesheet" href="css/new landing page.css">
-  <link rel="stylesheet" href="css/navbar.css">
 </head>
 <body>
+
   <header class="navbar">
-    <div class="logo">
+    
+    <div class="nav-left">
       <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
       <h1>BARANGAY ILAYA HEALTH CENTER</h1>
     </div>
-    <nav class="nav-main">
+
+    <div class="nav-center">
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="new about us.html">About Us</a></li>
         <li><a href="new services.html">Services</a></li>
       </ul>
+    </div>
 
-      <div class="dropdown">
-        <button id="menuButton" class="dropbtn">Menu ▼</button>
-        <div class="dropdown-content" id="dropdownMenu">
+    <div class="nav-right">
+      
+      <a href="inbox.php" class="icon-btn" title="Inbox">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+        </svg>
+        <span id="msgBadge" class="badge">0</span>
+      </a>
+
+      <div class="dropdown-container">
+        <button id="menuButton" class="menu-btn">Menu ▼</button>
+        <div id="menuDropdown" class="dropdown-content">
           <a href="book appointment.html">Book Appointment</a>
           <a href="my_appointment.html">My Appointment</a>
-          <a href="inbox.php">Inbox</a>
+          
         </div>
       </div>
 
-      <div class="nav-profile-wrapper">
-        <button id="navProfileBtn" class="profile-btn" aria-haspopup="true" aria-expanded="false">
-          <img id="navProfileImage" src="uploads/default_profile.png" alt="Profile" class="nav-profile">
-        </button>
-        <div id="navProfileDropdown" class="nav-profile-dropdown" hidden>
-          <div class="nav-profile-info">
-            <strong id="navProfileName">Guest</strong>
-            <div id="navPatientId" class="nav-pid">PTN-0000</div>
+      <div class="profile-container">
+        
+        <button id="profileButton" class="profile-btn" title="Account">
+          <img id="userAvatar" src="uploads/default_profile.png" alt="Profile">
+          <span class="active-dot"></span> </button>
+
+        <div id="profileDropdown" class="profile-card" hidden>
+          
+          <div class="profile-header">
+            <img id="dropdownAvatar" src="uploads/default_profile.png" alt="User">
+            <div class="header-info">
+              <strong id="userName">Guest User</strong>
+              <span id="userId">Patient ID: --</span>
+            </div>
           </div>
-          <hr>
-          <a href="account.html">Account Settings</a>
-          <button id="toggleDark" class="linkish">Toggle Dark Mode</button>
-          <a href="php/logout.php" class="logout-btn">Log Out</a>
+          
+          <hr class="divider">
+
+          <div class="profile-links">
+            <a href="account.html" class="p-link"><span class="icon"></span> Account Settings</a>
+            
+            <hr class="divider-small">
+            
+            <a href="php/logout.php" class="p-link logout">
+              <span class="icon"></span> Log Out
+            </a>
+          </div>
+
         </div>
       </div>
-    </nav>
+
+    </div> 
   </header>
 
   <section class="hero">
@@ -52,7 +80,7 @@
       <div class="hero-text">
         <h2>MAKE A<br><span>BOOKING</span></h2>
         <p>Now, you can get expert advice and schedule an appointment online.</p>
-        <a href="book appointment.html" class="book-btn">BOOK APPOINTMENT</a>
+        <a href="book appointment.html" class="cta-btn">BOOK APPOINTMENT</a>
       </div>
     </div>
   </section>
@@ -60,70 +88,97 @@
   <section class="testimonials">
     <h2>What Our Patients Say</h2>
     <div class="testimonial-grid">
-      <div class="testimonial-card">
+      <div class="card">
         <p class="quote">“Napakadaling magpa-book online, hindi na kailangang pumila.”</p>
         <p class="author">— Maria L.</p>
       </div>
-      <div class="testimonial-card">
-        <p class="quote">“Mabait at maasikaso ang mga staff. Salamat Barangay Ilaya Health Center!”</p>
+      <div class="card">
+        <p class="quote">“Mabait at maasikaso ang mga staff. Salamat Barangay Ilaya!”</p>
         <p class="author">— Ruel D.</p>
       </div>
-      <div class="testimonial-card">
+      <div class="card">
         <p class="quote">“Malinis at maayos ang pasilidad. Highly recommended!”</p>
         <p class="author">— Ana G.</p>
       </div>
     </div>
   </section>
 
-  <script>
-    (function(){
-      const menuButton = document.getElementById('menuButton');
-      const dropdownMenu = document.getElementById('dropdownMenu');
-      if (!menuButton || !dropdownMenu) return;
+  <div id="toastBox" class="toast-container"></div>
+  <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
-      // Toggle the menu and update aria-expanded
-      menuButton.addEventListener('click', function(e){
+  <script>
+    // 1. Dropdown Logic
+    const menuBtn = document.getElementById('menuButton');
+    const menuDropdown = document.getElementById('menuDropdown');
+    const profileBtn = document.getElementById('profileButton');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    function closeAll() {
+      if(menuDropdown) menuDropdown.classList.remove('show');
+      if(profileDropdown) profileDropdown.hidden = true;
+    }
+
+    // Menu Toggle
+    if(menuBtn) {
+      menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const opened = dropdownMenu.classList.toggle('show');
-        menuButton.setAttribute('aria-expanded', String(opened));
+        const isOpen = menuDropdown.classList.contains('show');
+        closeAll();
+        if(!isOpen) menuDropdown.classList.add('show');
       });
+    }
 
-      // Prevent clicks inside the menu from closing it
-      dropdownMenu.addEventListener('click', function(e){ e.stopPropagation(); });
-
-      // Close when clicking outside
-      window.addEventListener('click', function(){
-        if (dropdownMenu.classList.contains('show')){
-          dropdownMenu.classList.remove('show');
-          menuButton.setAttribute('aria-expanded', 'false');
-        }
+    // Profile Toggle
+    if(profileBtn) {
+      profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = !profileDropdown.hidden;
+        closeAll();
+        if(!isOpen) profileDropdown.hidden = false;
       });
-    })();
-  </script>
+    }
 
-  <script>
-    // Navbar profile dropdown & populate
-    (function(){
-      const btn = document.getElementById('navProfileBtn');
-      const dd = document.getElementById('navProfileDropdown');
-      const img = document.getElementById('navProfileImage');
-      const nameEl = document.getElementById('navProfileName');
-      const pidEl = document.getElementById('navPatientId');
-      btn && btn.addEventListener('click', function(e){ e.stopPropagation(); const open = dd.hidden; dd.hidden = !open; btn.setAttribute('aria-expanded', String(!open)); });
-      window.addEventListener('click', ()=>{ if(dd) dd.hidden = true; btn && btn.setAttribute('aria-expanded','false'); });
+    window.addEventListener('click', closeAll);
 
-      // populate user info if available
-      fetch('php/get_user.php').then(r=>r.json()).then(data=>{
-        if(!data || data.error) return;
-        if(img) img.src = data.profile_pic && data.profile_pic.trim() !== '' ? (data.profile_pic + '?v=' + Date.now()) : (data.gender && data.gender.toLowerCase().startsWith('m') ? 'uploads/default_male.svg' : (data.gender && data.gender.toLowerCase().startsWith('f') ? 'uploads/default_female.svg' : 'uploads/default_profile.png'));
-        if(nameEl) nameEl.textContent = (data.first_name || '') + ' ' + (data.last_name || '');
-        if(pidEl) pidEl.textContent = data.patient_id || '';
-      }).catch(()=>{});
+    // 2. User Info Fetcher
+    fetch('php/get_user.php').then(r=>r.json()).then(data => {
+      if(data && !data.error) {
+        const picUrl = data.profile_pic || 'uploads/default_profile.png';
+        
+        if(document.getElementById('userAvatar')) document.getElementById('userAvatar').src = picUrl;
+        if(document.getElementById('dropdownAvatar')) document.getElementById('dropdownAvatar').src = picUrl;
+        if(document.getElementById('userName')) document.getElementById('userName').innerText = data.first_name || 'User';
+        if(document.getElementById('userId')) document.getElementById('userId').innerText = data.patient_id || '';
+      }
+    }).catch(() => {});
 
-      // dark mode toggle (local only)
-      const toggle = document.getElementById('toggleDark');
-      toggle && toggle.addEventListener('click', ()=>{ document.body.classList.toggle('dark-mode'); });
-    })();
+    // 3. Notification System Logic
+    function triggerNotification(message) {
+      const badge = document.getElementById('msgBadge');
+      const toastBox = document.getElementById('toastBox');
+      const audio = document.getElementById('notifSound');
+
+      if(badge) { 
+        badge.style.display = 'flex'; 
+        badge.innerText = '1'; 
+      }
+      
+      if(audio) audio.play().catch(() => {}); 
+
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<div class="toast-icon">📩</div><div class="toast-msg"><h4>New Message</h4><p>${message}</p></div>`;
+      toastBox.appendChild(toast);
+
+      setTimeout(() => toast.classList.add('show'), 100);
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 5000);
+    }
+
+    // === SIMULATION: ADMIN MESSAGE ===
+    // Tutunog at lalabas ang popup na "You have a new message from Admin" after 3 seconds
+    setTimeout(() => { 
+        triggerNotification("You have a new message from Admin."); 
+    }, 3000);
   </script>
 </body>
 </html>
