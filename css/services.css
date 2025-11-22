@@ -118,18 +118,8 @@ body {
 /* ================= HERO SECTION (With Landing Page Background) ================= */
 
 .hero-services {
-    /* Background Image at Dark Green Overlay (from landing_page.css) */
-    background:
-        linear-gradient(rgba(30, 77, 43, 0.7), rgba(22, 59, 32, 0.8)),
-        url('https://i.ibb.co/fdQ620PT/Untitled-design-1.png') no-repeat center center;
-    background-size: cover;
-    background-attachment: fixed; /* Parallax effect */
-    
-    color: white;
-    padding: 100px 20px 80px;
-    text-align: center;
-    margin-bottom: 50px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(rgba(30, 77, 43, 0.7), rgba(22, 59, 32, 0.8)), url('https://i.ibb.co/fdQ620PT/Untitled-design-1.png') no-repeat center center;
+    background-size: cover; background-attachment: fixed; color: white; padding: 100px 20px 80px; text-align: center; margin-bottom: 50px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .hero-content {
