@@ -94,7 +94,7 @@ if($_SERVER["REQUEST_METHOD"] === "POST"){
             // or a concurrent one that got to the SELECT first).
             $pdo->rollBack(); 
             // Send an alert to the user.
-            echo "<script>alert('❌ Booking Failed: That exact slot has just been booked. Please select another time or refresh the page.'); window.history.back();</script>";
+            echo "<script>alert('The slot you are trying to book is no longer available. Please choose another one.'); window.history.back();</script>";
             exit;
         }
 
