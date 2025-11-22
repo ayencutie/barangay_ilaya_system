@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 13
+Patient ID     : PTN-0007
+Patient Name   : Joshua D. Pulanco
+Service        : Medical Certificate
+Date           : 2025-11-23
+Time           : 8:00 AM - 8:10 AM
+Status         : Completed
+=================================
