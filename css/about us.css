@@ -1,276 +1,132 @@
-/* ======================================
-   GLOBAL RESET & VARIABLES (Matched to landing_page.css)
-======================================= */
+/* ========== VARIABLES & GLOBAL SETTINGS ========== */
 :root {
-  --nav-height: 72px;
-  --green-main: #1E4D2B; /* Darker Green (Navbar color) */
-  --green-dark: #163b20; /* Very Dark Green (Primary text color) */
-  --white-soft: #F5F8F2; /* Soft White (Main background color - Semi Light) */
-  --green-accent: #009900; /* Bright Green Accent */
-  --card-bg: #ffffff; /* Card background */
-  --text-dark: #333333; /* Dark gray text for readability */
+  --green-main: #1E4D2B;
+  --green-dark: #163b20;
+  --white-soft: #F5F8F2;
 }
 
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-html, body {
-  height: 100%;
-}
+body { background-color: #f9f9f9; color: #222; }
 
-/* ========== BODY + BACKGROUND (Soft White/Semi Light Theme) ========== */
-body {
-  /* Ginamit ang soft white/off-white background */
-  background-color: var(--white-soft); 
-  /* Primary text color ay Dark Green para tumugma sa Navbar theme */
-  color: var(--green-dark); 
-  overflow-x: hidden;
-}
-
-/* ================= NAVBAR (EXACT COPY OF LANDING PAGE THEME) ================= */
+/* ========== NAVBAR ========== */
 .navbar {
-  position: sticky; 
+  width: 100%;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  height: var(--nav-height);
-  background: var(--green-main); /* #1E4D2B */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Medyo malaking shadow para mag-stand out */
-  display: flex;
-  align-items: center;
-  z-index: 1000; 
+  background: var(--green-main);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 1000;
 }
 
 .navbar-inner {
-  width: 100%;
-  padding: 0 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 15px 30px;
 }
 
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.nav-left, .nav-right, .nav-center { display: flex; align-items: center; }
 
-.nav-logo {
-  height: 40px; 
-  width: 40px;
-}
-
-.nav-title {
-  font-size: 18px; 
-  font-weight: 700;
-  color: white; 
-}
-
-.nav-center {
-  display: flex;
-  gap: 10px; 
-}
+.nav-logo { height: 40px; margin-right: 10px; }
+.nav-title { color: white; font-weight: 700; font-size: 18px; white-space: nowrap; }
 
 .nav-center a {
   color: white;
   text-decoration: none;
-  font-size: 16px;
   font-weight: 600;
-  padding: 10px 15px; 
+  padding: 10px 15px;
   border-radius: 6px;
-  transition: background-color 0.2s;
+  margin: 0 5px;
 }
 
-.nav-center a:hover {
-  background-color: var(--green-dark); /* #163b20 */
-}
+.nav-center a:hover,
+.nav-center a.active { background-color: var(--green-dark); }
 
-.nav-right {
-  display: flex;
-  gap: 15px;
-}
-
-/* NAV BUTTONS (Matched to landing_page.css) */
 .btn-outline {
-  padding: 8px 16px; 
-  border-radius: 8px;
+  padding: 8px 16px;
   border: 2px solid white;
   background: transparent;
   color: white;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
-.btn-outline:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
 
 .btn-white {
-  padding: 10px 18px; 
-  border-radius: 8px;
-  background: white;
-  color: var(--green-main); /* #1E4D2B */
-  font-weight: 700;
+  padding: 10px 18px;
   border: none;
+  background: white;
+  color: var(--green-main);
+  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
+  margin-left: 10px;
   transition: all 0.2s;
 }
-.btn-white:hover {
-    background: #e0e0e0; /* Medyo dark na white */
-}
 
+.btn-outline:hover { background: rgba(255, 255, 255, 0.1); }
+.btn-white:hover { background: var(--white-soft); }
 
-/* ================= ABOUT US PAGE (ENHANCED LAYOUT) ================= */
-
-.about-wrapper{
-  padding-top: calc(var(--nav-height) + 50px);
-  padding-bottom: 80px;
+/* ========== HERO SECTION ========== */
+.hero-about {
+  height: 300px;
+  background: linear-gradient(rgba(30, 77, 43, 0.7), rgba(22, 59, 32, 0.8)),
+              url('https://i.ibb.co/fdQ620PT/Untitled-design-1.png') no-repeat center center;
+  background-size: cover;
   display: flex;
+  align-items: center;
   justify-content: center;
-}
-
-.about-section{
-  max-width: 1100px; /* Nilakihan ng konti ang max-width */
-  width: 90%;
-}
-
-.section-title{
   text-align: center;
-  font-size: 44px;
-  font-weight: 900;
-  margin-bottom: 50px;
-  color: var(--green-main); /* Dark Green para sa main header */
+  color: #fff;
 }
 
-.about-content{
-  display: flex;
-  flex-direction: column;
+.hero-overlay h1 { font-size: 3rem; margin-bottom: 15px; font-weight: 800; }
+.hero-overlay p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; }
+
+/* ========== ABOUT US GRID ========== */
+.about-container { max-width: 1200px; margin: 50px auto; padding: 0 30px 80px; }
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 30px;
 }
 
-/* Base Card Style */
-.card{
-  background: var(--card-bg); /* White background */
-  padding: 30px;
+.box {
+  background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Soft shadow */
-  transition: transform 0.3s, box-shadow 0.3s;
+  padding: 40px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  transition: transform 0.3s;
+  border-top: 5px solid var(--green-main);
 }
 
-.card:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); /* Medyo mas lumalabas sa hover */
+.box:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+
+.who-we-are, .contact { grid-column: 1 / -1; }
+
+.box h3 {
+  font-size: 1.8rem; font-weight: 800; color: var(--green-main); margin-bottom: 20px;
+  border-bottom: 2px solid #eee; padding-bottom: 10px; display: inline-block;
 }
 
-.card-title{
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 20px;
-  color: var(--green-dark); /* Very Dark Green para sa headings */
-  position: relative;
-  display: inline-block;
-  padding-bottom: 8px;
-}
+.box p, .box li { font-size: 1.1rem; color: #444; margin-bottom: 15px; line-height: 1.7; }
+.box ul { padding-left: 20px; }
+.box ul li { margin-bottom: 10px; }
 
-/* Accent Line under Headings */
-.card-title::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 3px;
-    width: 60%;
-    background: var(--green-accent); /* Bright Green Accent */
-    border-radius: 3px;
-}
-
-/* Paragraph and List Text */
-.card p,
-.card li{
-  color: var(--text-dark); /* Dark Gray para sa body text */
-  line-height: 1.7;
-  font-size: 16px;
-}
-
-/* Mission & Vision Container (2-Column Grid) */
-.mv-container,
-.features-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-}
-
-/* List Styling */
-ul{
-  list-style: none;
-  padding: 0;
-  margin-top: 15px;
-}
-
-ul li{
-    position: relative;
-    padding-left: 30px;
-    margin-bottom: 10px;
-}
-
-ul li::before{
-  content:"\2713"; /* Checkmark symbol */
-  font-family: 'Inter', system-ui, sans-serif;
-  margin-right: 10px;
-  color: var(--green-accent); /* Bright Green Accent */
-  font-weight: 900;
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-/* Contact Info Card */
-.contact-info-card {
-    background-color: var(--green-main); /* Dark Green background */
-    color: white;
-    text-align: center;
-    border: none;
-}
-
-.contact-info-card .card-title {
-    color: white;
-}
-
-.contact-info-card .card-title::after {
-    background: white; /* White accent line */
-}
-
-.contact-info-card p,
-.contact-info-card p strong {
-    color: var(--white-soft);
-    font-size: 18px;
-}
-
-/* RESPONSIVE DESIGN */
+/* RESPONSIVE */
 @media (max-width: 900px){
-  .nav-center{ display: none; }
-
-  .navbar-inner {
-    padding: 15px 20px;
-  }
-
-  .mv-container,
-  .features-container {
-      grid-template-columns: 1fr; /* 1 column sa mobile */
-      gap: 20px;
-  }
-  
-  .section-title {
-      font-size: 36px;
-      margin-bottom: 30px;
-  }
-
-  .about-wrapper{
-    padding-top: calc(var(--nav-height) + 30px);
-  }
+  .navbar-inner { padding: 15px 20px; }
+  .nav-center { display: none; }
+  .hero-about { height: 250px; }
+  .hero-overlay h1 { font-size: 2.2rem; }
+  .about-grid { grid-template-columns: 1fr; }
 }

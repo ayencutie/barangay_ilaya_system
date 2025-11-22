@@ -2,98 +2,101 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About Us – Barangay Ilaya Health Center</title>
   <link rel="stylesheet" href="css/about us.css" />
 </head>
 <body>
 
+  <!-- NAVBAR -->
   <header class="navbar">
     <div class="navbar-inner">
+
       <div class="nav-left">
         <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" class="nav-logo" alt="logo">
         <span class="nav-title">BARANGAY ILAYA HEALTH CENTER</span>
       </div>
 
       <nav class="nav-center">
-        <a href="landing_page.php">HOME</a>
-        <a href="about us.html">ABOUT US</a>
+        <a href="landing_page.php">HOME</a> 
+        <a href="about us.html" class="active">ABOUT US</a>
         <a href="services.html">SERVICES</a>
       </nav>
 
       <div class="nav-right">
-        <a href="landing_page.html"><button class="btn-outline">LOG IN</button></a>
-        <a href="log in.html"><button class="btn-white">SIGN UP</button></a>
+        <a href="landing_page.php"><button class="btn-outline">LOG IN</button></a> 
+        <a href="signup.php"><button class="btn-white">SIGN UP</button></a>
       </div>
+
     </div>
   </header>
 
-  <section class="about-wrapper">
-    <div class="about-section">
-
-      <h2 class="section-title">Learn About Us</h2>
-
-      <div class="about-content">
-
-        <div class="who-we-are box card full-width">
-          <h3 class="card-title">Who We Are</h3>
-          <p>
-            Barangay Ilaya Health Center is a community-based primary healthcare facility dedicated to providing accessible, equitable, and quality health services to all residents of Barangay Ilaya.
-            Through our <strong>Online Appointment System</strong>, we aim to make healthcare more convenient and efficient by allowing residents to <strong>book consultations, request services, and get updates online</strong> — anytime, anywhere.
-          </p>
-        </div>
-
-        <div class="mv-container">
-          <div class="mission box card">
-            <h3 class="card-title">Mission</h3>
-            <p>
-              To provide accessible, equitable, and quality primary health care services to all <strong>Las Piñeros</strong> by competent, compassionate, and efficient <strong>frontliners</strong>, ready to serve with fortitude and professionalism using current and holistic approaches, maximizing community participation and multi-sectoral linkages.
-            </p>
-          </div>
-
-          <div class="vision box card">
-            <h3 class="card-title">Vision</h3>
-            <p>
-              <strong>Ilaya Health Center</strong> is a center of excellence in primary health care which is systematic, self-sufficient, and technologically advanced, aimed at improving the quality of life of all <strong>Las Piñeros</strong>, being an integral part of the community, promoting a healthy and safe environment by year <strong>2030</strong>.
-            </p>
-          </div>
-        </div>
-
-        <div class="features-container">
-          <div class="goals box card">
-            <h3 class="card-title">Our Goals</h3>
-            <ul>
-              <li>To make healthcare more accessible through digital appointment scheduling.</li>
-              <li>To reduce long waiting lines and improve service efficiency.</li>
-              <li>To empower the residents of Barangay Ilaya to take an active role in their health and well-being.</li>
-              <li>To enhance coordination between healthcare workers, community leaders, and partner institutions.</li>
-            </ul>
-          </div>
-
-          <div class="why-choose box card">
-            <h3 class="card-title">Why Choose Our System?</h3>
-            <ul>
-              <li>User-friendly — book anytime, anywhere</li>
-              <li>Real-time schedule updates</li>
-              <li>Reduced waiting time for consultations</li>
-              <li>Safe and secure patient information handling</li>
-              <li>Strengthens community–healthcare connection</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="contact box card full-width contact-info-card">
-          <h3 class="card-title">Contact Information</h3>
-          <p>
-            <strong>Address:</strong> Villa Coastal, Madrigal Compound, Ilaya Las Piñas City <br>
-            <strong>Email:</strong> barangayilayahealthcenter@gmail.com <br>
-            <strong>Clinic Hours:</strong> Monday – Friday | 8:00 AM – 5:00 PM
-          </p>
-        </div>
-
-      </div>
+  <!-- HERO SECTION -->
+  <section class="hero-about">
+    <div class="hero-overlay">
+      <h1>ABOUT US</h1>
+      <p>Committed to providing quality healthcare for every resident of Barangay Ilaya.</p>
     </div>
   </section>
+
+  <!-- ABOUT US CONTENT -->
+  <div class="about-container">
+    <div class="about-grid">
+
+      <div class="who-we-are box">
+        <h3>Who We Are</h3>
+        <p>
+          Barangay Ilaya Health Center is a community-based primary healthcare facility dedicated to providing accessible, equitable, and quality health services to all residents of Barangay Ilaya.
+          Through our <strong>Online Appointment System</strong>, we aim to make healthcare more convenient and efficient by allowing residents to <strong>book consultations, request services, and get updates online</strong> — anytime, anywhere.
+        </p>
+      </div>
+
+      <div class="mission box">
+        <h3>Mission</h3>
+        <p>
+          To provide accessible, equitable, and quality primary health care services to all <strong>Las Piñeros</strong> by competent, compassionate, and efficient <strong>frontliners</strong>, ready to serve with fortitude and professionalism.
+        </p>
+      </div>
+
+      <div class="vision box">
+        <h3>Vision</h3>
+        <p>
+          <strong>Ilaya Health Center</strong> is a center of excellence in primary health care which is systematic, self-sufficient, and technologically advanced.
+        </p>
+      </div>
+
+      <div class="goals box">
+        <h3>Our Goals</h3>
+        <ul>
+          <li>To make healthcare more accessible through digital appointment scheduling.</li>
+          <li>To reduce long waiting lines and improve service efficiency.</li>
+          <li>To empower the residents of Barangay Ilaya to take an active role in their health and well-being.</li>
+          <li>Enhance coordination with community leaders and institutions.</li>
+        </ul>
+      </div>
+
+      <div class="why-choose box">
+        <h3>Why Choose Our Online Appointment System?</h3>
+        <ul>
+          <li>User-friendly — book anytime, anywhere</li>
+          <li>Real-time schedule updates</li>
+          <li>Reduced waiting time for consultations</li>
+          <li>Safe and secure patient information handling</li>
+          <li>Strengthens community–healthcare connection</li>
+        </ul>
+      </div>
+
+      <div class="contact box">
+        <h3>Contact Information</h3>
+        <p>
+          📍 <strong>Address:</strong> Villa Coastal, Madrigal Compound, Ilaya Las Piñas City <br>
+          📧 <strong>Email:</strong> barangayilayahealthcenter@gmail.com <br>
+          🕒 <strong>Clinic Hours:</strong> Monday – Friday | 8:00 AM – 5:00 PM
+        </p>
+      </div>
+
+    </div>
+  </div>
 
 </body>
 </html>
