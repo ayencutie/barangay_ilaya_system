@@ -5,90 +5,107 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Account Settings – Barangay Ilaya Health Center</title>
 <link rel="stylesheet" href="css/account.css">
-<link rel="stylesheet" href="css/navbar.css">
 </head>
 <body>
 
 <header class="navbar">
-  <div class="logo">
+  
+  <div class="nav-left">
     <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
     <h1>BARANGAY ILAYA HEALTH CENTER</h1>
   </div>
-  <nav class="nav-main">
+
+  <div class="nav-center">
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="new about us.html">About Us</a></li>
       <li><a href="new services.html">Services</a></li>
     </ul>
+  </div>
 
-    <div class="nav-menu">
-      <button id="menuButton" class="dropbtn">Menu ▼</button>
-      <div class="dropdown-content" id="dropdownMenu">
+  <div class="nav-right">
+    
+    <a href="inbox.php" class="icon-btn" title="Inbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+      </svg>
+      <span id="msgBadge" class="badge">0</span>
+    </a>
+
+    <div class="dropdown-container">
+      <button id="menuButton" class="menu-btn">Menu ▼</button>
+      <div id="menuDropdown" class="dropdown-content">
         <a href="book appointment.html">Book Appointment</a>
         <a href="my_appointment.html">My Appointment</a>
-        <a href="inbox.php">Inbox</a>
+        <a href="medical_records.html">Medical Records</a>
       </div>
     </div>
 
-    <div class="nav-profile-wrapper">
-      <button id="navProfileBtn" class="profile-btn" aria-haspopup="true" aria-expanded="false">
-        <img id="navProfileImage" src="uploads/default_profile.png" alt="Profile" class="nav-profile">
+    <div class="profile-container">
+      <button id="profileButton" class="profile-btn" title="Account">
+        <img id="userAvatar" src="uploads/default_profile.png" alt="Profile">
+        <span class="active-dot"></span> 
       </button>
-      <div id="navProfileDropdown" class="nav-profile-dropdown" hidden>
-        <div class="nav-profile-info">
-          <strong id="navProfileName">Guest</strong>
-          <div id="navPatientId" class="nav-pid">PTN-0000</div>
+
+      <div id="profileDropdown" class="profile-card" hidden>
+        <div class="profile-header">
+          <img id="dropdownAvatar" src="uploads/default_profile.png" alt="User">
+          <div class="header-info">
+            <strong id="userName">Guest User</strong>
+            <span id="userId">Patient ID: --</span>
+          </div>
         </div>
-        <hr>
-        <a href="account.html">Account Settings</a>
-        <button id="toggleDark" class="linkish">Toggle Dark Mode</button>
-        <a href="php/logout.php" class="logout-btn">Log Out</a>
+        <hr class="divider">
+        <div class="profile-links">
+          <a href="profile_settings.html" class="p-link"><span class="icon">⚙️</span> Profile Settings</a>
+          <a href="account.html" class="p-link"><span class="icon">🛡️</span> Account Security</a>
+          <hr class="divider-small">
+          <a href="php/logout.php" class="p-link logout"><span class="icon">🚪</span> Log Out</a>
+        </div>
       </div>
     </div>
-  </nav>
-</header>
 
+  </div> 
+</header>
 <main class="content">
   <div class="account-card form-card">
     <h2>Account Settings</h2>
+    
     <div id="messages"></div>
 
-    <!-- PROFILE PICTURE SECTION -->
     <div class="profile-picture-container">
       <img id="profileImage" class="profile-picture" src="uploads/default_profile.png" alt="Profile Picture">
       <div class="profile-picture-actions">
         <button class="btn" onclick="document.getElementById('profileInput').click()">Change</button>
         <button class="btn alt" id="removePic">Remove</button>
       </div>
-      <form id="uploadProfileForm" enctype="multipart/form-data" style="display:none;">
-        <input type="file" id="profileInput" name="profile" accept="image/*">
-      </form>
+      <input type="file" id="profileInput" name="profile" accept="image/*" style="display:none;">
     </div>
 
     <div class="profile-grid">
       <div class="grid-row">
-        <div class="grid-col name-col">
+        <div class="grid-col">
           <label class="field-label">Full Name <span id="patientId" class="patient-id-small"></span></label>
-          <div id="name" class="profile-value"></div>
+          <div id="name" class="profile-value">Loading...</div>
         </div>
-        <div class="grid-col address-col">
+        <div class="grid-col">
           <label class="field-label">Address</label>
-          <div id="address" class="profile-value"></div>
+          <div id="address" class="profile-value">Loading...</div>
         </div>
       </div>
 
       <div class="info-row">
         <div class="info-col">
           <label class="field-label">Email</label>
-          <div id="email" class="profile-value"></div>
+          <div id="email" class="profile-value">--</div>
         </div>
         <div class="info-col">
           <label class="field-label">Birthdate</label>
-          <div id="birthdate" class="profile-value"></div>
+          <div id="birthdate" class="profile-value">--</div>
         </div>
         <div class="info-col">
           <label class="field-label">Phone</label>
-          <div id="phone" class="profile-value"></div>
+          <div id="phone" class="profile-value">--</div>
         </div>
       </div>
     </div>
@@ -98,97 +115,95 @@
       <button id="chgPassword" class="btn">Change Password</button>
     </div>
 
-    <!-- Floating panels for change phone and change password (hidden by default) -->
-    <!-- Backdrop -->
     <div id="panelBackdrop" class="panel-backdrop" style="display:none;"></div>
 
-    <!-- Phone Panel -->
-    <div id="phonePanel" class="floating-panel" style="display:none;" aria-hidden="true">
-      <button class="close-panel" id="closePhone" aria-label="Close">×</button>
+    <div id="phonePanel" class="floating-panel" style="display:none;">
+      <button class="close-panel" id="closePhone">×</button>
       <h3>Change Phone Number</h3>
       <form id="phoneForm" class="password-form">
-        <input type="text" id="newPhone" placeholder="Enter new phone number" maxlength="11" required>
-        <input type="password" id="pwdForPhone" placeholder="Enter your password" required>
-        <div style="display:flex;justify-content:flex-end;margin-top:8px;"><button type="submit" class="btn">Save Phone</button></div>
+        <input type="text" id="newPhone" name="phone" placeholder="Enter new phone number" maxlength="11" required>
+        <input type="password" id="pwdForPhone" name="password" placeholder="Enter your password" required>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+            <button type="submit" class="btn">Save Phone</button>
+        </div>
       </form>
     </div>
 
-    <!-- Password Panel -->
-    <div id="pwdPanel" class="floating-panel" style="display:none;" aria-hidden="true">
-      <button class="close-panel" id="closePwd" aria-label="Close">×</button>
+    <div id="pwdPanel" class="floating-panel" style="display:none;">
+      <button class="close-panel" id="closePwd">×</button>
       <h3>Change Password</h3>
       <form id="pwdForm" class="password-form">
-        <input type="password" id="oldpwd" placeholder="Old password" required>
-        <input type="password" id="newpwd" placeholder="New password" required>
-        <input type="password" id="confirmpwd" placeholder="Confirm new password" required>
-        <div style="display:flex;justify-content:flex-end;margin-top:8px;"><button type="submit" class="btn">Save Password</button></div>
+        <input type="password" id="oldpwd" name="old_password" placeholder="Old password" required>
+        <input type="password" id="newpwd" name="new_password" placeholder="New password" required>
+        <input type="password" id="confirmpwd" name="confirm_password" placeholder="Confirm new password" required>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+            <button type="submit" class="btn">Save Password</button>
+        </div>
       </form>
     </div>
   </div>
 </main>
+<div id="toastBox" class="toast-container"></div>
+<audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
 <script>
-// --- Dropdown Menu ---
-const menuButton = document.getElementById('menuButton');
-const dropdownMenu = document.getElementById('dropdownMenu');
-if (menuButton && dropdownMenu) {
-  menuButton.addEventListener('click', ()=>dropdownMenu.classList.toggle('show'));
-  window.addEventListener('click', e => {
-    if(!menuButton.contains(e.target) && !dropdownMenu.contains(e.target))
-      dropdownMenu.classList.remove('show');
-  });
+// ================= 1. NAVBAR LOGIC =================
+const menuBtn = document.getElementById('menuButton');
+const menuDropdown = document.getElementById('menuDropdown');
+const profileBtn = document.getElementById('profileButton');
+const profileDropdown = document.getElementById('profileDropdown');
+
+function closeAll() {
+  if(menuDropdown) menuDropdown.classList.remove('show');
+  if(profileDropdown) profileDropdown.hidden = true;
 }
 
-// --- Capitalize Function ---
+if(menuBtn) menuBtn.addEventListener('click', (e) => { e.stopPropagation(); menuDropdown.classList.toggle('show'); });
+if(profileBtn) profileBtn.addEventListener('click', (e) => { e.stopPropagation(); profileDropdown.hidden = !profileDropdown.hidden; });
+window.addEventListener('click', closeAll);
+
+// ================= 2. HELPER: SHOW MESSAGE =================
+function showMessage(msg, type) {
+  const msgDiv = document.getElementById('messages');
+  msgDiv.innerHTML = `<div class="${type}-message">${msg}</div>`;
+  setTimeout(() => msgDiv.innerHTML = '', 5000);
+}
+
+// ================= 3. FETCH USER INFO =================
 function capitalizeWords(str) {
-  return str.replace(/\b\w/g, char => char.toUpperCase());
+  return str ? str.replace(/\b\w/g, char => char.toUpperCase()) : '';
 }
 
-// --- Fetch user data ---
 function loadUser(){
   fetch('php/get_user.php')
   .then(res=>res.json())
   .then(data=>{
-    if(data.error){
-      alert(data.error);
-      window.location.href='login.php';
-      return;
-    }
+    if(data.error) return;
+    
+    const picUrl = data.profile_pic && data.profile_pic.trim() !== '' ? (data.profile_pic.indexOf('?') === -1 ? data.profile_pic + '?v=' + Date.now() : data.profile_pic) : 'uploads/default_profile.png';
+
+    // Navbar
+    if(document.getElementById('userAvatar')) document.getElementById('userAvatar').src = picUrl;
+    if(document.getElementById('dropdownAvatar')) document.getElementById('dropdownAvatar').src = picUrl;
+    if(document.getElementById('userName')) document.getElementById('userName').innerText = capitalizeWords(data.first_name + ' ' + data.last_name);
+    if(document.getElementById('userId')) document.getElementById('userId').innerText = data.patient_id;
+
+    // Page
+    document.getElementById('profileImage').src = picUrl;
     document.getElementById('patientId').textContent = data.patient_id;
     document.getElementById('name').textContent = capitalizeWords(data.first_name + ' ' + data.last_name);
     document.getElementById('address').textContent = capitalizeWords(data.address);
-    document.getElementById('birthdate').textContent = new Date(data.birthdate).toLocaleDateString('en-PH', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    document.getElementById('birthdate').textContent = new Date(data.birthdate).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
     document.getElementById('email').textContent = data.email;
     document.getElementById('phone').textContent = data.phone;
-    
-      // PROFILE PICTURE: use stored path if present, otherwise gender-based default
-      const picEl = document.getElementById('profileImage');
-      const pic = data.profile_pic && data.profile_pic.trim() !== '' ? data.profile_pic : null;
-      if (pic) {
-        picEl.src = pic.indexOf('?') === -1 ? pic + '?v=' + Date.now() : pic;
-      } else if (data.gender && data.gender.toLowerCase().startsWith('m')) {
-        picEl.src = 'uploads/default_male.svg';
-      } else if (data.gender && data.gender.toLowerCase().startsWith('f')) {
-        picEl.src = 'uploads/default_female.svg';
-      } else {
-        picEl.src = 'uploads/default_profile.png';
-      }
-      // populate nav profile (if navbar present)
-      const navImg = document.getElementById('navProfileImage');
-      const navName = document.getElementById('navProfileName');
-      const navPid = document.getElementById('navPatientId');
-      if (navImg) navImg.src = picEl.src;
-      if (navName) navName.textContent = capitalizeWords(data.first_name + ' ' + data.last_name);
-      if (navPid) navPid.textContent = data.patient_id;
-  });
-}
-loadUser();
 
-// === Profile upload/remove handlers ===
+  }).catch(err => console.log(err));
+}
+loadUser(); // Load data immediately
+
+// ================= 4. FUNCTIONALITIES =================
+
+// A. CHANGE PROFILE PICTURE
 const profileInput = document.getElementById('profileInput');
 if (profileInput) {
   profileInput.addEventListener('change', () => {
@@ -200,42 +215,97 @@ if (profileInput) {
     fetch('php/upload_profile.php', { method: 'POST', body: fd })
       .then(r => r.json())
       .then(j => {
-        const msgDiv = document.getElementById('messages');
         if (j.status === 'success') {
-          msgDiv.innerHTML = '<div class="success-message">Profile picture updated.</div>';
+          showMessage('Profile picture updated!', 'success');
+          loadUser(); 
         } else {
-          msgDiv.innerHTML = '<div class="error-message">' + (j.message || 'Upload failed') + '</div>';
+          showMessage(j.message || 'Upload failed', 'error');
         }
-        loadUser();
       })
-      .catch(err => {
-        document.getElementById('messages').innerHTML = '<div class="error-message">Upload failed (network)</div>';
-        console.error(err);
-      });
+      .catch(err => showMessage('Upload failed (network error)', 'error'));
   });
 }
 
+// B. REMOVE PROFILE PICTURE
 const removeBtn = document.getElementById('removePic');
 if (removeBtn) {
   removeBtn.addEventListener('click', ()=>{
     if (!confirm('Remove profile picture?')) return;
+    
     fetch('php/remove_profile.php', { method: 'POST' })
       .then(r => r.json())
       .then(j => {
-        const msgDiv = document.getElementById('messages');
-        if (j.status === 'success') msgDiv.innerHTML = '<div class="success-message">Profile removed.</div>';
-        else msgDiv.innerHTML = '<div class="error-message">' + (j.message || 'Remove failed') + '</div>';
-        loadUser();
+        if (j.status === 'success') {
+            showMessage('Profile picture removed.', 'success');
+            loadUser(); 
+        } else {
+            showMessage(j.message || 'Remove failed', 'error');
+        }
       })
-      .catch(err => {
-        document.getElementById('messages').innerHTML = '<div class="error-message">Request failed</div>';
-      });
+      .catch(err => showMessage('Request failed', 'error'));
   });
 }
 
-// --- Floating panels behavior ---
-const pwdForm = document.getElementById('pwdForm');
+// C. CHANGE PHONE NUMBER
 const phoneForm = document.getElementById('phoneForm');
+phoneForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const formData = new FormData(phoneForm);
+
+  fetch('php/update_phone.php', {
+    method: 'POST',
+    body: formData 
+  })
+  .then(res => res.text()) // Use text() first to debug if PHP returns HTML error
+  .then(text => {
+      try {
+          // Try to parse as JSON if possible
+          const data = JSON.parse(text); 
+          if(data.status === 'success' || text.includes('success-message')){
+             showMessage('Phone updated successfully!', 'success');
+             closePanels();
+             loadUser();
+             phoneForm.reset();
+          } else {
+             // If PHP returns HTML string (based on your uploaded file snippet)
+             document.getElementById('messages').innerHTML = text; 
+             closePanels();
+          }
+      } catch(e) {
+          // Fallback if PHP returns raw HTML div
+          document.getElementById('messages').innerHTML = text;
+          if(text.includes('success')) { closePanels(); loadUser(); phoneForm.reset(); }
+      }
+  });
+});
+
+// D. CHANGE PASSWORD
+const pwdForm = document.getElementById('pwdForm');
+pwdForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const formData = new FormData(pwdForm);
+
+  // Basic Validation
+  const newP = formData.get('new_password');
+  const confP = formData.get('confirm_password');
+  if(newP !== confP){ alert('Passwords do not match'); return; }
+
+  fetch('php/update_password.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.text())
+  .then(text => {
+      // Your PHP file returns HTML <div> strings, not JSON. So we insert it directly.
+      document.getElementById('messages').innerHTML = text;
+      if(text.includes('success')){
+          closePanels();
+          pwdForm.reset();
+      }
+  });
+});
+
+// ================= 5. MODAL/PANEL LOGIC =================
 const panelBackdrop = document.getElementById('panelBackdrop');
 const phonePanel = document.getElementById('phonePanel');
 const pwdPanel = document.getElementById('pwdPanel');
@@ -245,7 +315,6 @@ const closePwd = document.getElementById('closePwd');
 function openPanel(panel){
   panelBackdrop.style.display = 'block';
   panel.style.display = 'block';
-  panel.setAttribute('aria-hidden','false');
   const first = panel.querySelector('input');
   if (first) first.focus();
 }
@@ -253,85 +322,34 @@ function closePanels(){
   panelBackdrop.style.display = 'none';
   phonePanel.style.display = 'none';
   pwdPanel.style.display = 'none';
-  phonePanel.setAttribute('aria-hidden','true');
-  pwdPanel.setAttribute('aria-hidden','true');
 }
 
 document.getElementById('chgPassword').addEventListener('click', ()=> openPanel(pwdPanel));
 document.getElementById('chgPhone').addEventListener('click', ()=> openPanel(phonePanel));
-
 closePhone && closePhone.addEventListener('click', closePanels);
 closePwd && closePwd.addEventListener('click', closePanels);
 panelBackdrop && panelBackdrop.addEventListener('click', closePanels);
 
-// --- Update Phone ---
-phoneForm.addEventListener('submit', e=>{
-  e.preventDefault();
-  const phone = document.getElementById('newPhone').value;
-  const pwd = document.getElementById('pwdForPhone').value;
-  const msgDiv = document.getElementById('messages');
+// ================= 6. NOTIFICATION SIMULATION =================
+function triggerNotification(message) {
+  const badge = document.getElementById('msgBadge');
+  const toastBox = document.getElementById('toastBox');
+  const audio = document.getElementById('notifSound');
 
-  if(!/^\d{11}$/.test(phone)){
-    alert('Please enter a valid 11-digit phone number.');
-    return;
-  }
+  if(badge) { badge.style.display = 'flex'; badge.innerText = '1'; }
+  if(audio) audio.play().catch(() => {}); 
 
-  fetch('php/update_phone.php', {
-    method:'POST',
-    headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    body:`phone=${encodeURIComponent(phone)}&password=${encodeURIComponent(pwd)}`
-  })
-  .then(res=>res.text())
-  .then(data=>{
-    msgDiv.innerHTML = data;
-    if(data.includes('success')){
-      document.getElementById('phone').textContent = phone;
-      phoneForm.reset();
-      closePanels();
-    }
-  });
-});
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<div class="toast-icon">📩</div><div class="toast-msg"><h4>New Message</h4><p>${message}</p></div>`;
+  toastBox.appendChild(toast);
 
-// --- Update Password ---
-// --- Update Password ---
-pwdForm.addEventListener('submit', e=>{
-  e.preventDefault();
-  const oldpwd = document.getElementById('oldpwd').value;
-  const newpwd = document.getElementById('newpwd').value;
-  const confirmpwd = document.getElementById('confirmpwd').value;
-  const msgDiv = document.getElementById('messages');
+  setTimeout(() => toast.classList.add('show'), 100);
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 5000);
+}
 
-  if(newpwd !== confirmpwd){
-    alert('Passwords do not match');
-    return;
-  }
+setTimeout(() => { triggerNotification("You have a new message from Admin."); }, 3000);
 
-  fetch('php/update_password.php', {
-    method:'POST',
-    headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    body:`old_password=${encodeURIComponent(oldpwd)}&new_password=${encodeURIComponent(newpwd)}&confirm_password=${encodeURIComponent(confirmpwd)}`
-  })
-  .then(res=>res.text())
-  .then(data=>{
-    msgDiv.innerHTML = data;
-    if(data.includes('success')){
-      pwdForm.reset();
-      closePanels();
-    }
-  });
-});
-
-// --- Navbar profile dropdown & dark-mode toggle (matches index.html behavior) ---
-(function(){
-  const btn = document.getElementById('navProfileBtn');
-  const dd = document.getElementById('navProfileDropdown');
-  btn && btn.addEventListener('click', function(e){ e.stopPropagation(); const open = dd ? dd.hidden : true; if(dd) dd.hidden = !open; btn.setAttribute('aria-expanded', String(!open)); });
-  window.addEventListener('click', ()=>{ if(dd) dd.hidden = true; btn && btn.setAttribute('aria-expanded','false'); });
-
-  // dark mode toggle (local only)
-  const toggle = document.getElementById('toggleDark');
-  toggle && toggle.addEventListener('click', ()=>{ document.body.classList.toggle('dark-mode'); });
-})();
 </script>
 </body>
 </html>
