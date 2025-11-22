@@ -2,7 +2,7 @@
    FIXED COLOR VARIABLES (NO DARK MODE)
 ============================================ */
 :root {
-  --sidebar-bg: #009900;
+  --sidebar-bg: #1E4D2B;
   --sidebar-text: #ffffff;
   --sidebar-hover: rgba(0, 0, 0, 0.20);
   --sidebar-active: rgba(0, 0, 0, 0.30);

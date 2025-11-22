@@ -128,7 +128,7 @@
 .chat-input button {
   padding: 12px 20px;
   border-radius: 25px;
-  background: #009900;
+  background: #1E4D2B;
   color: #fff;
   border: none;
   cursor: pointer;
@@ -147,7 +147,7 @@
 
 .user-list::-webkit-scrollbar-thumb,
 .chat-messages::-webkit-scrollbar-thumb {
-  background: #009900;
+  background: #1E4D2B;
   border-radius: 3px;
 }
 
