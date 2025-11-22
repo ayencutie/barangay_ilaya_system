@@ -69,6 +69,9 @@
       </div>
     </div>
 
+    <!-- Hidden birthdate input -->
+    <input type="hidden" name="birthdate" id="birthdate_hidden">
+
     <!-- Phone & Email -->
     <div class="row">
       <div class="field">
@@ -139,15 +142,8 @@
       return;
     }
 
-    let hidden = document.getElementById("birthdate_hidden");
-    if (!hidden) {
-      hidden = document.createElement("input");
-      hidden.type = "hidden";
-      hidden.name = "birthdate";
-      hidden.id = "birthdate_hidden";
-      this.appendChild(hidden);
-    }
-    hidden.value = `${year}-${month}-${day}`;
+    const hidden = document.getElementById("birthdate_hidden");
+    hidden.value = `${year}-${month}-${day}`; // YYYY-MM-DD
   });
 </script>
 </body>
