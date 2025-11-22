@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Appointments – Barangay Ilaya Health Center</title>
-  <link rel="stylesheet" href="css/my appointment.css" />
+  <link rel="stylesheet" href="css/my appointment.css">
 </head>
 <body>
 
+  <!-- NAVBAR -->
   <header class="navbar">
-    
     <div class="nav-left">
       <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
       <h1>BARANGAY ILAYA HEALTH CENTER</h1>
@@ -24,7 +24,6 @@
     </div>
 
     <div class="nav-right">
-      
       <a href="inbox.php" class="icon-btn" title="Inbox">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
@@ -37,14 +36,13 @@
         <div id="menuDropdown" class="dropdown-content">
           <a href="book appointment.html">Book Appointment</a>
           <a href="my_appointment.html" class="active">My Appointment</a>
-          
         </div>
       </div>
 
       <div class="profile-container">
         <button id="profileButton" class="profile-btn" title="Account">
           <img id="userAvatar" src="uploads/default_profile.png" alt="Profile">
-          <span class="active-dot"></span> 
+          <span class="active-dot"></span>
         </button>
 
         <div id="profileDropdown" class="profile-card" hidden>
@@ -63,17 +61,18 @@
           </div>
         </div>
       </div>
-
-    </div> 
+    </div>
   </header>
+
+  <!-- CONTENT -->
   <section class="content">
     <div class="appointments-container">
       <h1>My Appointments</h1>
       <p>Manage your scheduled visits and view history.</p>
 
       <div class="tabs-container">
-        <button class="tab-btn active" onclick="filterAppointments('upcoming')">Upcoming Appointments</button>
-        <button class="tab-btn" onclick="filterAppointments('archive')">Archive / History</button>
+        <button class="tab-btn active" onclick="filterAppointments('upcoming')">Upcoming</button>
+        <button class="tab-btn" onclick="filterAppointments('archive')">Archive</button>
       </div>
 
       <div class="table-responsive">
@@ -88,31 +87,28 @@
             </tr>
           </thead>
           <tbody id="tableBody">
-            </tbody>
+            <tr><td colspan="5">Loading...</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
   </section>
 
+  <!-- EDIT MODAL -->
   <div id="editModal" class="modal">
     <div class="modal-content">
       <h3>Edit Appointment</h3>
+      <label for="editService">Service:</label>
+      <select id="editService"></select>
 
-      <label for="editService">Select Service:</label>
-      <select id="editService" class="select-input"></select>
+      <label for="editDate">Date:</label>
+      <input type="date" id="editDate">
 
-      <label>Select Date:</label>
-      <div class="date-selectors">
-        <select id="editMonth" class="select-input"></select>
-        <select id="editDay" class="select-input"></select>
-        <select id="editYear" class="select-input"></select>
-      </div>
-
-      <label>Select Time Slot:</label>
-      <div id="editTimeGrid" class="time-grid"></div>
+      <label for="editTimeSlot">Time Slot:</label>
+      <input type="time" id="editTimeSlot">
 
       <div class="modal-buttons">
-        <button id="saveEditBtn" class="btn-save">Save Changes</button>
+        <button id="saveEditBtn" class="btn-save">Save</button>
         <button id="cancelEditBtn" class="btn-cancel">Close</button>
       </div>
     </div>
@@ -122,196 +118,128 @@
   <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
   <script>
-    // ================= 1. NAVBAR LOGIC =================
+    // ---------------- NAVBAR ----------------
     const menuBtn = document.getElementById('menuButton');
     const menuDropdown = document.getElementById('menuDropdown');
     const profileBtn = document.getElementById('profileButton');
     const profileDropdown = document.getElementById('profileDropdown');
+    menuBtn?.addEventListener('click', e=>{e.stopPropagation(); menuDropdown.classList.toggle('show')});
+    profileBtn?.addEventListener('click', e=>{e.stopPropagation(); profileDropdown.hidden=!profileDropdown.hidden});
+    window.addEventListener('click', ()=>{ menuDropdown.classList.remove('show'); profileDropdown.hidden=true; });
 
-    function closeAll() {
-      if(menuDropdown) menuDropdown.classList.remove('show');
-      if(profileDropdown) profileDropdown.hidden = true;
-    }
-
-    if(menuBtn) {
-      menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = menuDropdown.classList.contains('show');
-        closeAll();
-        if(!isOpen) menuDropdown.classList.add('show');
-      });
-    }
-
-    if(profileBtn) {
-      profileBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = !profileDropdown.hidden;
-        closeAll();
-        if(!isOpen) profileDropdown.hidden = false;
-      });
-    }
-
-    window.addEventListener('click', closeAll);
-
-    // User Info
-    fetch('php/get_user.php').then(r=>r.json()).then(data => {
-      if(data && !data.error) {
-        const picUrl = data.profile_pic || 'uploads/default_profile.png';
-        if(document.getElementById('userAvatar')) document.getElementById('userAvatar').src = picUrl;
-        if(document.getElementById('dropdownAvatar')) document.getElementById('dropdownAvatar').src = picUrl;
-        if(document.getElementById('userName')) document.getElementById('userName').innerText = data.first_name || 'User';
-        if(document.getElementById('userId')) document.getElementById('userId').innerText = data.patient_id || '';
+    // ---------------- USER INFO ----------------
+    fetch('php/get_user.php').then(r=>r.json()).then(data=>{
+      if(data && !data.error){
+        document.getElementById('userAvatar').src = data.profile_pic||'uploads/default_profile.png';
+        document.getElementById('dropdownAvatar').src = data.profile_pic||'uploads/default_profile.png';
+        document.getElementById('userName').innerText = data.first_name||'User';
+        document.getElementById('userId').innerText = data.patient_id||'';
       }
-    }).catch(() => {});
-
-    // ================= 2. NOTIFICATION SIMULATION =================
-    function triggerNotification(message) {
-      const badge = document.getElementById('msgBadge');
-      const toastBox = document.getElementById('toastBox');
-      const audio = document.getElementById('notifSound');
-
-      if(badge) { badge.style.display = 'flex'; badge.innerText = '1'; }
-      if(audio) audio.play().catch(() => {}); 
-
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.innerHTML = `<div class="toast-icon">📩</div><div class="toast-msg"><h4>New Message</h4><p>${message}</p></div>`;
-      toastBox.appendChild(toast);
-
-      setTimeout(() => toast.classList.add('show'), 100);
-      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 5000);
-    }
-
-    setTimeout(() => { 
-      triggerNotification("You have a new message from Admin."); 
-    }, 3000);
-
-    // ================= 3. APPOINTMENT LOGIC (WITH TABS) =================
-    let allAppointments = []; // Store all data here
-    let currentFilter = 'upcoming'; // 'upcoming' or 'archive'
-
-    // Mock Data or Fetch from PHP
-    // Replace this logic with fetch('php/my_appointment.php') in production
-    // For now, we assume 'appointments' is populated via fetch
-    async function loadAppointments() {
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
-      
-      try {
-        const res = await fetch('php/my_appointment.php');
-        const data = await res.json();
-        
-        if(data.status === 'success'){
-          allAppointments = data.appointments;
-          renderTable();
-        } else {
-          tbody.innerHTML = `<tr><td colspan="5">${data.message || 'Failed to load.'}</td></tr>`;
-        }
-      } catch(err) {
-        console.error(err);
-        tbody.innerHTML = '<tr><td colspan="5">⚠️ Error loading data.</td></tr>';
-      }
-    }
-
-    function filterAppointments(type) {
-        currentFilter = type;
-        
-        // Update Tab UI
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-
-        renderTable();
-    }
-
-    function renderTable() {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-
-        // Filter Logic
-        const filtered = allAppointments.filter(a => {
-            if (currentFilter === 'upcoming') {
-                return a.status === 'Pending' || a.status === 'Approved';
-            } else {
-                return ['Completed', 'Cancelled', 'Missed', 'Rejected'].includes(a.status);
-            }
-        });
-
-        if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5">No records found in this section.</td></tr>';
-            return;
-        }
-
-        filtered.forEach(a => {
-            const tr = document.createElement('tr');
-            
-            // Status Color
-            let color = '#333';
-            if(a.status === 'Pending') color = 'orange';
-            else if(a.status === 'Approved') color = 'green';
-            else if(a.status === 'Cancelled' || a.status === 'Missed') color = 'red';
-            else if(a.status === 'Completed') color = 'blue';
-
-            // Actions Buttons (Only for Upcoming)
-            let actionsHtml = '';
-            if(currentFilter === 'upcoming') {
-                actionsHtml = `
-                    <button class="btn-edit" onclick="openEditModal(${a.id})">Edit</button>
-                    <button class="btn-cancel-row" onclick="cancelAppointment(${a.id})">Cancel</button>
-                `;
-            } else {
-                actionsHtml = '<span style="color: #888; font-size: 12px;">Archived</span>';
-            }
-
-            tr.innerHTML = `
-                <td>${a.service}</td>
-                <td>${a.date}</td>
-                <td>${a.time_slot}</td>
-                <td style="color:${color}; font-weight:bold;">${a.status}</td>
-                <td>${actionsHtml}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    loadAppointments();
-
-    // ... (KEEP YOUR EXISTING EDIT/CANCEL/MODAL LOGIC HERE) ...
-    // I'm assuming you have the functions openEditModal(), cancelAppointment() etc.
-    // Just make sure to integrate them with the new renderTable() call after success.
-
-    // --- MODAL LOGIC ---
-    const editModal = document.getElementById('editModal');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-    cancelEditBtn.addEventListener('click', () => editModal.style.display='none');
-
-    // Sample variables for modal population (from your previous code)
-    let editingAppointmentId = null;
-    let selectedTimeSlot = "";
-    const servicesList = ["Immunization", "Medical Certificate", "Pre Natal / Post Natal", "Diagnostic", "Outpatient Consultation", "Dental Care", "Family Planning"];
-    
-    // Populate Services in Modal
-    const editService = document.getElementById('editService');
-    servicesList.forEach(s => {
-       const opt = document.createElement('option');
-       opt.value = s; opt.textContent = s;
-       editService.appendChild(opt);
     });
 
-    // [Add Calendar/Time Logic here if needed, or keep it simple]
-
-    // Add dummy functions to prevent errors if backend is missing
-    window.openEditModal = function(id) {
-        // Implement your edit open logic here
-        // Use 'allAppointments.find(a => a.id === id)' to get data
-        alert("Open edit for ID: " + id); 
-    }
-    window.cancelAppointment = async function(id) {
-        if(!confirm("Cancel this appointment?")) return;
-        // Call API then reload
-        alert("Cancelling ID: " + id);
-        // loadAppointments();
+    // ---------------- TOAST ----------------
+    function showToast(msg){
+      const toastBox = document.getElementById('toastBox');
+      const toast = document.createElement('div');
+      toast.className='toast';
+      toast.innerHTML=`<div class="toast-icon">📩</div><div class="toast-msg"><h4>Notification</h4><p>${msg}</p></div>`;
+      toastBox.appendChild(toast);
+      setTimeout(()=>toast.classList.add('show'),100);
+      setTimeout(()=>{ toast.classList.remove('show'); setTimeout(()=>toast.remove(),500); }, 4000);
     }
 
+    // ---------------- APPOINTMENTS ----------------
+    let allAppointments = [], currentFilter='upcoming', editingId=null;
+
+    async function loadAppointments(){
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML='<tr><td colspan="5">Loading...</td></tr>';
+      try{
+        const res = await fetch('php/my_appointment.php');
+        const data = await res.json();
+        if(data.status==='success'){ allAppointments=data.appointments; renderTable(); }
+        else tbody.innerHTML=`<tr><td colspan="5">${data.message||'No records'}</td></tr>`;
+      }catch(e){tbody.innerHTML='<tr><td colspan="5">Error loading data.</td></tr>'; console.error(e);}
+    }
+
+    function filterAppointments(type){
+      currentFilter=type;
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderTable();
+    }
+
+    function renderTable(){
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML='';
+      const filtered=allAppointments.filter(a=>{
+        if(currentFilter==='upcoming') return a.status==='Pending'||a.status==='Approved';
+        else return ['Completed','Cancelled','Missed','Rejected'].includes(a.status);
+      });
+      if(filtered.length===0){ tbody.innerHTML='<tr><td colspan="5">No records found.</td></tr>'; return; }
+      filtered.forEach(a=>{
+        let color='#333';
+        if(a.status==='Pending') color='orange';
+        else if(a.status==='Approved') color='green';
+        else if(a.status==='Cancelled'||a.status==='Missed') color='red';
+        else if(a.status==='Completed') color='blue';
+
+        let actions='';
+        if(currentFilter==='upcoming'){
+          actions=`<button class="btn-edit" onclick="openEditModal(${a.appointment_id})">Edit</button>
+                   <button class="btn-cancel" onclick="cancelAppointment(${a.appointment_id})">Cancel</button>`;
+        } else actions='<span style="color:#888;font-size:12px">Archived</span>';
+
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${a.service}</td><td>${a.date}</td><td>${a.time_slot}</td>
+                        <td style="color:${color};font-weight:bold">${a.status}</td><td>${actions}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ---------------- CANCEL ----------------
+    async function cancelAppointment(id){
+      if(!confirm("Cancel this appointment?")) return;
+      try{
+        const res = await fetch('php/cancel_appointment.php',{method:'POST',body:JSON.stringify({id}),headers:{'Content-Type':'application/json'}});
+        const data = await res.json();
+        if(data.status==='success'){ showToast("Appointment cancelled."); loadAppointments(); }
+        else showToast(data.message||'Failed');
+      }catch(e){ console.error(e); showToast('Error cancelling'); }
+    }
+
+    // ---------------- EDIT ----------------
+    const editModal = document.getElementById('editModal');
+    document.getElementById('cancelEditBtn').addEventListener('click',()=>{editModal.style.display='none'});
+
+    const servicesList = ["Immunization","Medical Certificate","Pre Natal / Post Natal","Diagnostic","Outpatient Consultation","Dental Care","Family Planning"];
+    const editService = document.getElementById('editService');
+    servicesList.forEach(s=>{ let opt=document.createElement('option'); opt.value=s; opt.textContent=s; editService.appendChild(opt); });
+
+    window.openEditModal = function(id){
+      editingId=id;
+      const appt = allAppointments.find(a=>a.appointment_id===id);
+      if(!appt) return alert("Appointment not found");
+      editService.value=appt.service;
+      document.getElementById('editDate').value=appt.date;
+      document.getElementById('editTimeSlot').value=appt.time_slot;
+      editModal.style.display='flex';
+    }
+
+    document.getElementById('saveEditBtn').addEventListener('click', async()=>{
+      const service = editService.value;
+      const date = document.getElementById('editDate').value;
+      const time_slot = document.getElementById('editTimeSlot').value;
+      if(!service||!date||!time_slot) return alert("All fields required");
+      try{
+        const res = await fetch('php/edit_appointment.php',{method:'POST',body:JSON.stringify({id:editingId,service,date,time_slot}),headers:{'Content-Type':'application/json'}});
+        const data = await res.json();
+        if(data.status==='success'){ showToast("Appointment updated."); editModal.style.display='none'; loadAppointments(); }
+        else showToast(data.message||'Failed to update');
+      }catch(e){ console.error(e); showToast('Error updating'); }
+    });
+
+    loadAppointments();
   </script>
 
 </body>
