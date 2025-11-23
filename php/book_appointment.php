@@ -47,6 +47,21 @@ if ($service === '' || $date === '' || $time_slot === '') {
 }
 
 // ------------------------------------------------------------
+// WEEKEND VALIDATION
+// ------------------------------------------------------------
+$timestamp = strtotime($date);
+$dayOfWeek = date('N', $timestamp); // 1=Monday, 7=Sunday
+
+if ($dayOfWeek >= 6) { // 6 = Saturday, 7 = Sunday
+    echo "<script>
+            alert('❌ Appointments cannot be booked on Saturdays or Sundays. Please choose a weekday.');
+            window.history.back();
+          </script>";
+    exit;
+}
+
+
+// ------------------------------------------------------------
 // FUTURE DATE/TIME VALIDATION
 // ------------------------------------------------------------
 

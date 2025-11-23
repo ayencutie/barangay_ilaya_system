@@ -141,268 +141,539 @@
   <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
   <script>
-    // ---------------- NAVBAR & USER INFO LOGIC ----------------
-    const menuBtn = document.getElementById('menuButton');
-    const menuDropdown = document.getElementById('menuDropdown');
-    const profileBtn = document.getElementById('profileButton');
-    const profileDropdown = document.getElementById('profileDropdown');
-    menuBtn?.addEventListener('click', e=>{e.stopPropagation(); menuDropdown.classList.toggle('show')});
-    profileBtn?.addEventListener('click', e=>{e.stopPropagation(); profileDropdown.hidden=!profileDropdown.hidden});
-    window.addEventListener('click', ()=>{ menuDropdown.classList.remove('show'); profileDropdown.hidden=true; });
+/*
+ Clean, modular, plain-vanilla JS rewrite.
+ - Keeps same features: navbar/profile toggles, fetch user, toast notifications,
+   load/filter/render appointments, cancel, edit modal with date selectors and time-slot selection,
+   prevents selecting past times for "today".
+ - Uses modern JS (const/let, arrow functions), clearer helpers and comments.
+ - Exposes only the functions that need to be called from HTML: window.openEditModal, window.cancelAppointment
+*/
 
-    fetch('php/get_user.php').then(r=>r.json()).then(data=>{
-      if(data && !data.error){
-        document.getElementById('userAvatar').src = data.profile_pic||'uploads/default_profile.png';
-        document.getElementById('dropdownAvatar').src = data.profile_pic||'uploads/default_profile.png';
-        document.getElementById('userName').innerText = data.first_name||'User';
-        document.getElementById('userId').innerText = data.patient_id||'';
-      }
-    });
+/* ---------------------- Utilities ---------------------- */
+const qs = (sel, root = document) => root.querySelector(sel);
+const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-    // ---------------- TOAST ----------------
-    function showToast(msg){
-      const toastBox = document.getElementById('toastBox');
-      const toast = document.createElement('div');
-      toast.className='toast';
-      toast.innerHTML=`<div class="toast-icon">📩</div><div class="toast-msg"><h4>Notification</h4><p>${msg}</p></div>`;
-      toastBox.appendChild(toast);
-      setTimeout(()=>toast.classList.add('show'),100);
-      setTimeout(()=>{ toast.classList.remove('show'); setTimeout(()=>toast.remove(),500); }, 4000);
-    }
+const formatTwo = n => String(n).padStart(2, '0');
 
-    // ---------------- APPOINTMENTS & TABLE LOGIC ----------------
-    let allAppointments = [], currentFilter='upcoming', editingId=null;
+const minutesToDisplay = mins => {
+  const h24 = Math.floor(mins / 60);
+  const m = mins % 60;
+  const period = h24 >= 12 ? 'PM' : 'AM';
+  const h12 = h24 % 12 || 12;
+  return `${h12}:${formatTwo(m)} ${period}`;
+};
 
-    async function loadAppointments(){
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML='<tr><td colspan="5">Loading...</td></tr>';
-      try{
-        const res = await fetch('php/my_appointment.php');
-        const data = await res.json();
-        if(data.status==='success'){ allAppointments=data.appointments; renderTable(); }
-        else tbody.innerHTML=`<tr><td colspan="5">${data.message||'No records'}</td></tr>`;
-      }catch(e){tbody.innerHTML='<tr><td colspan="5">Error loading data.</td></tr>'; console.error(e);}
-    }
+/* ---------------------- NAVBAR & USER INFO ---------------------- */
+(() => {
+  const menuBtn = qs('#menuButton');
+  const menuDropdown = qs('#menuDropdown');
+  const profileBtn = qs('#profileButton');
+  const profileDropdown = qs('#profileDropdown');
 
-    function filterAppointments(type){
-      currentFilter=type;
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      event.target.classList.add('active');
-      renderTable();
-    }
-
-    function renderTable(){
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML='';
-      const filtered=allAppointments.filter(a=>{
-        if(currentFilter==='upcoming') return a.status==='Pending'||a.status==='Approved';
-        else return ['Completed','Cancelled','Missed','Rejected'].includes(a.status);
-      });
-      if(filtered.length===0){ tbody.innerHTML='<tr><td colspan="5">No records found.</td></tr>'; return; }
-      filtered.forEach(a=>{
-        let color='#333';
-        if(a.status==='Pending') color='orange';
-        else if(a.status==='Approved') color='green';
-        else if(a.status==='Cancelled'||a.status==='Missed') color='red';
-        else if(a.status==='Completed') color='blue';
-
-        let actions='';
-        if(currentFilter==='upcoming'){
-          // NOTE: Changed to btn-cancel-table to match CSS styling in the next step
-          actions=`<button class="btn-edit" onclick="openEditModal(${a.appointment_id})">Edit</button>
-                   <button class="btn-cancel-table" onclick="cancelAppointment(${a.appointment_id})">Cancel</button>`;
-        } else actions='<span style="color:#888;font-size:12px">Archived</span>';
-
-        const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${a.service}</td><td>${a.date}</td><td>${a.time_slot}</td>
-                        <td style="color:${color};font-weight:bold">${a.status}</td><td>${actions}</td>`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // ---------------- CANCEL ----------------
-    async function cancelAppointment(id){
-      if(!confirm("Cancel this appointment?")) return;
-      try{
-        const res = await fetch('php/cancel_appointment.php',{method:'POST',body:JSON.stringify({id}),headers:{'Content-Type':'application/json'}});
-        const data = await res.json();
-        if(data.status==='success'){ showToast("Appointment cancelled."); loadAppointments(); }
-        else showToast(data.message||'Failed');
-      }catch(e){ console.error(e); showToast('Error cancelling'); }
-    }
-
-    // ---------------- EDIT MODAL LOGIC (MATCHED) ----------------
-    const editModal = document.getElementById('editModal');
-    const editServiceButton = document.getElementById('editServiceButton');
-    const editServicesList = document.getElementById('editServicesList');
-    const editServiceInput = document.getElementById('editServiceInput'); 
-    const editTimeSlotsGrid = document.getElementById('editTimeSlotsGrid');
-    const editTimeInput = document.getElementById('editTimeInput');
-    
-    // Date Picker elements
-    const editMonthSelect = document.getElementById("editMonth");
-    const editDaySelect = document.getElementById("editDay");
-    const editYearSelect = document.getElementById("editYear");
-    
-    const today = new Date();
-    const thisYear = today.getFullYear();
-    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    
-    // Populate Month/Year selectors once on load
-    months.forEach((m,i)=>{ 
-        const opt=document.createElement("option"); 
-        opt.value=i+1; 
-        opt.text=m; 
-        editMonthSelect.appendChild(opt); 
-    });
-
-    for(let y=thisYear; y<=thisYear+2; y++){ 
-        const opt=document.createElement("option"); 
-        opt.value=y; 
-        opt.text=y; 
-        editYearSelect.appendChild(opt); 
-    }
-
-    // Function to update the number of days based on selected month/year
-    function updateEditDays(){
-        const month=parseInt(editMonthSelect.value);
-        const year=parseInt(editYearSelect.value);
-        const daysInMonth=new Date(year, month, 0).getDate();
-        editDaySelect.innerHTML="";
-        for(let d=1; d<=daysInMonth; d++){
-            const opt=document.createElement("option");
-            opt.value=d;
-            opt.text=d;
-            editDaySelect.appendChild(opt);
-        }
-    }
-    
-    // Attach event listeners for date changes
-    editMonthSelect.addEventListener("change", updateEditDays);
-    editYearSelect.addEventListener("change", updateEditDays);
-
-    document.getElementById('cancelEditBtn').addEventListener('click',()=>{editModal.style.display='none'});
-    
-    // Service Dropdown toggle logic
-    editServiceButton?.addEventListener('click', e => {
+  if (menuBtn && menuDropdown) {
+    menuBtn.addEventListener('click', e => {
       e.stopPropagation();
-      editServicesList.classList.toggle('show');
+      menuDropdown.classList.toggle('show');
     });
-    window.addEventListener('click', () => editServicesList.classList.remove('show'));
+  }
 
-    // Service Item selection logic
-    document.querySelectorAll('#editServicesList .service-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const service = item.getAttribute('data-service');
-        editServiceButton.textContent = service + ' ▼';
-        editServiceInput.value = service;
-        editServicesList.classList.remove('show');
+  if (profileBtn && profileDropdown) {
+    profileBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      profileDropdown.hidden = !profileDropdown.hidden;
+    });
+  }
+
+  window.addEventListener('click', () => {
+    if (menuDropdown) menuDropdown.classList.remove('show');
+    if (profileDropdown) profileDropdown.hidden = true;
+  });
+
+  // fetch user info
+  fetch('php/get_user.php')
+    .then(r => r.json())
+    .then(data => {
+      if (!data || data.error) return;
+      const avatar = data.profile_pic || 'uploads/default_profile.png';
+      const firstName = data.first_name || 'User';
+      const userId = data.patient_id || '';
+
+      const userAvatar = qs('#userAvatar');
+      const dropdownAvatar = qs('#dropdownAvatar');
+      const userName = qs('#userName');
+      const userIdEl = qs('#userId');
+
+      if (userAvatar) userAvatar.src = avatar;
+      if (dropdownAvatar) dropdownAvatar.src = avatar;
+      if (userName) userName.innerText = firstName;
+      if (userIdEl) userIdEl.innerText = userId;
+    })
+    .catch(err => console.error('get_user error:', err));
+})();
+
+/* ---------------------- TOAST ---------------------- */
+const showToast = (msg = '') => {
+  const toastBox = qs('#toastBox');
+  if (!toastBox) return;
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `
+    <div class="toast-icon">📩</div>
+    <div class="toast-msg"><h4>Notification</h4><p>${String(msg)}</p></div>
+  `;
+  toastBox.appendChild(toast);
+  // show animation
+  requestAnimationFrame(() => toast.classList.add('show'));
+  // auto remove
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 500);
+  }, 4000);
+};
+
+/* ---------------------- APPOINTMENTS STATE ---------------------- */
+let allAppointments = [];
+let currentFilter = 'upcoming'; // 'upcoming' | 'archived'
+let editingId = null;
+
+/* ---------------------- LOAD / RENDER APPOINTMENTS ---------------------- */
+const loadAppointments = async () => {
+  const tbody = qs('#tableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+
+  try {
+    const res = await fetch('php/my_appointment.php');
+    const data = await res.json();
+    if (data && data.status === 'success' && Array.isArray(data.appointments)) {
+      allAppointments = data.appointments;
+      renderTable();
+    } else {
+      tbody.innerHTML = `<tr><td colspan="5">${(data && data.message) || 'No records'}</td></tr>`;
+    }
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="5">Error loading data.</td></tr>';
+    console.error('loadAppointments error:', err);
+  }
+};
+
+const setFilter = (filter, btnElement = null) => {
+  currentFilter = filter === 'archive' ? 'archived' : 'upcoming';
+  qsa('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btnElement) btnElement.classList.add('active');
+  renderTable();
+};
+
+const renderTable = () => {
+  const tbody = qs('#tableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const filtered = allAppointments.filter(a => {
+    if (currentFilter === 'upcoming') return a.status === 'Pending' || a.status === 'Approved';
+    return ['Completed', 'Cancelled', 'Missed', 'Rejected'].includes(a.status);
+  });
+
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="5">No records found.</td></tr>';
+    return;
+  }
+
+  filtered.forEach(a => {
+    const color = (a.status === 'Pending' && 'orange') ||
+                  (a.status === 'Approved' && 'green') ||
+                  (['Cancelled','Missed'].includes(a.status) && 'red') ||
+                  (a.status === 'Completed' && 'blue') ||
+                  '#333';
+
+    const tr = document.createElement('tr');
+
+    const actions = (currentFilter === 'upcoming')
+      ? `<button class="btn-edit" onclick="openEditModal(${a.appointment_id})">Edit</button>
+         <button class="btn-cancel-table" onclick="cancelAppointment(${a.appointment_id})">Cancel</button>`
+      : `<span style="color:#888;font-size:12px">Archived</span>`;
+
+    tr.innerHTML = `
+      <td>${escapeHtml(a.service)}</td>
+      <td>${escapeHtml(a.date)}</td>
+      <td>${escapeHtml(a.time_slot)}</td>
+      <td style="color:${color};font-weight:bold">${escapeHtml(a.status)}</td>
+      <td>${actions}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+};
+
+/* small helper to avoid HTML injection if any strings contain special chars */
+function escapeHtml(str = '') {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/* ---------------------- CANCEL APPOINTMENT ---------------------- */
+window.cancelAppointment = async function(id) {
+  if (!confirm('Cancel this appointment?')) return;
+  try {
+    const res = await fetch('php/cancel_appointment.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({id})
+    });
+    const data = await res.json();
+    if (data && data.status === 'success') {
+      showToast('Appointment cancelled.');
+      await loadAppointments();
+    } else {
+      showToast((data && data.message) || 'Failed to cancel');
+    }
+  } catch (err) {
+    console.error('cancelAppointment error:', err);
+    showToast('Error cancelling');
+  }
+};
+
+/* ---------------------- EDIT MODAL & DATE/TIME LOGIC ---------------------- */
+const editModal = qs('#editModal');
+const editServiceButton = qs('#editServiceButton');
+const editServicesList = qs('#editServicesList');
+const editServiceInput = qs('#editServiceInput');
+const editTimeSlotsGrid = qs('#editTimeSlotsGrid');
+const editTimeInput = qs('#editTimeInput');
+
+const editMonthSelect = qs('#editMonth');
+const editDaySelect = qs('#editDay');
+const editYearSelect = qs('#editYear');
+
+const cancelEditBtn = qs('#cancelEditBtn');
+const saveEditBtn = qs('#saveEditBtn');
+
+const today = new Date();
+const thisYear = today.getFullYear();
+const thisMonth = today.getMonth() + 1; // 1..12
+const thisDay = today.getDate();
+
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function initDateSelectors() {
+  if (!editMonthSelect || !editDaySelect || !editYearSelect) return;
+
+  // populate months
+  editMonthSelect.innerHTML = '';
+  months.forEach((m, i) => {
+    const o = document.createElement('option');
+    o.value = String(i + 1);
+    o.text = m;
+    editMonthSelect.appendChild(o);
+  });
+
+  // populate years: this year .. this year + 2
+  editYearSelect.innerHTML = '';
+  for (let y = thisYear; y <= thisYear + 2; y++) {
+    const o = document.createElement('option');
+    o.value = String(y);
+    o.text = String(y);
+    editYearSelect.appendChild(o);
+  }
+
+  // ensure day select gets updated when month/year changes
+  editMonthSelect.addEventListener('change', updateEditDays);
+  editYearSelect.addEventListener('change', updateEditDays);
+  // Re-render time slots whenever day changes
+  editDaySelect.addEventListener('change', () => renderTimeSlots()); 
+}
+
+
+/**
+ * Checks if the given date represented by selectors is a Saturday (6) or Sunday (0).
+ * @returns {number | false} The day index (0-6) if it's a weekend, otherwise false.
+ */
+function checkWeekend() {
+    if (!editMonthSelect || !editDaySelect || !editYearSelect) return false;
+
+    const month = parseInt(editMonthSelect.value, 10); // 1-12
+    const day = parseInt(editDaySelect.value, 10);
+    const year = parseInt(editYearSelect.value, 10);
+    
+    // JS Date month is 0-indexed (0-11)
+    const selectedDate = new Date(year, month - 1, day);
+    const dayOfWeek = selectedDate.getDay(); // 0=Sunday, 6=Saturday
+
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+        return dayOfWeek;
+    }
+    return false;
+}
+
+function updateEditDays() {
+  if (!editMonthSelect || !editDaySelect || !editYearSelect) return;
+
+  const month = parseInt(editMonthSelect.value, 10);
+  const year = parseInt(editYearSelect.value, 10);
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  // Determine starting day: 1 or today's day if month/year == current
+  let startDay = 1;
+  if (year === thisYear && month === thisMonth) startDay = thisDay;
+
+  const prevSelected = editDaySelect.value;
+  editDaySelect.innerHTML = '';
+  for (let d = startDay; d <= daysInMonth; d++) {
+    const o = document.createElement('option');
+    o.value = String(d);
+    o.text = String(d);
+    editDaySelect.appendChild(o);
+  }
+
+  // Try to restore previous selection if still valid
+  if (prevSelected && Array.from(editDaySelect.options).some(o => o.value === prevSelected)) {
+    editDaySelect.value = prevSelected;
+  } else if (editDaySelect.options.length) {
+    editDaySelect.value = editDaySelect.options[0].value;
+  }
+
+  // re-render slots whenever days change, this will also trigger the weekend check
+  renderTimeSlots();
+}
+
+/* generate time slots from start to end in minutes with 10-min steps */
+function generateTimeSlots(startHour = 8, endHour = 17, stepMin = 10) {
+  const start = startHour * 60;
+  const end = endHour * 60;
+  const slots = [];
+  for (let t = start; t < end; t += stepMin) {
+    const startDisplay = minutesToDisplay(t);
+    const endDisplay = minutesToDisplay(t + stepMin);
+    slots.push(`${startDisplay} - ${endDisplay}`);
+  }
+  return slots;
+}
+
+/* parse a slot like "8:00 AM - 8:10 AM" and return Date object for start time on given yyyy-mm-dd */
+function slotStartDate(selectedDateStr, slotRangeStr) {
+  // selectedDateStr expected 'YYYY-MM-DD'
+  const [yearStr, monthStr, dayStr] = selectedDateStr.split('-').map(s => s.replace(/^0+/, '') || '0');
+  const startPart = slotRangeStr.split(' - ')[0].trim(); // "8:00 AM"
+  // parse startPart
+  const match = startPart.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return null;
+  let h = parseInt(match[1], 10);
+  const m = parseInt(match[2], 10);
+  const period = match[3].toUpperCase();
+  if (period === 'PM' && h !== 12) h += 12;
+  if (period === 'AM' && h === 12) h = 0;
+  // month param for Date is zero-based
+  return new Date(parseInt(yearStr, 10), parseInt(monthStr, 10) - 1, parseInt(dayStr, 10), h, m, 0, 0);
+}
+
+/* returns true if slot (string) for the selected date is in the past (<= now) */
+function isSlotInPast(selectedDateStr, slotRangeStr) {
+  const slotDate = slotStartDate(selectedDateStr, slotRangeStr);
+  if (!slotDate) return false;
+  const now = new Date();
+  // Compare by milliseconds
+  return slotDate.getTime() <= now.getTime();
+}
+
+/* render time slot buttons in the grid, disabling past ones */
+function renderTimeSlots(selectedDateStr = null) {
+  if (!editTimeSlotsGrid) return;
+  
+  // *** FIX: Check for Weekend ***
+  if (checkWeekend() !== false) {
+    editTimeSlotsGrid.innerHTML = `
+        <div style="padding: 15px; text-align: center; color: #D32F2F; font-weight: bold; background-color: #ffebee; border-radius: 8px; grid-column: 1 / -1; margin-top: 10px;">
+            ⚠️ Appointments are not available on weekends (Saturday/Sunday). Please select a weekday.
+        </div>
+    `;
+    if (editTimeInput) editTimeInput.value = ''; // Clear time selection
+    return;
+  }
+  // *** END FIX ***
+
+
+  // compute selected date string if not provided
+  if (!selectedDateStr && editYearSelect && editMonthSelect && editDaySelect) {
+    const y = editYearSelect.value;
+    const m = formatTwo(Number(editMonthSelect.value));
+    const d = formatTwo(Number(editDaySelect.value));
+    selectedDateStr = `${y}-${m}-${d}`;
+  }
+
+  const currentSelected = editTimeInput ? editTimeInput.value : '';
+  editTimeSlotsGrid.innerHTML = '';
+
+  const slots = generateTimeSlots();
+
+  slots.forEach(slot => {
+    const btn = document.createElement('div');
+    btn.className = 'time-slot';
+    btn.textContent = slot;
+    btn.setAttribute('data-time', slot);
+
+    const past = isSlotInPast(selectedDateStr, slot);
+
+    if (past) {
+      btn.classList.add('past');
+      btn.setAttribute('aria-disabled', 'true');
+    } else {
+      btn.tabIndex = 0;
+      btn.addEventListener('click', () => {
+        qsa('#editTimeSlotsGrid .time-slot').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        if (editTimeInput) editTimeInput.value = slot;
       });
-    });
-
-    // Generate Time Slots (8:00 AM to 5:00 PM in 10-minute intervals)
-    function generateTimeSlots(){
-        const start = 8 * 60; // 8:00 AM in minutes
-        const end = 17 * 60; // 5:00 PM in minutes
-        const timeSlots = [];
-        
-        const fmt = (h, m) => { 
-            const s = h >= 12 ? "PM" : "AM"; 
-            const hr = h % 12 || 12; 
-            return `${hr}:${m.toString().padStart(2, "0")}`; 
-        };
-        const formatRange = (t) => {
-            const h = Math.floor(t / 60);
-            const m = t % 60;
-            const nh = Math.floor((t + 10) / 60);
-            const nm = (t + 10) % 60;
-            return `${fmt(h, m)} - ${fmt(nh, nm)} ${nh >= 12 ? "PM" : "AM"}`;
-        };
-
-        for (let t = start; t < end; t += 10) {
-            timeSlots.push(formatRange(t));
+      // allow keyboard selection
+      btn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
         }
-        return timeSlots;
+      });
     }
 
-    // Populate Time Slot buttons
-    generateTimeSlots().forEach(slot => {
-        const button = document.createElement('div');
-        button.className = 'time-slot';
-        button.textContent = slot;
-        button.setAttribute('data-time', slot);
-        button.addEventListener('click', function() {
-            document.querySelectorAll('#editTimeSlotsGrid .time-slot').forEach(btn => btn.classList.remove('selected'));
-            this.classList.add('selected');
-            editTimeInput.value = slot;
-        });
-        editTimeSlotsGrid.appendChild(button);
-    });
+    if (slot === currentSelected && !past) {
+      btn.classList.add('selected');
+    } else if (slot === currentSelected && past && editTimeInput) {
+      // clear selection if original slot is now past
+      editTimeInput.value = '';
+    }
 
+    editTimeSlotsGrid.appendChild(btn);
+  });
+}
 
-    window.openEditModal = function(id){
-      editingId = id;
-      const appt = allAppointments.find(a => a.appointment_id == id); // Loose comparison is OK
-      
-      if(!appt) {
-          console.error('ID not found:', id, allAppointments);
-          return alert("Appointment not found in list.");
+/* toggle service dropdown */
+if (editServiceButton && editServicesList) {
+  editServiceButton.addEventListener('click', e => {
+    e.stopPropagation();
+    editServicesList.classList.toggle('show');
+  });
+  window.addEventListener('click', () => editServicesList.classList.remove('show'));
+  // wire up service list clicks (delegation)
+  editServicesList.addEventListener('click', e => {
+    const item = e.target.closest('.service-item');
+    if (!item) return;
+    const service = item.getAttribute('data-service') || item.textContent.trim();
+    if (editServiceInput) editServiceInput.value = service;
+    editServiceButton.textContent = `${service} ▼`;
+    editServicesList.classList.remove('show');
+  });
+}
+
+/* cancel button inside modal */
+if (cancelEditBtn) {
+  cancelEditBtn.addEventListener('click', () => {
+    if (editModal) editModal.style.display = 'none';
+  });
+}
+
+/* save changes */
+if (saveEditBtn) {
+  saveEditBtn.addEventListener('click', async () => {
+    // *** FIX: Weekend check on save ***
+    if (checkWeekend() !== false) {
+        return alert('❌ Appointments are not available on weekends (Saturday/Sunday). Please choose a weekday.');
+    }
+    // *** END FIX ***
+    
+    const service = editServiceInput ? editServiceInput.value.trim() : '';
+    const year = editYearSelect ? editYearSelect.value : '';
+    const month = editMonthSelect ? editMonthSelect.value : '';
+    const day = editDaySelect ? editDaySelect.value : '';
+    const time_slot = editTimeInput ? editTimeInput.value : '';
+
+    if (!service || !year || !month || !day || !time_slot) {
+      return alert('⚠️ Please select a service, date, and time slot.');
+    }
+
+    const date = `${year}-${formatTwo(Number(month))}-${formatTwo(Number(day))}`;
+
+    if (isSlotInPast(date, time_slot)) {
+      return alert('❌ The selected time slot has already passed. Please choose a future time.');
+    }
+
+    try {
+      const res = await fetch('php/edit_appointment.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id: editingId, service, date, time_slot})
+      });
+      const data = await res.json();
+      if (data && data.status === 'success') {
+        showToast('Appointment updated.');
+        if (editModal) editModal.style.display = 'none';
+        await loadAppointments();
+      } else {
+        showToast((data && data.message) || 'Failed to update');
       }
-      
-      // 1. Set Service values
-      editServiceInput.value = appt.service;
-      editServiceButton.textContent = appt.service + ' ▼';
-      
-      // 2. Set Date values
-      const dateParts = appt.date.split('-'); // e.g., ['2025', '11', '23']
-      
-      editYearSelect.value = dateParts[0];
-      editMonthSelect.value = dateParts[1];
-      updateEditDays(); // Update days dropdown first
-      editDaySelect.value = dateParts[2];
-      
-      // 3. Set Time Slot value and select the button
-      editTimeInput.value = appt.time_slot;
-      document.querySelectorAll('#editTimeSlotsGrid .time-slot').forEach(div => {
-          div.classList.remove('selected');
-          if (div.getAttribute('data-time') === appt.time_slot) {
-              div.classList.add('selected');
-              div.scrollIntoView({behavior: 'smooth', block: 'nearest'}); // Scroll to selected slot
-          }
-      });
-      
-      editModal.style.display='flex';
+    } catch (err) {
+      console.error('saveEdit error:', err);
+      showToast('Error updating');
     }
+  });
+}
 
-    document.getElementById('saveEditBtn').addEventListener('click', async()=>{
-      const service = editServiceInput.value; 
-      const year = editYearSelect.value;
-      const month = editMonthSelect.value;
-      const day = editDaySelect.value;
-      const time_slot = editTimeInput.value; 
+/* ---------------------- openEditModal (exposed) ---------------------- */
+window.openEditModal = function(id) {
+  editingId = id;
+  const appt = allAppointments.find(a => String(a.appointment_id) === String(id));
+  if (!appt) {
+    console.error('Appointment id not found', id, allAppointments);
+    return alert('Appointment not found in list.');
+  }
 
-      if(!service||!year||!month||!day||!time_slot) return alert("⚠️ Please select a service, date, and time slot.");
+  // set service
+  if (editServiceInput) editServiceInput.value = appt.service || '';
+  if (editServiceButton) editServiceButton.textContent = (appt.service || 'Select Service') + ' ▼';
 
-      const date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  // parse and set date selectors (expected appt.date 'YYYY-MM-DD')
+  const [y, m, d] = (appt.date || '').split('-').map(s => s || '');
+  if (y && m && d && editYearSelect && editMonthSelect && editDaySelect) {
+    editYearSelect.value = y;
+    editMonthSelect.value = String(Number(m)); // remove leading zero
+    // update days before setting day
+    updateEditDays();
+    // set day (strip leading zero)
+    editDaySelect.value = String(Number(d));
+  } else {
+    // fallback to today
+    editYearSelect.value = String(thisYear);
+    editMonthSelect.value = String(thisMonth);
+    updateEditDays();
+    editDaySelect.value = String(thisDay);
+  }
 
-      try{
-        const res = await fetch('php/edit_appointment.php',{
-            method:'POST',
-            body:JSON.stringify({id:editingId, service, date, time_slot}),
-            headers:{'Content-Type':'application/json'}
-        });
-        const data = await res.json();
-        if(data.status==='success'){ 
-            showToast("Appointment updated."); 
-            editModal.style.display='none'; 
-            loadAppointments(); 
-        }
-        else showToast(data.message||'Failed to update');
-      }catch(e){ console.error(e); showToast('Error updating'); }
-    });
+  // set time & render slots
+  if (editTimeInput) editTimeInput.value = appt.time_slot || '';
+  // Pass the selected date explicitly for accurate rendering/past checks
+  const selectedDateStr = `${editYearSelect.value}-${formatTwo(Number(editMonthSelect.value))}-${formatTwo(Number(editDaySelect.value))}`;
+  renderTimeSlots(selectedDateStr);
 
-    loadAppointments();
-  </script>
+  // ensure selected slot is visible
+  requestAnimationFrame(() => {
+    const selectedSlot = qs('#editTimeSlotsGrid .time-slot.selected');
+    if (selectedSlot) selectedSlot.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    else if (editTimeSlotsGrid) editTimeSlotsGrid.scrollTop = 0;
+  });
+
+  if (editModal) editModal.style.display = 'flex';
+};
+
+/* ---------------------- Initialization ---------------------- */
+initDateSelectors();
+updateEditDays();    // initial days (also calls renderTimeSlots)
+loadAppointments();  // initial data load
+
+/* ---------------------- Helper: Allow tab-click filter wiring ---------------------- */
+/* Example: <button class="tab-btn" onclick="setFilter('upcoming', this)">Upcoming</button> */
+window.filterAppointments = setFilter; // Renamed to match your HTML
+window.setFilter = setFilter;
+
+</script>
+
 
 </body>
 </html>
