@@ -142,12 +142,12 @@
 
   <script>
 /*
-  Clean, modular, plain-vanilla JS rewrite.
-  - Keeps same features: navbar/profile toggles, fetch user, toast notifications,
-    load/filter/render appointments, cancel, edit modal with date selectors and time-slot selection,
-    prevents selecting past times for "today".
-  - Uses modern JS (const/let, arrow functions), clearer helpers and comments.
-  - Exposes only the functions that need to be called from HTML: window.openEditModal, window.cancelAppointment
+ Clean, modular, plain-vanilla JS rewrite.
+ - Keeps same features: navbar/profile toggles, fetch user, toast notifications,
+   load/filter/render appointments, cancel, edit modal with date selectors and time-slot selection,
+   prevents selecting past times for "today".
+ - Uses modern JS (const/let, arrow functions), clearer helpers and comments.
+ - Exposes only the functions that need to be called from HTML: window.openEditModal, window.cancelAppointment
 */
 
 /* ---------------------- Utilities ---------------------- */
@@ -259,7 +259,7 @@ const loadAppointments = async () => {
 };
 
 const setFilter = (filter, btnElement = null) => {
-  currentFilter = filter === 'archived' ? 'archived' : 'upcoming';
+  currentFilter = filter === 'archive' ? 'archived' : 'upcoming';
   qsa('.tab-btn').forEach(b => b.classList.remove('active'));
   if (btnElement) btnElement.classList.add('active');
   renderTable();
@@ -381,7 +381,30 @@ function initDateSelectors() {
   // ensure day select gets updated when month/year changes
   editMonthSelect.addEventListener('change', updateEditDays);
   editYearSelect.addEventListener('change', updateEditDays);
-  editDaySelect.addEventListener('change', () => renderTimeSlots());
+  // Re-render time slots whenever day changes
+  editDaySelect.addEventListener('change', () => renderTimeSlots()); 
+}
+
+
+/**
+ * Checks if the given date represented by selectors is a Saturday (6) or Sunday (0).
+ * @returns {number | false} The day index (0-6) if it's a weekend, otherwise false.
+ */
+function checkWeekend() {
+    if (!editMonthSelect || !editDaySelect || !editYearSelect) return false;
+
+    const month = parseInt(editMonthSelect.value, 10); // 1-12
+    const day = parseInt(editDaySelect.value, 10);
+    const year = parseInt(editYearSelect.value, 10);
+    
+    // JS Date month is 0-indexed (0-11)
+    const selectedDate = new Date(year, month - 1, day);
+    const dayOfWeek = selectedDate.getDay(); // 0=Sunday, 6=Saturday
+
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+        return dayOfWeek;
+    }
+    return false;
 }
 
 function updateEditDays() {
@@ -411,7 +434,7 @@ function updateEditDays() {
     editDaySelect.value = editDaySelect.options[0].value;
   }
 
-  // re-render slots whenever days change
+  // re-render slots whenever days change, this will also trigger the weekend check
   renderTimeSlots();
 }
 
@@ -457,6 +480,19 @@ function isSlotInPast(selectedDateStr, slotRangeStr) {
 /* render time slot buttons in the grid, disabling past ones */
 function renderTimeSlots(selectedDateStr = null) {
   if (!editTimeSlotsGrid) return;
+  
+  // *** FIX: Check for Weekend ***
+  if (checkWeekend() !== false) {
+    editTimeSlotsGrid.innerHTML = `
+        <div style="padding: 15px; text-align: center; color: #D32F2F; font-weight: bold; background-color: #ffebee; border-radius: 8px; grid-column: 1 / -1; margin-top: 10px;">
+            ⚠️ Appointments are not available on weekends (Saturday/Sunday). Please select a weekday.
+        </div>
+    `;
+    if (editTimeInput) editTimeInput.value = ''; // Clear time selection
+    return;
+  }
+  // *** END FIX ***
+
 
   // compute selected date string if not provided
   if (!selectedDateStr && editYearSelect && editMonthSelect && editDaySelect) {
@@ -537,6 +573,12 @@ if (cancelEditBtn) {
 /* save changes */
 if (saveEditBtn) {
   saveEditBtn.addEventListener('click', async () => {
+    // *** FIX: Weekend check on save ***
+    if (checkWeekend() !== false) {
+        return alert('❌ Appointments are not available on weekends (Saturday/Sunday). Please choose a weekday.');
+    }
+    // *** END FIX ***
+    
     const service = editServiceInput ? editServiceInput.value.trim() : '';
     const year = editYearSelect ? editYearSelect.value : '';
     const month = editMonthSelect ? editMonthSelect.value : '';
@@ -606,7 +648,9 @@ window.openEditModal = function(id) {
 
   // set time & render slots
   if (editTimeInput) editTimeInput.value = appt.time_slot || '';
-  renderTimeSlots(appt.date || null);
+  // Pass the selected date explicitly for accurate rendering/past checks
+  const selectedDateStr = `${editYearSelect.value}-${formatTwo(Number(editMonthSelect.value))}-${formatTwo(Number(editDaySelect.value))}`;
+  renderTimeSlots(selectedDateStr);
 
   // ensure selected slot is visible
   requestAnimationFrame(() => {
@@ -620,12 +664,12 @@ window.openEditModal = function(id) {
 
 /* ---------------------- Initialization ---------------------- */
 initDateSelectors();
-updateEditDays();    // initial days
-renderTimeSlots();   // initial slots
-loadAppointments();  // initial data load
+updateEditDays();    // initial days (also calls renderTimeSlots)
+loadAppointments();  // initial data load
 
 /* ---------------------- Helper: Allow tab-click filter wiring ---------------------- */
 /* Example: <button class="tab-btn" onclick="setFilter('upcoming', this)">Upcoming</button> */
+window.filterAppointments = setFilter; // Renamed to match your HTML
 window.setFilter = setFilter;
 
 </script>
