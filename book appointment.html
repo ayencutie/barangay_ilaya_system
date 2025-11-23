@@ -8,11 +8,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Book Appointment – Barangay Ilaya Health Center</title>
   <link rel="stylesheet" href="css/book appointment.css" />
+  <style>
+    .no-slots-msg {
+        padding: 15px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: red;
+    }
+  </style>
 </head>
 <body>
 
   <header class="navbar">
-    
     <div class="nav-left">
       <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
       <h1>BARANGAY ILAYA HEALTH CENTER</h1>
@@ -27,7 +35,6 @@
     </div>
 
     <div class="nav-right">
-      
       <a href="inbox.php" class="icon-btn" title="Inbox">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
@@ -40,7 +47,6 @@
         <div id="menuDropdown" class="dropdown-content">
           <a href="book appointment.html">Book Appointment</a>
           <a href="my_appointment.html">My Appointment</a>
-          
         </div>
       </div>
 
@@ -49,7 +55,6 @@
           <img id="userAvatar" src="uploads/default_profile.png" alt="Profile">
           <span class="active-dot"></span> 
         </button>
-
         <div id="profileDropdown" class="profile-card" hidden>
           <div class="profile-header">
             <img id="dropdownAvatar" src="uploads/default_profile.png" alt="User">
@@ -66,9 +71,9 @@
           </div>
         </div>
       </div>
-
     </div> 
   </header>
+
   <section class="content">
     <div class="booking-container">
       <h1>BOOK AN APPOINTMENT</h1>
@@ -118,11 +123,12 @@
       </form>
     </div>
   </section>
+
   <div id="toastBox" class="toast-container"></div>
   <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
   <script>
-    // --- 1. NAVBAR & INBOX LOGIC (ADDED) ---
+    // --- NAVBAR & PROFILE ---
     const menuBtn = document.getElementById('menuButton');
     const menuDropdown = document.getElementById('menuDropdown');
     const profileBtn = document.getElementById('profileButton');
@@ -153,7 +159,7 @@
 
     window.addEventListener('click', closeAll);
 
-    // Fetch User Info
+    // Fetch user info
     fetch('php/get_user.php').then(r=>r.json()).then(data => {
       if(data && !data.error) {
         const picUrl = data.profile_pic || 'uploads/default_profile.png';
@@ -164,49 +170,7 @@
       }
     }).catch(() => {});
 
-    // Notification Simulation
-    function triggerNotification(message) {
-      const badge = document.getElementById('msgBadge');
-      const toastBox = document.getElementById('toastBox');
-      const audio = document.getElementById('notifSound');
-
-      if(badge) { badge.style.display = 'flex'; badge.innerText = '1'; }
-      if(audio) audio.play().catch(() => {}); 
-
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.innerHTML = `<div class="toast-icon">📩</div><div class="toast-msg"><h4>New Message</h4><p>${message}</p></div>`;
-      toastBox.appendChild(toast);
-
-      setTimeout(() => toast.classList.add('show'), 100);
-      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 5000);
-    }
-
-    // Trigger after 3 seconds
-    setTimeout(() => { 
-      triggerNotification("You have a new message from Admin."); 
-    }, 3000);
-
-
-    // --- 2. ORIGINAL BOOKING LOGIC (PRESERVED) ---
-    
-    // Session check
-    function checkSessionAndRedirect(){
-      fetch('php/get_session.php', { credentials: 'same-origin' })
-        .then(r => r.json())
-        .then(data => {
-          if (!data.authenticated || (data.user_role && data.user_role !== 'patient')) {
-            window.location.replace('landing_page.html');
-          }
-        })
-        .catch(() => {
-          window.location.replace('landing_page.html');
-        });
-    }
-    checkSessionAndRedirect();
-    window.addEventListener('pageshow', function(event){ checkSessionAndRedirect(); });
-
-    // Service Selection
+    // --- SERVICE SELECTION ---
     const serviceButton = document.getElementById("serviceButton");
     const servicesList = document.getElementById("servicesList");
     let selectedService = "";
@@ -226,27 +190,7 @@
 
     window.addEventListener("click", () => servicesList.classList.remove("show"));
 
-    // Time Slots
-    const timeGrid = document.getElementById("time-grid");
-    const start = 8*60, end = 17*60;
-    let selectedTime = "";
-    for(let t=start; t<end; t+=10){
-      const h=Math.floor(t/60), m=t%60;
-      const nh=Math.floor((t+10)/60), nm=(t+10)%60;
-      const fmt=(h,m)=> { const s=h>=12?"PM":"AM"; const hr=h%12||12; return `${hr}:${m.toString().padStart(2,"0")} ${s}`; };
-      const div=document.createElement("div");
-      div.className="time-slot";
-      div.textContent=`${fmt(h,m)} - ${fmt(nh,nm)}`;
-      div.onclick=()=>selectTime(div);
-      timeGrid.appendChild(div);
-    }
-    function selectTime(slot){
-      document.querySelectorAll(".time-slot").forEach(s=>s.classList.remove("selected"));
-      slot.classList.add("selected");
-      selectedTime = slot.textContent;
-    }
-
-    // Date Picker
+    // --- DATE PICKER ---
     const monthSelect=document.getElementById("month");
     const daySelect=document.getElementById("day");
     const yearSelect=document.getElementById("year");
@@ -277,7 +221,60 @@
     updateDays();
     daySelect.value=today.getDate();
 
-    // Submit
+    // --- TIME SLOTS ---
+    const timeGrid = document.getElementById("time-grid");
+    let selectedTime = "";
+
+    function renderTimeSlots() {
+        timeGrid.innerHTML = "";
+        selectedTime = "";
+
+        const day = parseInt(daySelect.value);
+        const month = parseInt(monthSelect.value) - 1;
+        const year = parseInt(yearSelect.value);
+
+        const selectedDate = new Date(year, month, day);
+        const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 6 = Saturday
+
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+            const msg = document.createElement("div");
+            msg.className = "no-slots-msg";
+            msg.textContent = "❌ No appointments available on weekends.";
+            timeGrid.appendChild(msg);
+            return;
+        }
+
+        const start = 8 * 60; // 8:00 AM
+        const end = 17 * 60;  // 5:00 PM
+        for (let t = start; t < end; t += 10) {
+            const h = Math.floor(t / 60), m = t % 60;
+            const nh = Math.floor((t + 10) / 60), nm = (t + 10) % 60;
+            const fmt = (h, m) => { 
+                const s = h >= 12 ? "PM" : "AM"; 
+                const hr = h % 12 || 12; 
+                return `${hr}:${m.toString().padStart(2,"0")} ${s}`; 
+            };
+            const div = document.createElement("div");
+            div.className = "time-slot";
+            div.textContent = `${fmt(h,m)} - ${fmt(nh,nm)}`;
+            div.onclick = () => selectTime(div);
+            timeGrid.appendChild(div);
+        }
+    }
+
+    function selectTime(slot){
+      document.querySelectorAll(".time-slot").forEach(s=>s.classList.remove("selected"));
+      slot.classList.add("selected");
+      selectedTime = slot.textContent;
+    }
+
+    daySelect.addEventListener("change", renderTimeSlots);
+    monthSelect.addEventListener("change", renderTimeSlots);
+    yearSelect.addEventListener("change", renderTimeSlots);
+
+    renderTimeSlots();
+
+    // --- FORM SUBMIT ---
     document.getElementById("bookingForm").addEventListener("submit", function(e){
       if(!selectedService || !selectedTime){
         e.preventDefault();
