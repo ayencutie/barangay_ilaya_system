@@ -204,7 +204,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             // B. Default error message for attempts 1 and 2
             $remaining = MAX_ATTEMPTS - $attempts;
-            $_SESSION['login_error'] = "Wrong password. You have **$remaining attempt(s)** remaining before a lockout starts.";
+            $_SESSION['login_error'] = "Wrong password. Please  try again.";
             
             // Redirect pabalik sa login form para ipakita ang remaining attempts
             header("Location: ../landing_page.php"); 
