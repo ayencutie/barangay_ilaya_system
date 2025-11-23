@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let openDropdown = null;
 
   function escapeHtml(s){
-    return String(s || '').replace(/[&<>"']/g, (m)=>({
+    return String(s || '').replace(/[&<>"']/g,(m)=>({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     }[m]));
   }
@@ -86,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
     filtered.forEach(a => {
       const tr = document.createElement('tr');
 
-      // 🟥 If completed/missed/cancelled → REMOVE ACTION BUTTON
       const noActions = ['Completed', 'Missed', 'Cancelled'].includes(a.status);
 
       tr.innerHTML = `
@@ -100,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td class="action-cell">
           ${
             noActions
-              ? "" 
+              ? ""
               : `<button class="dots-btn" data-id="${a.appointment_id}">⋯</button>`
           }
         </td>
@@ -247,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams();
     if(currentStatus !== 'All') params.set('status', currentStatus);
     if(searchInput.value) params.set('q', searchInput.value.trim());
-    window.location = '../php/admin/export_appointments.php?' + params.toString();
+    window.location = '../admin/export_appointments.php?' + params.toString();
   });
 
   loadAppointments();
