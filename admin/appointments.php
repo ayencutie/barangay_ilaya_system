@@ -34,7 +34,7 @@ require __DIR__ . '/_auth_admin.php';
     <div class="controls">
       <div class="tabs" role="tablist" id="tabsWrap">
         <button class="tab-btn active" data-status="All">All</button>
-        <button class="tab-btn" data-status="Upcoming">Upcoming</button>
+        
         <button class="tab-btn" data-status="Pending">Pending</button>
         <button class="tab-btn" data-status="Approved">Approved</button>
         <button class="tab-btn" data-status="Completed">Completed</button>
