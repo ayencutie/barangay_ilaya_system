@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 23
+Patient ID     : PTN-0001
+Patient Name   : Florence T. Ayen
+Service        : Dental Care
+Date           : 2025-11-23
+Time           : 4:20 PM - 4:30 PM
+Status         : Completed
+=================================

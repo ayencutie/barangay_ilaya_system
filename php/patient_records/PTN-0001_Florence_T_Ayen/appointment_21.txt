@@ -1,0 +1,9 @@
+===== COMPLETED APPOINTMENT =====
+Appointment ID : 21
+Patient ID     : PTN-0001
+Patient Name   : Florence T. Ayen
+Service        : Family Planning
+Date           : 2025-11-23
+Time           : 1:00 PM - 1:10 PM
+Status         : Completed
+=================================
