@@ -5,25 +5,25 @@ if (!isset($_SESSION['patient_id'])) { header("Location: landing_page.html"); ex
 $patient_id = $_SESSION['patient_id'];
 
 // ===============================================
-// ✅ API LOGIC (UNCHANGED)
+// ✅ API LOGIC (FIXED)
 // ===============================================
 if (isset($_GET['action'])) {
     header('Content-Type: application/json');
 
     $action = $_GET['action'];
-    $TARGET_ADMIN = 'admin';
+    $TARGET_ADMIN = 'admin'; // Default receiver pag ikaw nag reply
     $SENDER_ID = $patient_id;
 
     try {
         if ($action === 'load_messages') {
+            // BINAGO DITO: Kukunin lahat ng message basta involved ka (sender ka man o receiver)
             $stmt = $pdo->prepare("
                 SELECT message_body, sender_id, timestamp
                 FROM chat_messages
-                WHERE (sender_id = :pid AND receiver_id = :admin) 
-                   OR (sender_id = :admin AND receiver_id = :pid)
+                WHERE sender_id = :pid OR receiver_id = :pid
                 ORDER BY timestamp ASC
             ");
-            $stmt->execute([':pid' => $SENDER_ID, ':admin' => $TARGET_ADMIN]);
+            $stmt->execute([':pid' => $SENDER_ID]);
             $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $result = array_map(function($m) use ($SENDER_ID) {
@@ -226,9 +226,10 @@ if (isset($_GET['action'])) {
         }
 
         // Simulate Notification after 3s
-        setTimeout(() => { 
-            triggerNotification("You have a new message from Admin."); 
-        }, 3000);
+        // Note: You might want to remove this simulated delay in production if real-time fetching works
+        // setTimeout(() => { 
+        //     triggerNotification("You have a new message from Admin."); 
+        // }, 3000);
 
         // 4. CHAT LOGIC
         const chatBox = document.getElementById('chatMessages');

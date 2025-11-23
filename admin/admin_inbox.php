@@ -3,21 +3,20 @@
 require __DIR__ . '/_auth_admin.php'; 
 require __DIR__ . '/../php/db.php';
 
-// Assuming admin details are stored in session (set by _auth_admin.php)
-// If _auth_admin.php doesn't set it, this is necessary for dark mode logic
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+
 $admin = $_SESSION['admin_user_data'] ?? []; 
-$ADMIN_ID = 'admin'; // Static ID for the Admin account
+$REAL_ADMIN_ID = isset($_SESSION['patient_id']) ? $_SESSION['patient_id'] : '22'; 
+$SYSTEM_ADMIN_ID = 'admin'; 
 
 // ===============================================
-// ✅ ONE-FILE API LOGIC (ADMIN SIDE)
+// ✅ ONE-FILE API LOGIC (ADMIN SIDE) - RETAINED
 // ===============================================
 if (isset($_GET['action'])) {
     header('Content-Type: application/json');
 
-    // 2. Authentication Check
     if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
         http_response_code(403); echo json_encode(['error' => 'Access denied']); exit;
     }
@@ -26,7 +25,6 @@ if (isset($_GET['action'])) {
 
     try {
         if ($action === 'load_conversations') {
-            // --- LOAD CONVERSATIONS LIST ---
             $stmt = $pdo->prepare("
                 SELECT 
                     t1.patient_id, 
@@ -37,20 +35,26 @@ if (isset($_GET['action'])) {
                 FROM users t1
                 INNER JOIN (
                     SELECT 
-                        CASE WHEN sender_id = :admin_id THEN receiver_id ELSE sender_id END AS patient_id_in_convo,
+                        CASE 
+                            WHEN sender_id IN (:real_id, :sys_id) THEN receiver_id 
+                            ELSE sender_id 
+                        END AS patient_id_in_convo,
                         message_body,
                         timestamp,
                         ROW_NUMBER() OVER(PARTITION BY 
-                            CASE WHEN sender_id = :admin_id THEN receiver_id ELSE sender_id END
+                            CASE 
+                                WHEN sender_id IN (:real_id, :sys_id) THEN receiver_id 
+                                ELSE sender_id 
+                            END
                             ORDER BY timestamp DESC) as rn
                     FROM chat_messages
-                    WHERE sender_id = :admin_id OR receiver_id = :admin_id
+                    WHERE sender_id IN (:real_id, :sys_id) OR receiver_id IN (:real_id, :sys_id)
                 ) t2 
                 ON t1.patient_id = t2.patient_id_in_convo AND t2.rn = 1
                 WHERE t1.user_role = 'patient'
                 ORDER BY t2.timestamp DESC
             ");
-            $stmt->execute([':admin_id' => $ADMIN_ID]);
+            $stmt->execute([':real_id' => $REAL_ADMIN_ID, ':sys_id' => $SYSTEM_ADMIN_ID]);
             $conversations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $result = array_map(function($c) {
@@ -65,7 +69,6 @@ if (isset($_GET['action'])) {
             echo json_encode($result);
 
         } elseif ($action === 'load_messages') {
-            // --- LOAD MESSAGES ---
             $pid = $_GET['patient_id'] ?? null;
             if (empty($pid)) { http_response_code(400); echo json_encode(['error' => 'Patient ID required']); exit; }
 
@@ -75,11 +78,11 @@ if (isset($_GET['action'])) {
                     sender_id, 
                     timestamp
                 FROM chat_messages
-                WHERE (sender_id = :pid AND receiver_id = :admin) 
-                   OR (sender_id = :admin AND receiver_id = :pid)
+                WHERE (sender_id = :pid AND receiver_id IN (:real_id, :sys_id)) 
+                   OR (sender_id IN (:real_id, :sys_id) AND receiver_id = :pid)
                 ORDER BY timestamp ASC
             ");
-            $stmt->execute([':pid' => $pid, ':admin' => $ADMIN_ID]);
+            $stmt->execute([':pid' => $pid, ':real_id' => $REAL_ADMIN_ID, ':sys_id' => $SYSTEM_ADMIN_ID]);
             $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $result = array_map(function($m) use ($pid) {
@@ -93,18 +96,19 @@ if (isset($_GET['action'])) {
             echo json_encode($result);
 
         } elseif ($action === 'send_message' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-            // --- SEND MESSAGE ---
             $pid = $_POST['patient_id'] ?? null;
             $message = trim($_POST['message'] ?? '');
             
             if (empty($pid) || empty($message)) { http_response_code(400); echo json_encode(['error' => 'Missing data']); exit; }
+
+            $SENDER_TO_USE = $SYSTEM_ADMIN_ID; 
 
             $stmt = $pdo->prepare("
                 INSERT INTO chat_messages (sender_id, receiver_id, message_body)
                 VALUES (:sender, :receiver, :message)
             ");
             $stmt->execute([
-                ':sender' => $ADMIN_ID,
+                ':sender' => $SENDER_TO_USE,
                 ':receiver' => $pid,
                 ':message' => $message
             ]);
@@ -122,9 +126,8 @@ if (isset($_GET['action'])) {
         echo json_encode(['error' => 'Database operation failed.']);
     }
 
-    exit; // EXIT HERE TO PREVENT HTML OUTPUT ON AJAX CALLS
+    exit;
 }
-// ===============================================
 ?>
 <!doctype html>
 <html lang="en">
@@ -133,6 +136,7 @@ if (isset($_GET['action'])) {
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin Inbox — Barangay Ilaya</title>
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="css/sidebar.css">
   <link rel="stylesheet" href="css/admin_inbox.css"> 
 </head>
@@ -152,27 +156,33 @@ if (isset($_GET['action'])) {
 </aside>
 
 <main class="main">
-  <div class="header">
-    <h1>Inbox</h1> 
-  </div>
-
   <div class="inbox-wrapper">
 
     <div class="users-panel">
-      <input type="text" id="userSearch" placeholder="Search patient...">
+      <div class="panel-header">
+        <h3>Inbox</h3>
+      </div>
+      <div class="search-box">
+         <input type="text" id="userSearch" placeholder="Search patient...">
+      </div>
       <div id="userList" class="user-list"></div>
     </div>
 
     <div class="chat-panel">
       <div class="chat-header" id="chatHeader">
-        <h3>Select a User</h3>
+        <div class="header-info">
+            <h3 id="chatUserName">Select a User</h3>
+            <span class="status-indicator"><span class="dot"></span> Online • Replies typically in minutes</span>
+        </div>
       </div>
 
       <div class="chat-messages" id="chatMessages"></div>
 
-      <div class="chat-input">
-        <input type="text" id="msgInput" placeholder="Type your message...">
-        <button id="sendBtn">Send</button>
+      <div class="chat-input-area">
+        <div class="input-wrapper">
+            <input type="text" id="msgInput" placeholder="Type your message here...">
+            <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
       </div>
     </div>
 
@@ -181,45 +191,44 @@ if (isset($_GET['action'])) {
 
 <script>
 // ===============================================
-// ✅ INBOX JAVASCRIPT LOGIC (ADMIN SIDE)
+// ✅ INBOX JAVASCRIPT LOGIC (ADMIN SIDE) - RETAINED
 // ===============================================
 let currentUser = null; 
 const ADMIN_INBOX_PHP_URL = 'admin_inbox.php'; 
 
-/* -------------------------
-   LOAD CONVERSATIONS (Users)
--------------------------- */
 function loadConversations(search = "") {
     fetch(`${ADMIN_INBOX_PHP_URL}?action=load_conversations`)
     .then(r => r.json())
     .then(users => {
         const list = document.getElementById("userList");
-        list.innerHTML = "";
+        const currentSelection = currentUser;
 
         if (users.error) {
-            console.error("Conversation Error:", users.error);
             list.innerHTML = `<p style="color:red;padding:10px;">Error: ${users.error}</p>`;
             return;
         }
 
-        const filteredUsers = users
-            .filter(u => u.name.toLowerCase().includes(search.toLowerCase()));
+        const filteredUsers = users.filter(u => u.name.toLowerCase().includes(search.toLowerCase()));
+        list.innerHTML = "";
+
+        if (filteredUsers.length === 0) {
+            list.innerHTML = `<p style="padding:10px;color:#666;text-align:center;font-size:13px;">No conversations found.</p>`;
+        }
 
         filteredUsers.forEach(u => {
             const div = document.createElement("div");
             div.className = `user ${u.patient_id === currentUser ? 'active-user' : ''}`;
             div.setAttribute('data-pid', u.patient_id); 
             div.innerHTML = `
-                <strong>${u.name}</strong><br>
-                <small>${u.last_message ? u.last_message.substring(0, 30) + (u.last_message.length > 30 ? '...' : '') : 'No messages yet'}</small>
+                <div class="avatar-circle">${u.name.charAt(0)}</div>
+                <div class="user-details">
+                    <strong>${u.name}</strong>
+                    <small>${u.last_message ? u.last_message.substring(0, 25) + (u.last_message.length > 25 ? '...' : '') : 'No messages'}</small>
+                </div>
             `;
             div.onclick = () => selectUser(u.patient_id, u.name);
             list.appendChild(div);
         });
-
-        if (!currentUser && filteredUsers.length > 0) {
-            selectUser(filteredUsers[0].patient_id, filteredUsers[0].name);
-        }
     })
     .catch(e => console.error("Error fetching conversations:", e));
 }
@@ -228,14 +237,12 @@ document.getElementById("userSearch").addEventListener("input", e => {
     loadConversations(e.target.value);
 });
 
-/* -------------------------
-   SELECT USER
--------------------------- */
 function selectUser(pid, name) {
     if (currentUser === pid) return; 
 
     currentUser = pid;
-    document.getElementById("chatHeader").innerHTML = `<h3>${name}</h3>`;
+    // Update Header Text specifically
+    document.getElementById("chatUserName").innerText = name;
     
     document.querySelectorAll('.user').forEach(el => el.classList.remove('active-user'));
     const selectedEl = document.querySelector(`.user[data-pid="${pid}"]`);
@@ -244,53 +251,46 @@ function selectUser(pid, name) {
     loadMessages();
 }
 
-/* -------------------------
-   LOAD MESSAGES
--------------------------- */
 function loadMessages() {
     if (!currentUser) {
-        document.getElementById("chatMessages").innerHTML = "<p style='text-align:center;'>Select a user to view the chat.</p>";
+        document.getElementById("chatMessages").innerHTML = "<div class='empty-state'><p>Select a user to start chatting</p></div>";
         return;
     }
 
     fetch(`${ADMIN_INBOX_PHP_URL}?action=load_messages&patient_id=${currentUser}`)
     .then(r => r.json())
     .then(msgs => {
-        if (msgs.error) {
-            console.error("Messages Error:", msgs.error);
-            return;
-        }
+        if (msgs.error) return;
         
         const box = document.getElementById("chatMessages");
-        const currentScroll = box.scrollHeight - box.clientHeight - box.scrollTop;
-        const shouldScroll = currentScroll <= 20 || msgs.length === 0;
-
+        const isNearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 100;
         box.innerHTML = "";
+
+        if (msgs.length === 0) {
+             box.innerHTML = "<p style='text-align:center; padding-top:20px; color:#ccc;'>No messages yet.</p>";
+        }
 
         msgs.forEach(m => {
             const div = document.createElement("div");
             div.className = `message ${m.sender_type === 'user' ? 'user' : 'admin'}`;
+            // Removed internal timestamp for cleaner look, or can be added as hover
             div.innerHTML = `
-                <p>${m.message}</p>
-                <span>${m.timestamp}</span>
+                <div class="bubble">${m.message}</div>
+                <div class="meta">${m.timestamp}</div>
             `;
             box.appendChild(div);
         });
 
-        if (shouldScroll) {
+        if (isNearBottom || msgs.length === 1) { 
             box.scrollTop = box.scrollHeight;
         }
     })
     .catch(e => console.error("Error fetching messages:", e));
 }
 
-/* -------------------------
-   SEND MESSAGE
--------------------------- */
 document.getElementById("sendBtn").onclick = function () {
     const input = document.getElementById("msgInput");
     const msg = input.value.trim();
-
     if (!msg || !currentUser) return;
 
     fetch(`${ADMIN_INBOX_PHP_URL}?action=send_message`, {
@@ -305,7 +305,7 @@ document.getElementById("sendBtn").onclick = function () {
             loadMessages();
             loadConversations(document.getElementById("userSearch").value); 
         } else {
-            alert("Failed to send message: " + (data.error || 'Unknown error'));
+            alert("Failed: " + (data.error || 'Unknown error'));
         }
     })
     .catch(e => console.error("Error sending message:", e));
@@ -318,19 +318,12 @@ document.getElementById("msgInput").addEventListener('keypress', function(e) {
     }
 });
 
-
-/* -------------------------
-   AUTO REFRESH (Polling)
--------------------------- */
 setInterval(() => {
     const searchVal = document.getElementById("userSearch").value;
-    if (searchVal === "") {
-        loadConversations();
-    }
-    loadMessages();
-}, 1500);
+    if (searchVal === "") loadConversations();
+    if (currentUser) loadMessages();
+}, 2000);
 
-// INIT
 loadConversations();
 </script>
 

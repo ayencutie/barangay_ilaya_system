@@ -1,4 +1,5 @@
 // admin/js/dashboard.js
+
 document.addEventListener('DOMContentLoaded', () => {
   loadDashboard();
   document.getElementById('adminSearch')?.addEventListener('input', filterPending);
@@ -53,7 +54,7 @@ function renderPendingTable(list){
     tbody.appendChild(tr);
   });
 
-  // attach action handlers
+  // attach action handlers for Approve/Reject
   tbody.querySelectorAll('.btn-approve').forEach(btn => {
     btn.addEventListener('click', () => updateAppointmentStatus(btn.dataset.id, 'Approved'));
   });
@@ -65,23 +66,56 @@ function renderPendingTable(list){
 function renderUpcoming(list){
   const cont = document.getElementById('upcomingList');
   cont.innerHTML = '';
+  
   if (!list.length){
     cont.innerHTML = '<div class="upcoming-item">No upcoming appointments.</div>';
     return;
   }
+
   list.forEach(a => {
     const div = document.createElement('div');
     div.className = 'upcoming-item';
+    // UPDATED: Gumamit ng class na 'btn-reminder' para hindi maghalo sa approve button
     div.innerHTML = `<p><strong>${a.patient_name}</strong> — ${a.service} — ${a.date} ${a.time_slot}</p>
-                     <button class="btn-approve" data-id="${a.appointment_id}">Send Reminder</button>`;
+                     <button class="btn-reminder" style="margin-left:auto; cursor:pointer;" data-id="${a.appointment_id}">Send Reminder</button>`;
     cont.appendChild(div);
   });
 
-  // send reminder action (dummy)
-  cont.querySelectorAll('.btn-approve').forEach(btn => {
-    btn.addEventListener('click', () => {
-      btn.textContent = 'Reminder Sent';
+  // UPDATED: Logic para sa Send Reminder
+  cont.querySelectorAll('.btn-reminder').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      
+      // UI Feedback: Disable button agad
+      const originalText = btn.textContent;
+      btn.textContent = 'Sending...';
       btn.disabled = true;
+
+      try {
+        const res = await fetch('../php/admin/send_reminder.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ appointment_id: id })
+        });
+
+        const result = await res.json();
+
+        if (result.status === 'success') {
+            btn.textContent = 'Sent ✔';
+            alert('Reminder sent successfully to patient inbox!');
+        } else {
+            // Kung fail, ibalik para pwede itry ulit
+            btn.textContent = originalText;
+            btn.disabled = false;
+            alert('Failed: ' + result.message);
+        }
+
+      } catch (err) {
+          console.error(err);
+          btn.textContent = 'Error';
+          alert('Network error occurred. Check console.');
+          btn.disabled = false;
+      }
     });
   });
 }
