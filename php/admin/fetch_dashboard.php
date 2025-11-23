@@ -4,16 +4,16 @@ header('Content-Type: application/json; charset=utf-8');
 session_start();
 require __DIR__ . '/../db.php';
 
-/* ===============================
-   ADMIN AUTH CHECK (FIXED)
-   =============================== */
+/* =====================================================
+   ADMIN AUTH VALIDATION
+   ===================================================== */
 if (!isset($_SESSION['user_id'])) {
     http_response_code(403);
     echo json_encode(['error' => 'not_logged_in']);
     exit;
 }
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+if (empty($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     http_response_code(403);
     echo json_encode(['error' => 'not_admin']);
     exit;
@@ -21,41 +21,34 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 try {
 
-    /* ===============================
+    /* =====================================================
        TOTAL PATIENTS
-       =============================== */
-    $stmt = $pdo->query("
-        SELECT COUNT(*) 
-        FROM users 
-        WHERE COALESCE(user_role,'patient') != 'admin'
-    ");
-    $totalPatients = (int)$stmt->fetchColumn();
+       (All users except admins)
+       ===================================================== */
+    $totalPatients = (int) $pdo
+        ->query("SELECT COUNT(*) FROM users WHERE COALESCE(user_role,'patient') != 'admin'")
+        ->fetchColumn();
 
-    /* ===============================
+
+    /* =====================================================
        TODAY'S APPOINTMENTS
-       =============================== */
-    $stmt = $pdo->prepare("
-        SELECT COUNT(*) 
-        FROM appointments 
-        WHERE date = CURDATE()
-    ");
+       ===================================================== */
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM appointments WHERE date = CURDATE()");
     $stmt->execute();
-    $todayAppointments = (int)$stmt->fetchColumn();
+    $todayAppointments = (int) $stmt->fetchColumn();
 
-    /* ===============================
+
+    /* =====================================================
        COMPLETED APPOINTMENTS
-       =============================== */
-    $stmt = $pdo->prepare("
-        SELECT COUNT(*) 
-        FROM appointments 
-        WHERE status = 'Completed'
-    ");
+       ===================================================== */
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM appointments WHERE status = 'Completed'");
     $stmt->execute();
-    $completedAppointments = (int)$stmt->fetchColumn();
+    $completedAppointments = (int) $stmt->fetchColumn();
 
-    /* ===============================
-       PENDING APPOINTMENTS
-       =============================== */
+
+    /* =====================================================
+       PENDING APPOINTMENTS (List)
+       ===================================================== */
     $stmt = $pdo->prepare("
         SELECT 
             a.appointment_id,
@@ -73,9 +66,10 @@ try {
     $stmt->execute();
     $pendingAppointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    /* ===============================
-       UPCOMING APPOINTMENTS (next 7 days)
-       =============================== */
+
+    /* =====================================================
+       UPCOMING APPROVED APPOINTMENTS (Next 7 days)
+       ===================================================== */
     $stmt = $pdo->prepare("
         SELECT 
             a.appointment_id,
@@ -87,16 +81,18 @@ try {
         FROM appointments a
         LEFT JOIN users u ON u.patient_id = a.patient_id
         WHERE a.date >= CURDATE()
-          AND a.status IN ('Approved','Pending')
+          AND a.date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+          AND a.status = 'Approved'
         ORDER BY a.date ASC, a.time_slot ASC
         LIMIT 10
     ");
     $stmt->execute();
     $upcomingAppointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    /* ===============================
-       SEND JSON RESULT
-       =============================== */
+
+    /* =====================================================
+       JSON RESPONSE
+       ===================================================== */
     echo json_encode([
         'totalPatients'        => $totalPatients,
         'todayAppointments'    => $todayAppointments,
@@ -106,10 +102,12 @@ try {
     ]);
 
 } catch (PDOException $e) {
+
     http_response_code(500);
     echo json_encode([
-        'error' => 'db_error',
+        'error'   => 'db_error',
         'message' => $e->getMessage()
     ]);
+
 }
 ?>
