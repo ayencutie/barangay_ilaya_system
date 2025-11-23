@@ -8,7 +8,6 @@
 </head>
 <body>
 
-  <!-- NAVBAR -->
   <header class="navbar">
     <div class="nav-left">
       <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
@@ -64,7 +63,6 @@
     </div>
   </header>
 
-  <!-- CONTENT -->
   <section class="content">
     <div class="appointments-container">
       <h1>My Appointments</h1>
@@ -94,31 +92,56 @@
     </div>
   </section>
 
-  <!-- EDIT MODAL -->
   <div id="editModal" class="modal">
     <div class="modal-content">
       <h3>Edit Appointment</h3>
-      <label for="editService">Service:</label>
-      <select id="editService"></select>
+      
+      <div class="services-container">
+        <h3>Select a Service</h3>
+        <div class="service-dropdown" id="editServiceDropdown"> 
+          <button type="button" id="editServiceButton">-- Select Service -- ▼</button>
+          <div class="services-list" id="editServicesList">
+             <div class="service-item" data-service="Immunization">Immunization</div>
+            <div class="service-item" data-service="Medical Certificate">Medical Certificate</div>
+            <div class="service-item" data-service="Pre Natal / Post Natal">Pre Natal / Post Natal</div>
+            <div class="service-item" data-service="Diagnostic">Diagnostic</div>
+            <div class="service-item" data-service="Outpatient Consultation">Outpatient Consultation</div>
+            <div class="service-item" data-service="Death Certificate / Burial">Death Certificate / Burial</div>
+            <div class="service-item" data-service="Greencard / Hospitalization">Greencard / Hospitalization</div>
+            <div class="service-item" data-service="Dental Care">Dental Care</div>
+            <div class="service-item" data-service="Family Planning">Family Planning</div>
+          </div>
+        </div>
+        <input type="hidden" id="editServiceInput"> 
+      </div>
+      
+      <div class="date-container">
+        <h3>Choose Date</h3>
+        <div class="date-picker">
+          <select id="editMonth" required></select>
+          <select id="editDay" required></select>
+          <select id="editYear" required></select>
+        </div>
+      </div>
 
-      <label for="editDate">Date:</label>
-      <input type="date" id="editDate">
-
-      <label for="editTimeSlot">Time Slot:</label>
-      <input type="time" id="editTimeSlot">
+      <div class="time-slot-container">
+        <h3>Available Time Slots</h3>
+        <div class="time-grid" id="editTimeSlotsGrid"> 
+            </div>
+        <input type="hidden" id="editTimeInput"> 
+      </div>
 
       <div class="modal-buttons">
-        <button id="saveEditBtn" class="btn-save">Save</button>
-        <button id="cancelEditBtn" class="btn-cancel">Close</button>
+        <button id="saveEditBtn" class="submit-btn">Save Appointment</button> 
+        <button id="cancelEditBtn" class="btn-cancel">Cancel</button>
       </div>
     </div>
   </div>
-
   <div id="toastBox" class="toast-container"></div>
   <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
   <script>
-    // ---------------- NAVBAR ----------------
+    // ---------------- NAVBAR & USER INFO LOGIC ----------------
     const menuBtn = document.getElementById('menuButton');
     const menuDropdown = document.getElementById('menuDropdown');
     const profileBtn = document.getElementById('profileButton');
@@ -127,7 +150,6 @@
     profileBtn?.addEventListener('click', e=>{e.stopPropagation(); profileDropdown.hidden=!profileDropdown.hidden});
     window.addEventListener('click', ()=>{ menuDropdown.classList.remove('show'); profileDropdown.hidden=true; });
 
-    // ---------------- USER INFO ----------------
     fetch('php/get_user.php').then(r=>r.json()).then(data=>{
       if(data && !data.error){
         document.getElementById('userAvatar').src = data.profile_pic||'uploads/default_profile.png';
@@ -148,7 +170,7 @@
       setTimeout(()=>{ toast.classList.remove('show'); setTimeout(()=>toast.remove(),500); }, 4000);
     }
 
-    // ---------------- APPOINTMENTS ----------------
+    // ---------------- APPOINTMENTS & TABLE LOGIC ----------------
     let allAppointments = [], currentFilter='upcoming', editingId=null;
 
     async function loadAppointments(){
@@ -186,8 +208,9 @@
 
         let actions='';
         if(currentFilter==='upcoming'){
+          // NOTE: Changed to btn-cancel-table to match CSS styling in the next step
           actions=`<button class="btn-edit" onclick="openEditModal(${a.appointment_id})">Edit</button>
-                   <button class="btn-cancel" onclick="cancelAppointment(${a.appointment_id})">Cancel</button>`;
+                   <button class="btn-cancel-table" onclick="cancelAppointment(${a.appointment_id})">Cancel</button>`;
         } else actions='<span style="color:#888;font-size:12px">Archived</span>';
 
         const tr=document.createElement('tr');
@@ -208,33 +231,172 @@
       }catch(e){ console.error(e); showToast('Error cancelling'); }
     }
 
-    // ---------------- EDIT ----------------
+    // ---------------- EDIT MODAL LOGIC (MATCHED) ----------------
     const editModal = document.getElementById('editModal');
-    document.getElementById('cancelEditBtn').addEventListener('click',()=>{editModal.style.display='none'});
+    const editServiceButton = document.getElementById('editServiceButton');
+    const editServicesList = document.getElementById('editServicesList');
+    const editServiceInput = document.getElementById('editServiceInput'); 
+    const editTimeSlotsGrid = document.getElementById('editTimeSlotsGrid');
+    const editTimeInput = document.getElementById('editTimeInput');
+    
+    // Date Picker elements
+    const editMonthSelect = document.getElementById("editMonth");
+    const editDaySelect = document.getElementById("editDay");
+    const editYearSelect = document.getElementById("editYear");
+    
+    const today = new Date();
+    const thisYear = today.getFullYear();
+    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    
+    // Populate Month/Year selectors once on load
+    months.forEach((m,i)=>{ 
+        const opt=document.createElement("option"); 
+        opt.value=i+1; 
+        opt.text=m; 
+        editMonthSelect.appendChild(opt); 
+    });
 
-    const servicesList = ["Immunization","Medical Certificate","Pre Natal / Post Natal","Diagnostic","Outpatient Consultation","Dental Care","Family Planning"];
-    const editService = document.getElementById('editService');
-    servicesList.forEach(s=>{ let opt=document.createElement('option'); opt.value=s; opt.textContent=s; editService.appendChild(opt); });
+    for(let y=thisYear; y<=thisYear+2; y++){ 
+        const opt=document.createElement("option"); 
+        opt.value=y; 
+        opt.text=y; 
+        editYearSelect.appendChild(opt); 
+    }
+
+    // Function to update the number of days based on selected month/year
+    function updateEditDays(){
+        const month=parseInt(editMonthSelect.value);
+        const year=parseInt(editYearSelect.value);
+        const daysInMonth=new Date(year, month, 0).getDate();
+        editDaySelect.innerHTML="";
+        for(let d=1; d<=daysInMonth; d++){
+            const opt=document.createElement("option");
+            opt.value=d;
+            opt.text=d;
+            editDaySelect.appendChild(opt);
+        }
+    }
+    
+    // Attach event listeners for date changes
+    editMonthSelect.addEventListener("change", updateEditDays);
+    editYearSelect.addEventListener("change", updateEditDays);
+
+    document.getElementById('cancelEditBtn').addEventListener('click',()=>{editModal.style.display='none'});
+    
+    // Service Dropdown toggle logic
+    editServiceButton?.addEventListener('click', e => {
+      e.stopPropagation();
+      editServicesList.classList.toggle('show');
+    });
+    window.addEventListener('click', () => editServicesList.classList.remove('show'));
+
+    // Service Item selection logic
+    document.querySelectorAll('#editServicesList .service-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const service = item.getAttribute('data-service');
+        editServiceButton.textContent = service + ' ▼';
+        editServiceInput.value = service;
+        editServicesList.classList.remove('show');
+      });
+    });
+
+    // Generate Time Slots (8:00 AM to 5:00 PM in 10-minute intervals)
+    function generateTimeSlots(){
+        const start = 8 * 60; // 8:00 AM in minutes
+        const end = 17 * 60; // 5:00 PM in minutes
+        const timeSlots = [];
+        
+        const fmt = (h, m) => { 
+            const s = h >= 12 ? "PM" : "AM"; 
+            const hr = h % 12 || 12; 
+            return `${hr}:${m.toString().padStart(2, "0")}`; 
+        };
+        const formatRange = (t) => {
+            const h = Math.floor(t / 60);
+            const m = t % 60;
+            const nh = Math.floor((t + 10) / 60);
+            const nm = (t + 10) % 60;
+            return `${fmt(h, m)} - ${fmt(nh, nm)} ${nh >= 12 ? "PM" : "AM"}`;
+        };
+
+        for (let t = start; t < end; t += 10) {
+            timeSlots.push(formatRange(t));
+        }
+        return timeSlots;
+    }
+
+    // Populate Time Slot buttons
+    generateTimeSlots().forEach(slot => {
+        const button = document.createElement('div');
+        button.className = 'time-slot';
+        button.textContent = slot;
+        button.setAttribute('data-time', slot);
+        button.addEventListener('click', function() {
+            document.querySelectorAll('#editTimeSlotsGrid .time-slot').forEach(btn => btn.classList.remove('selected'));
+            this.classList.add('selected');
+            editTimeInput.value = slot;
+        });
+        editTimeSlotsGrid.appendChild(button);
+    });
+
 
     window.openEditModal = function(id){
-      editingId=id;
-      const appt = allAppointments.find(a=>a.appointment_id===id);
-      if(!appt) return alert("Appointment not found");
-      editService.value=appt.service;
-      document.getElementById('editDate').value=appt.date;
-      document.getElementById('editTimeSlot').value=appt.time_slot;
+      editingId = id;
+      const appt = allAppointments.find(a => a.appointment_id == id); // Loose comparison is OK
+      
+      if(!appt) {
+          console.error('ID not found:', id, allAppointments);
+          return alert("Appointment not found in list.");
+      }
+      
+      // 1. Set Service values
+      editServiceInput.value = appt.service;
+      editServiceButton.textContent = appt.service + ' ▼';
+      
+      // 2. Set Date values
+      const dateParts = appt.date.split('-'); // e.g., ['2025', '11', '23']
+      
+      editYearSelect.value = dateParts[0];
+      editMonthSelect.value = dateParts[1];
+      updateEditDays(); // Update days dropdown first
+      editDaySelect.value = dateParts[2];
+      
+      // 3. Set Time Slot value and select the button
+      editTimeInput.value = appt.time_slot;
+      document.querySelectorAll('#editTimeSlotsGrid .time-slot').forEach(div => {
+          div.classList.remove('selected');
+          if (div.getAttribute('data-time') === appt.time_slot) {
+              div.classList.add('selected');
+              div.scrollIntoView({behavior: 'smooth', block: 'nearest'}); // Scroll to selected slot
+          }
+      });
+      
       editModal.style.display='flex';
     }
 
     document.getElementById('saveEditBtn').addEventListener('click', async()=>{
-      const service = editService.value;
-      const date = document.getElementById('editDate').value;
-      const time_slot = document.getElementById('editTimeSlot').value;
-      if(!service||!date||!time_slot) return alert("All fields required");
+      const service = editServiceInput.value; 
+      const year = editYearSelect.value;
+      const month = editMonthSelect.value;
+      const day = editDaySelect.value;
+      const time_slot = editTimeInput.value; 
+
+      if(!service||!year||!month||!day||!time_slot) return alert("⚠️ Please select a service, date, and time slot.");
+
+      const date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+
       try{
-        const res = await fetch('php/edit_appointment.php',{method:'POST',body:JSON.stringify({id:editingId,service,date,time_slot}),headers:{'Content-Type':'application/json'}});
+        const res = await fetch('php/edit_appointment.php',{
+            method:'POST',
+            body:JSON.stringify({id:editingId, service, date, time_slot}),
+            headers:{'Content-Type':'application/json'}
+        });
         const data = await res.json();
-        if(data.status==='success'){ showToast("Appointment updated."); editModal.style.display='none'; loadAppointments(); }
+        if(data.status==='success'){ 
+            showToast("Appointment updated."); 
+            editModal.style.display='none'; 
+            loadAppointments(); 
+        }
         else showToast(data.message||'Failed to update');
       }catch(e){ console.error(e); showToast('Error updating'); }
     });
