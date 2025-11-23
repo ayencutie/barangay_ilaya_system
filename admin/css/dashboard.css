@@ -61,6 +61,21 @@ th{ background:#fafafa; color:#444; font-weight:700; }
 .btn-approve{ background:#1aa37a; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; }
 .btn-reject{ background:#e74c3c; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; margin-left:6px; }
 
+.btn-reminder {
+    background: #1aa37a; /* Distinct blue for the reminder action */
+    color: #fff; 
+    border: none; 
+    padding: 6px 10px; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    /* Important: Add margin-left if you need spacing next to another element */
+    margin-left: 6px; 
+}
+
+.btn-reminder:hover {
+    background: #128663; /* Darker blue on hover for feedback */
+}
+
 /* UPCOMING LIST */
 .upcoming { background:var(--card-bg); padding:18px; border-radius:12px; box-shadow:var(--shadow); }
 .upcoming-list{ display:flex; flex-direction:column; gap:10px; }
