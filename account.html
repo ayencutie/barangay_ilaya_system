@@ -331,25 +331,104 @@ closePwd && closePwd.addEventListener('click', closePanels);
 panelBackdrop && panelBackdrop.addEventListener('click', closePanels);
 
 // ================= 6. NOTIFICATION SIMULATION =================
-function triggerNotification(message) {
-  const badge = document.getElementById('msgBadge');
-  const toastBox = document.getElementById('toastBox');
-  const audio = document.getElementById('notifSound');
+// Function to update the message badge
+  function updateMessageBadge(hasUnread, shouldPlaySound = false) {
+    const badge = document.getElementById('msgBadge');
+    const audio = document.getElementById('notifSound'); 
 
-  if(badge) { badge.style.display = 'flex'; badge.innerText = '1'; }
-  if(audio) audio.play().catch(() => {}); 
+    if (!badge) return;
 
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.innerHTML = `<div class="toast-icon">📩</div><div class="toast-msg"><h4>New Message</h4><p>${message}</p></div>`;
-  toastBox.appendChild(toast);
+    if (hasUnread) {
+      badge.style.display = 'flex';
+      badge.innerText = '1';
 
-  setTimeout(() => toast.classList.add('show'), 100);
-  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 5000);
-}
+      if (shouldPlaySound && audio) {
+        audio.play().catch(() => {});
+        // showToastNotification("You have a new message from Admin"); 
+      }
+    } else {
+      badge.style.display = 'none';
+      badge.innerText = '';
+    }
+  }
 
-setTimeout(() => { triggerNotification("You have a new message from Admin."); }, 3000);
+  // Polling function to check for new messages
+  async function checkNewMessages() {
+    try {
+      const response = await fetch('./php/check_unread.php'); 
+      const data = await response.json();
+      
+      const wasUnread = window.hasUnread; 
+      window.hasUnread = data.has_unread; 
+
+      const playSound = (data.has_unread && wasUnread !== true);
+
+      updateMessageBadge(data.has_unread, playSound);
+      
+    } catch(e) {
+      // console.error("Error checking new messages:", e); 
+    }
+  }
+
+  // Initial check and start polling every 5 seconds 
+  checkNewMessages();
+  setInterval(checkNewMessages, 5000); 
+
+  // Prevent sound on initial load if we are on the inbox page 
+  if (window.location.pathname.includes('inbox.php')) {
+    window.hasUnread = false; 
+  }
 
 </script>
+
+<script>
+    // Function to update the message badge
+    function updateMessageBadge(hasUnread, shouldPlaySound = false) {
+      const badge = document.getElementById('msgBadge');
+      const audio = document.getElementById('notifSound'); 
+
+      if (!badge) return;
+
+      if (hasUnread) {
+        badge.style.display = 'flex';
+        badge.innerText = '1';
+
+        if (shouldPlaySound && audio) {
+          audio.play().catch(() => {});
+          // showToastNotification("You have a new message from Admin"); 
+        }
+      } else {
+        badge.style.display = 'none';
+        badge.innerText = '';
+      }
+    }
+
+    // Polling function to check for new messages
+    async function checkNewMessages() {
+      try {
+        const response = await fetch('./php/check_unread.php'); 
+        const data = await response.json();
+        
+        const wasUnread = window.hasUnread; 
+        window.hasUnread = data.has_unread; 
+
+        const playSound = (data.has_unread && wasUnread !== true);
+
+        updateMessageBadge(data.has_unread, playSound);
+        
+      } catch(e) {
+        // console.error("Error checking new messages:", e); 
+      }
+    }
+
+    // Initial check and start polling every 5 seconds 
+    checkNewMessages();
+    setInterval(checkNewMessages, 5000); 
+
+    // Prevent sound on initial load if we are on the inbox page 
+    if (window.location.pathname.includes('inbox.php')) {
+      window.hasUnread = false; 
+    }
+  </script>
 </body>
 </html>
