@@ -1,5 +1,6 @@
 <?php
 session_start();
+// Assuming db.php correctly establishes a PDO connection named $pdo
 require 'db.php';
 
 // ------------------------------------------------------------
@@ -105,24 +106,25 @@ try {
 
     // --------------------------------------------------------
     // Check if the slot is still available (lock row)
+    // FIX: Removed ':service' from WHERE clause to prevent double booking 
+    //      on the same time slot, regardless of the service.
     // --------------------------------------------------------
     $sql_check = "
         SELECT COUNT(*) 
         FROM appointments 
-        WHERE service = :service AND date = :date AND time_slot = :time_slot
+        WHERE date = :date AND time_slot = :time_slot
         FOR UPDATE
     ";
 
     $stmt = $pdo->prepare($sql_check);
     $stmt->execute([
-        ':service'   => $service,
         ':date'      => $date,
         ':time_slot' => $time_slot
     ]);
 
     if ($stmt->fetchColumn() > 0) {
         $pdo->rollBack();
-        echo "<script>alert('This slot is already taken. Please choose another.'); window.history.back();</script>";
+        echo "<script>alert('❌ This time slot is already taken by another appointment. Please choose another.'); window.history.back();</script>";
         exit;
     }
 
@@ -156,8 +158,9 @@ try {
         $pdo->rollBack();
     }
 
+    // Note: The Integrity Error (23000) might occur if you also set a UNIQUE index on (date, time_slot) in the database.
     $msg = ($e->getCode() === '23000')
-        ? "❌ Slot already reserved. (Integrity Error)"
+        ? "❌ A conflict occurred. The time slot might have been taken just now. (Integrity Error)"
         : "❌ Unexpected error occurred. Please try again.";
 
     error_log("Appointment Booking Error: " . $e->getMessage());
