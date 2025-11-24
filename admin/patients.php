@@ -38,7 +38,7 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <main class="main">
     <div class="header">
-      <h1>Patient Records</h1>
+      <h1>Patient History</h1>
       <input id="search" class="search" placeholder="Search patient..." />
     </div>
 

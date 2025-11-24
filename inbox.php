@@ -1,7 +1,7 @@
 <?php
 session_start();
 require 'php/db.php';
-if (!isset($_SESSION['patient_id'])) { header("Location: landing_page.html"); exit; }
+if (!isset($_SESSION['patient_id'])) { header("Location: landing_page.php"); exit; }
 $patient_id = $_SESSION['patient_id'];
 
 // ===============================================
