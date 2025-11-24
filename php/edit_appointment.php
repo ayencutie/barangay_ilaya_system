@@ -1,10 +1,11 @@
 <?php
 session_start();
-require 'db.php'; // Siguraduhin na tama ang path ng db.php mo
+// IMPORTANT: Replace 'db.php' with the correct path to your database connection file
+require 'db.php'; 
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['patient_id'])) {
-    echo json_encode(["status"=>"error","message"=>"You must be logged in."]);
+    echo json_encode(["status" => "error", "message" => "You must be logged in to edit appointments."]);
     exit();
 }
 
@@ -14,14 +15,73 @@ $appointment_id = $input['id'] ?? null;
 $service = trim($input['service'] ?? '');
 $date = $input['date'] ?? '';
 $time_slot = trim($input['time_slot'] ?? '');
+$patient_id = $_SESSION['patient_id']; // This is the ID of the person making the edit
 
-if(!$appointment_id || !$service || !$date || !$time_slot){
-    echo json_encode(["status"=>"error","message"=>"All fields are required."]);
+if (!$appointment_id || !$service || !$date || !$time_slot) {
+    echo json_encode(["status" => "error", "message" => "All fields (Appointment ID, Service, Date, Time Slot) are required."]);
     exit();
 }
 
 try {
-    // Update ang appointment details at ibalik sa 'Pending' ang status
+    // =================================================================
+    // === CONFLICT CHECK 1: PREVENT SELF-OVERLAP (The current user has ANY appointment at this time) ===
+    // This blocks the patient from scheduling two appointments concurrently (e.g., Dental and Family Planning at 1 PM).
+    // =================================================================
+    $self_check_stmt = $pdo->prepare("
+        SELECT appointment_id FROM appointments 
+        WHERE patient_id = :pid
+          AND date = :date
+          AND time_slot = :time_slot
+          AND status IN ('Pending', 'Approved') 
+          AND appointment_id != :appointment_id
+    ");
+
+    $self_check_stmt->execute([
+        ':pid' => $patient_id, 
+        ':date' => $date,
+        ':time_slot' => $time_slot,
+        ':appointment_id' => $appointment_id
+    ]);
+    
+    if ($self_check_stmt->fetch()) {
+        echo json_encode([
+            "status" => "error",
+            "message" => "❌ You already have another appointment at this exact time. Please choose a different slot."
+        ]);
+        exit();
+    }
+    
+    // =================================================================
+    // === CONFLICT CHECK 2: PREVENT CROSS-USER OVERBOOKING (Another person has ANY appointment at this time) ===
+    // This blocks the edit if ANY other patient has a booking at the same date and time, regardless of service.
+    // This ensures Person 1 cannot take Person 2's time slot.
+    // =================================================================
+    $other_user_check_stmt = $pdo->prepare("
+        SELECT appointment_id FROM appointments 
+        WHERE date = :date
+          AND time_slot = :time_slot
+          AND status IN ('Pending', 'Approved') 
+          AND patient_id != :pid 
+    ");
+
+    $other_user_check_stmt->execute([
+        ':date' => $date,
+        ':time_slot' => $time_slot,
+        ':pid' => $patient_id // Ensures we only check against OTHER patients
+    ]);
+
+    if ($other_user_check_stmt->fetch()) {
+        echo json_encode([
+            "status" => "error",
+            "message" => "❌ The time slot is already occupied by another patient. Please choose a different time."
+        ]);
+        exit();
+    }
+    // --- END CONFLICT CHECKS ---
+
+    // =================================================================
+    // === STEP 3: UPDATE APPOINTMENT DETAILS (If all checks pass) ===
+    // =================================================================
     $stmt = $pdo->prepare("
         UPDATE appointments 
         SET service=:service, date=:date, time_slot=:time_slot, status='Pending'
@@ -29,21 +89,22 @@ try {
     ");
     
     $stmt->execute([
-        ':service'=>$service,
-        ':date'=>$date,
-        ':time_slot'=>$time_slot,
-        ':appointment_id'=>$appointment_id,
-        ':pid'=>$_SESSION['patient_id']
+        ':service' => $service,
+        ':date' => $date,
+        ':time_slot' => $time_slot,
+        ':appointment_id' => $appointment_id,
+        ':pid' => $patient_id
     ]);
 
     if ($stmt->rowCount() > 0) {
-        echo json_encode(["status"=>"success", "message"=>"Updated successfully"]);
+        echo json_encode(["status" => "success", "message" => "Appointment updated successfully. It has been moved to Pending for re-confirmation."]);
     } else {
-        // Success pa rin ang return kahit walang nabago, para hindi mag-error sa frontend
-        echo json_encode(["status"=>"success", "message"=>"No changes made"]);
+        echo json_encode(["status" => "success", "message" => "No changes were detected or the appointment status prevents immediate editing."]);
     }
 
 } catch(PDOException $e){
-    echo json_encode(["status"=>"error","message"=>"Database error: ".$e->getMessage()]);
+    // Log error for server debugging
+    error_log("Edit Appointment DB Error: " . $e->getMessage()); 
+    echo json_encode(["status" => "error", "message" => "A database error occurred during the update."]);
 }
 ?>
