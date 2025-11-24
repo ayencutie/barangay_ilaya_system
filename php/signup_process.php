@@ -32,6 +32,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
+    // --- Password minimum length validation ---
+    if (strlen($password) < 8) {
+        echo "<script>alert('Password must be at least 8 characters long.'); window.history.back();</script>";
+        exit();
+    }
+
     // --- Password match validation ---
     if ($password !== $confirm_password) {
         echo "<script>alert('Passwords do not match!'); window.history.back();</script>";
