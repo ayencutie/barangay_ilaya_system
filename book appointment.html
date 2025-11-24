@@ -1,292 +1,453 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Book Appointment – Barangay Ilaya Health Center</title>
-  <link rel="stylesheet" href="css/book appointment.css" />
-  <style>
-    .no-slots-msg {
-        padding: 15px;
-        text-align: center;
-        font-weight: bold;
-        font-size: 1.1rem;
-        color: red;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Appointment – Barangay Ilaya Health Center</title>
+    <link rel="stylesheet" href="css/book appointment.css" />
+    <style>
+        /* Existing style for no slots message */
+        .no-slots-msg {
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: red;
+        }
+
+        /* --- NEW STYLES FOR AVAILABILITY VISUALS --- */
+
+        /* Style for slots that are currently selected (Your Active Green) */
+        .time-slot.selected {
+            background-color: #28a745; /* Your desired green */
+            color: white;
+            border: 1px solid #28a745;
+        }
+
+        /* Style for slots that are already booked (Taken) or in the Past */
+        .time-slot.taken,
+        .time-slot.past {
+            /* Use a muted, shaded look to indicate unavailability */
+            background-color: #f1f1f1; /* Light gray shade */
+            color: #a0a0a0; /* Muted gray text color */
+            border: 1px solid #ccc;
+            cursor: not-allowed;
+            pointer-events: none; /* Crucial: Disables click interaction */
+            opacity: 0.8; 
+            box-shadow: none; 
+        }
+
+        /* Optional: Ensure regular available slots look clickable */
+        .time-slot:not(.taken):not(.past):hover {
+            background-color: #218838; /* Darker green on hover */
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
-  <header class="navbar">
-    <div class="nav-left">
-      <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
-      <h1>BARANGAY ILAYA HEALTH CENTER</h1>
-    </div>
-
-    <div class="nav-center">
-      <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="new about us.html">About Us</a></li>
-        <li><a href="new services.html">Services</a></li>
-      </ul>
-    </div>
-
-    <div class="nav-right">
-      <a href="inbox.php" class="icon-btn" title="Inbox">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-        </svg>
-        <span id="msgBadge" class="badge">0</span>
-      </a>
-
-      <div class="dropdown-container">
-        <button id="menuButton" class="menu-btn">Menu ▼</button>
-        <div id="menuDropdown" class="dropdown-content">
-          <a href="book appointment.html">Book Appointment</a>
-          <a href="my_appointment.html">My Appointment</a>
-        </div>
-      </div>
-
-      <div class="profile-container">
-        <button id="profileButton" class="profile-btn" title="Account">
-          <img id="userAvatar" src="uploads/default_profile.png" alt="Profile">
-          <span class="active-dot"></span> 
-        </button>
-        <div id="profileDropdown" class="profile-card" hidden>
-          <div class="profile-header">
-            <img id="dropdownAvatar" src="uploads/default_profile.png" alt="User">
-            <div class="header-info">
-              <strong id="userName">Guest User</strong>
-              <span id="userId">Patient ID: --</span>
-            </div>
-          </div>
-          <hr class="divider">
-          <div class="profile-links">
-            <a href="account.html" class="p-link"><span class="icon"></span> Account Settings</a>
-            <hr class="divider-small">
-            <a href="php/logout.php" class="p-link logout"><span class="icon"></span> Log Out</a>
-          </div>
-        </div>
-      </div>
-    </div> 
-  </header>
-
-  <section class="content">
-    <div class="booking-container">
-      <h1>BOOK AN APPOINTMENT</h1>
-      <p>Select a service and available time slot below.</p>
-
-      <form id="bookingForm" action="php/book_appointment.php" method="POST">
-
-        <div class="booking-sections">
-
-          <div class="services-container">
-            <h3>Select a Service</h3>
-            <div class="service-dropdown" id="serviceDropdown">
-              <button type="button" id="serviceButton">-- Select Service -- ▼</button>
-              <div class="services-list" id="servicesList">
-                <div class="service-item" data-service="Immunization">Immunization</div>
-                <div class="service-item" data-service="Medical Certificate">Medical Certificate</div>
-                <div class="service-item" data-service="Pre Natal / Post Natal">Pre Natal / Post Natal</div>
-                <div class="service-item" data-service="Diagnostic">Diagnostic</div>
-                <div class="service-item" data-service="Outpatient Consultation">Outpatient Consultation</div>
-                <div class="service-item" data-service="Death Certificate / Burial">Death Certificate / Burial</div>
-                <div class="service-item" data-service="Greencard / Hospitalization">Greencard / Hospitalization</div>
-                <div class="service-item" data-service="Dental Care">Dental Care</div>
-                <div class="service-item" data-service="Family Planning">Family Planning</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="date-container">
-            <h3>Choose Date</h3>
-            <div class="date-picker">
-              <select id="month" required></select>
-              <select id="day" required></select>
-              <select id="year" required></select>
-            </div>
-          </div>
-
+    <header class="navbar">
+        <div class="nav-left">
+            <img src="https://i.ibb.co/qFPvFtms/167565708-10159274632132790-1386372340681598199-n-removebg-preview.png" alt="Logo">
+            <h1>BARANGAY ILAYA HEALTH CENTER</h1>
         </div>
 
-        <h3>Available Time Slots</h3>
-        <div id="time-grid" class="time-grid"></div>
+        <div class="nav-center">
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="new about us.html">About Us</a></li>
+                <li><a href="new services.html">Services</a></li>
+            </ul>
+        </div>
 
-        <input type="hidden" name="service" id="serviceInput">
-        <input type="hidden" name="date" id="dateInput">
-        <input type="hidden" name="time_slot" id="timeInput">
+        <div class="nav-right">
+            <a href="inbox.php" class="icon-btn" title="Inbox">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                <span id="msgBadge" class="badge">0</span>
+            </a>
 
-        <button type="submit" class="submit-btn">Submit Appointment</button>
-      </form>
-    </div>
-  </section>
+            <div class="dropdown-container">
+                <button id="menuButton" class="menu-btn">Menu ▼</button>
+                <div id="menuDropdown" class="dropdown-content">
+                    <a href="book appointment.html">Book Appointment</a>
+                    <a href="my_appointment.html">My Appointment</a>
+                </div>
+            </div>
 
-  <div id="toastBox" class="toast-container"></div>
-  <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+            <div class="profile-container">
+                <button id="profileButton" class="profile-btn" title="Account">
+                    <img id="userAvatar" src="uploads/default_profile.png" alt="Profile">
+                    <span class="active-dot"></span> 
+                </button>
+                <div id="profileDropdown" class="profile-card" hidden>
+                    <div class="profile-header">
+                        <img id="dropdownAvatar" src="uploads/default_profile.png" alt="User">
+                        <div class="header-info">
+                            <strong id="userName">Guest User</strong>
+                            <span id="userId">Patient ID: --</span>
+                        </div>
+                    </div>
+                    <hr class="divider">
+                    <div class="profile-links">
+                        <a href="account.html" class="p-link"><span class="icon"></span> Account Settings</a>
+                        <hr class="divider-small">
+                        <a href="php/logout.php" class="p-link logout"><span class="icon"></span> Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </header>
 
-  <script>
-    // --- NAVBAR & PROFILE ---
-    const menuBtn = document.getElementById('menuButton');
-    const menuDropdown = document.getElementById('menuDropdown');
-    const profileBtn = document.getElementById('profileButton');
-    const profileDropdown = document.getElementById('profileDropdown');
+    <section class="content">
+        <div class="booking-container">
+            <h1>BOOK AN APPOINTMENT</h1>
+            <p>Select a service and available time slot below.</p>
 
-    function closeAll() {
-      if(menuDropdown) menuDropdown.classList.remove('show');
-      if(profileDropdown) profileDropdown.hidden = true;
-    }
+            <form id="bookingForm" action="php/book_appointment.php" method="POST">
 
-    if(menuBtn) {
-      menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = menuDropdown.classList.contains('show');
-        closeAll();
-        if(!isOpen) menuDropdown.classList.add('show');
-      });
-    }
+                <div class="booking-sections">
 
-    if(profileBtn) {
-      profileBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = !profileDropdown.hidden;
-        closeAll();
-        if(!isOpen) profileDropdown.hidden = false;
-      });
-    }
+                    <div class="services-container">
+                        <h3>Select a Service</h3>
+                        <div class="service-dropdown" id="serviceDropdown">
+                            <button type="button" id="serviceButton">-- Select Service -- ▼</button>
+                            <div class="services-list" id="servicesList">
+                                <div class="service-item" data-service="Immunization">Immunization</div>
+                                <div class="service-item" data-service="Medical Certificate">Medical Certificate</div>
+                                <div class="service-item" data-service="Pre Natal / Post Natal">Pre Natal / Post Natal</div>
+                                <div class="service-item" data-service="Diagnostic">Diagnostic</div>
+                                <div class="service-item" data-service="Outpatient Consultation">Outpatient Consultation</div>
+                                <div class="service-item" data-service="Death Certificate / Burial">Death Certificate / Burial</div>
+                                <div class="service-item" data-service="Greencard / Hospitalization">Greencard / Hospitalization</div>
+                                <div class="service-item" data-service="Dental Care">Dental Care</div>
+                                <div class="service-item" data-service="Family Planning">Family Planning</div>
+                            </div>
+                        </div>
+                    </div>
 
-    window.addEventListener('click', closeAll);
+                    <div class="date-container">
+                        <h3>Choose Date</h3>
+                        <div class="date-picker">
+                            <select id="month" required></select>
+                            <select id="day" required></select>
+                            <select id="year" required></select>
+                        </div>
+                    </div>
 
-    // Fetch user info
-    fetch('php/get_user.php').then(r=>r.json()).then(data => {
-      if(data && !data.error) {
-        const picUrl = data.profile_pic || 'uploads/default_profile.png';
-        if(document.getElementById('userAvatar')) document.getElementById('userAvatar').src = picUrl;
-        if(document.getElementById('dropdownAvatar')) document.getElementById('dropdownAvatar').src = picUrl;
-        if(document.getElementById('userName')) document.getElementById('userName').innerText = data.first_name || 'User';
-        if(document.getElementById('userId')) document.getElementById('userId').innerText = data.patient_id || '';
-      }
-    }).catch(() => {});
+                </div>
 
-    // --- SERVICE SELECTION ---
-    const serviceButton = document.getElementById("serviceButton");
-    const servicesList = document.getElementById("servicesList");
-    let selectedService = "";
+                <h3>Available Time Slots</h3>
+                <div id="time-grid" class="time-grid"></div>
 
-    serviceButton.addEventListener("click", (e) => {
-      e.stopPropagation();
-      servicesList.classList.toggle("show");
-    });
+                <input type="hidden" name="service" id="serviceInput">
+                <input type="hidden" name="date" id="dateInput">
+                <input type="hidden" name="time_slot" id="timeInput">
 
-    document.querySelectorAll(".service-item").forEach(item => {
-      item.addEventListener("click", () => {
-        selectedService = item.getAttribute("data-service");
-        serviceButton.textContent = selectedService + " ▼";
-        servicesList.classList.remove("show");
-      });
-    });
+                <button type="submit" class="submit-btn">Submit Appointment</button>
+            </form>
+        </div>
+    </section>
 
-    window.addEventListener("click", () => servicesList.classList.remove("show"));
+    <div id="toastBox" class="toast-container"></div>
+    <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
-    // --- DATE PICKER ---
-    const monthSelect=document.getElementById("month");
-    const daySelect=document.getElementById("day");
-    const yearSelect=document.getElementById("year");
-    const today=new Date();
-    const thisYear=today.getFullYear();
-    const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-    months.forEach((m,i)=>{ const opt=document.createElement("option"); opt.value=i+1; opt.text=m; monthSelect.appendChild(opt); });
+    <script>
+        // --- UTILITY FUNCTIONS ---
+        const qs = (sel) => document.querySelector(sel);
+        const qsa = (sel) => Array.from(document.querySelectorAll(sel));
+        const formatTwo = n => String(n).padStart(2, '0');
 
-    for(let y=thisYear; y<=thisYear+2; y++){ const opt=document.createElement("option"); opt.value=y; opt.text=y; yearSelect.appendChild(opt); }
+        // --- NAVBAR & PROFILE ---
+        const menuBtn = qs('#menuButton');
+        const menuDropdown = qs('#menuDropdown');
+        const profileBtn = qs('#profileButton');
+        const profileDropdown = qs('#profileDropdown');
+        
+        function closeAll() {
+          if(menuDropdown) menuDropdown.classList.remove('show');
+          if(profileDropdown) profileDropdown.hidden = true;
+        }
 
-    function updateDays(){
-      const month=parseInt(monthSelect.value);
-      const year=parseInt(yearSelect.value);
-      const daysInMonth=new Date(year, month,0).getDate();
-      daySelect.innerHTML="";
-      for(let d=1; d<=daysInMonth; d++){
-        const opt=document.createElement("option");
-        opt.value=d;
-        opt.text=d;
-        daySelect.appendChild(opt);
-      }
-    }
+        if(menuBtn) {
+          menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = menuDropdown.classList.contains('show');
+            closeAll();
+            if(!isOpen) menuDropdown.classList.add('show');
+          });
+        }
 
-    monthSelect.addEventListener("change", updateDays);
-    yearSelect.addEventListener("change", updateDays);
-    monthSelect.value = today.getMonth()+1;
-    yearSelect.value=thisYear;
-    updateDays();
-    daySelect.value=today.getDate();
+        if(profileBtn) {
+          profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = !profileDropdown.hidden;
+            closeAll();
+            if(!isOpen) profileDropdown.hidden = false;
+          });
+        }
 
-    // --- TIME SLOTS ---
-    const timeGrid = document.getElementById("time-grid");
-    let selectedTime = "";
+        window.addEventListener('click', closeAll);
 
-    function renderTimeSlots() {
-        timeGrid.innerHTML = "";
-        selectedTime = "";
+        // Fetch user info
+        fetch('php/get_user.php').then(r=>r.json()).then(data => {
+          if(data && !data.error) {
+            const picUrl = data.profile_pic || 'uploads/default_profile.png';
+            if(qs('#userAvatar')) qs('#userAvatar').src = picUrl;
+            if(qs('#dropdownAvatar')) qs('#dropdownAvatar').src = picUrl;
+            if(qs('#userName')) qs('#userName').innerText = data.first_name || 'User';
+            if(qs('#userId')) qs('#userId').innerText = data.patient_id || '';
+          }
+        }).catch(() => {});
 
-        const day = parseInt(daySelect.value);
-        const month = parseInt(monthSelect.value) - 1;
-        const year = parseInt(yearSelect.value);
+        // --- SERVICE SELECTION ---
+        const serviceButton = qs("#serviceButton");
+        const servicesList = qs("#servicesList");
+        const serviceInput = qs("#serviceInput");
+        let selectedService = "";
 
-        const selectedDate = new Date(year, month, day);
-        const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 6 = Saturday
+        serviceButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          servicesList.classList.toggle("show");
+        });
 
-        if (dayOfWeek === 0 || dayOfWeek === 6) {
-            const msg = document.createElement("div");
-            msg.className = "no-slots-msg";
-            msg.textContent = "❌ No appointments available on weekends.";
-            timeGrid.appendChild(msg);
+        qsa(".service-item").forEach(item => {
+          item.addEventListener("click", () => {
+            selectedService = item.getAttribute("data-service");
+            serviceButton.textContent = selectedService + " ▼";
+            serviceInput.value = selectedService; // Update hidden input
+            servicesList.classList.remove("show");
+            // *** NEW: Render slots after service change ***
+            renderTimeSlots(); 
+          });
+        });
+
+        window.addEventListener("click", () => servicesList.classList.remove("show"));
+
+        // --- DATE PICKER ---
+        const monthSelect=qs("#month");
+        const daySelect=qs("#day");
+        const yearSelect=qs("#year");
+        const today=new Date();
+        const thisYear=today.getFullYear();
+        const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+        months.forEach((m,i)=>{ const opt=document.createElement("option"); opt.value=i+1; opt.text=m; monthSelect.appendChild(opt); });
+
+        for(let y=thisYear; y<=thisYear+2; y++){ const opt=document.createElement("option"); opt.value=y; opt.text=y; yearSelect.appendChild(opt); }
+
+        function updateDays(){
+          const month=parseInt(monthSelect.value);
+          const year=parseInt(yearSelect.value);
+          const daysInMonth=new Date(year, month,0).getDate();
+          daySelect.innerHTML="";
+          for(let d=1; d<=daysInMonth; d++){
+            const opt=document.createElement("option");
+            opt.value=d;
+            opt.text=d;
+            daySelect.appendChild(opt);
+          }
+          renderTimeSlots(); // Re-render slots whenever days change
+        }
+
+        monthSelect.addEventListener("change", updateDays);
+        yearSelect.addEventListener("change", updateDays);
+        monthSelect.value = today.getMonth()+1;
+        yearSelect.value=thisYear;
+        updateDays();
+        daySelect.value=today.getDate();
+
+        // --- TIME SLOTS LOGIC ---
+        const timeGrid = qs("#time-grid");
+        let selectedTime = "";
+        const timeInput = qs("#timeInput");
+        const dateInput = qs("#dateInput");
+
+        function selectTime(slot){
+          // Do nothing if taken or past
+          if(slot.classList.contains("taken") || slot.classList.contains("past")){
+            return; 
+          }
+          qsa(".time-slot").forEach(s=>s.classList.remove("selected"));
+          slot.classList.add("selected");
+          selectedTime = slot.textContent;
+          timeInput.value = selectedTime;
+        }
+
+        // Function to check if a slot is in the past for today's date
+        function isSlotInPast(slotRangeStr, dateStr) {
+            if (!dateStr) return false;
+            
+            const now = new Date();
+            const currentDateStr = `${now.getFullYear()}-${formatTwo(now.getMonth() + 1)}-${formatTwo(now.getDate())}`;
+
+            if (dateStr !== currentDateStr) return false;
+
+            const startPart = slotRangeStr.split(' - ')[0].trim(); // "8:00 AM"
+            const match = startPart.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+            if (!match) return false;
+            
+            let h = parseInt(match[1], 10);
+            const m = parseInt(match[2], 10);
+            const period = match[3].toUpperCase();
+            
+            if (period === 'PM' && h !== 12) h += 12;
+            if (period === 'AM' && h === 12) h = 0;
+            
+            const slotMinutes = h * 60 + m;
+            const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+            // Check if the slot START time is already passed
+            return slotMinutes <= nowMinutes; 
+        }
+
+
+        async function renderTimeSlots() {
+            timeGrid.innerHTML = "";
+            selectedTime = "";
+            timeInput.value = ""; // Clear selected time on re-render
+
+            const day = parseInt(daySelect.value);
+            const month = parseInt(monthSelect.value);
+            const year = parseInt(yearSelect.value);
+            
+            const selectedDate = new Date(year, month - 1, day);
+            const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 6 = Saturday
+            const dateStr = `${year}-${formatTwo(month)}-${formatTwo(day)}`;
+            dateInput.value = dateStr;
+
+            // Check 1: Weekend Block
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                timeGrid.innerHTML = `<div class="no-slots-msg">❌ No appointments available on weekends.</div>`;
+                return;
+            }
+
+            if (!selectedService) {
+                 timeGrid.innerHTML = `<div class="no-slots-msg">⚠️ Please select a service first.</div>`;
+                 return;
+            }
+            
+            // --- FETCH TAKEN SLOTS FROM SERVER ---
+            timeGrid.innerHTML = `<div style="text-align: center; padding: 10px;">Checking availability...</div>`;
+            let takenSlots = [];
+            try {
+                // Use the new PHP endpoint to get taken slots
+                const url = `php/get_available_slots.php?date=${dateStr}&service=${encodeURIComponent(selectedService)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.status === 'success' && Array.isArray(data.taken_slots)) {
+                    takenSlots = data.taken_slots;
+                } else {
+                     console.error("Server response error:", data.message || "Unknown error");
+                }
+            } catch (e) {
+                // If fetching fails entirely (e.g., server offline), assume all slots are available for now
+                console.error("Error fetching slots:", e);
+            }
+            
+            // --- GENERATE AND RENDER SLOTS ---
+            timeGrid.innerHTML = '';
+            const start = 8 * 60; // 8:00 AM
+            const end = 17 * 60;  // 5:00 PM
+            let slotsAvailable = false;
+
+            for (let t = start; t < end; t += 10) {
+                const h = Math.floor(t / 60), m = t % 60;
+                const nh = Math.floor((t + 10) / 60), nm = (t + 10) % 60;
+                
+                const fmt = (h, m) => { 
+                    const s = h >= 12 ? "PM" : "AM"; 
+                    const hr = h % 12 || 12; 
+                    return `${hr}:${m.toString().padStart(2,"0")} ${s}`; 
+                };
+                
+                const slotText = `${fmt(h,m)} - ${fmt(nh,nm)}`;
+                const isPast = isSlotInPast(slotText, dateStr);
+                const isTaken = takenSlots.includes(slotText); // Check against fetched data
+
+                const div = document.createElement("div");
+                div.className = "time-slot";
+                div.textContent = slotText;
+
+                if (isPast) {
+                    div.classList.add("past");
+                    div.title = "Time has passed";
+                } else if (isTaken) {
+                    div.classList.add("taken");
+                    div.title = "Already Booked";
+                } else {
+                    div.onclick = () => selectTime(div);
+                    slotsAvailable = true;
+                }
+                timeGrid.appendChild(div);
+            }
+
+            if (!slotsAvailable && !timeGrid.querySelector('.no-slots-msg')) {
+                 timeGrid.innerHTML = `<div class="no-slots-msg">😞 No available slots for the selected date.</div>`;
+            }
+        }
+
+        // --- Event Listeners ---
+        daySelect.addEventListener("change", renderTimeSlots);
+        monthSelect.addEventListener("change", renderTimeSlots);
+        yearSelect.addEventListener("change", renderTimeSlots);
+
+        renderTimeSlots(); // Initial render
+
+        // --- FORM SUBMIT ---
+        document.getElementById("bookingForm").addEventListener("submit", function(e){
+          if(!selectedService || !selectedTime){
+            e.preventDefault();
+            alert("⚠️ Please select a service and time slot.");
             return;
+          }
+          
+          // Basic check to ensure not submitting a past/taken slot (though click is disabled)
+          const selectedSlotElement = qs('.time-slot.selected');
+          if (selectedSlotElement && (selectedSlotElement.classList.contains('taken') || selectedSlotElement.classList.contains('past'))) {
+              e.preventDefault();
+              alert("❌ The selected slot is not available.");
+              return;
+          }
+        });
+
+        // --- MESSAGE BADGE POLLING (Existing Code) ---
+        function updateMessageBadge(hasUnread, shouldPlaySound = false) {
+          const badge = qs('#msgBadge');
+          const audio = qs('#notifSound'); 
+          if (!badge) return;
+          if (hasUnread) {
+            badge.style.display = 'flex';
+            badge.innerText = '1';
+            if (shouldPlaySound && audio) {
+              audio.play().catch(() => {});
+            }
+          } else {
+            badge.style.display = 'none';
+            badge.innerText = '';
+          }
         }
 
-        const start = 8 * 60; // 8:00 AM
-        const end = 17 * 60;  // 5:00 PM
-        for (let t = start; t < end; t += 10) {
-            const h = Math.floor(t / 60), m = t % 60;
-            const nh = Math.floor((t + 10) / 60), nm = (t + 10) % 60;
-            const fmt = (h, m) => { 
-                const s = h >= 12 ? "PM" : "AM"; 
-                const hr = h % 12 || 12; 
-                return `${hr}:${m.toString().padStart(2,"0")} ${s}`; 
-            };
-            const div = document.createElement("div");
-            div.className = "time-slot";
-            div.textContent = `${fmt(h,m)} - ${fmt(nh,nm)}`;
-            div.onclick = () => selectTime(div);
-            timeGrid.appendChild(div);
+        async function checkNewMessages() {
+          try {
+            const response = await fetch('./php/check_unread.php'); 
+            const data = await response.json();
+            const wasUnread = window.hasUnread; 
+            window.hasUnread = data.has_unread; 
+            const playSound = (data.has_unread && wasUnread !== true);
+            updateMessageBadge(data.has_unread, playSound);
+          } catch(e) { /* silent fail */ }
         }
-    }
 
-    function selectTime(slot){
-      document.querySelectorAll(".time-slot").forEach(s=>s.classList.remove("selected"));
-      slot.classList.add("selected");
-      selectedTime = slot.textContent;
-    }
-
-    daySelect.addEventListener("change", renderTimeSlots);
-    monthSelect.addEventListener("change", renderTimeSlots);
-    yearSelect.addEventListener("change", renderTimeSlots);
-
-    renderTimeSlots();
-
-    // --- FORM SUBMIT ---
-    document.getElementById("bookingForm").addEventListener("submit", function(e){
-      if(!selectedService || !selectedTime){
-        e.preventDefault();
-        alert("⚠️ Please select a service and time slot.");
-        return;
-      }
-      document.getElementById("serviceInput").value = selectedService;
-      document.getElementById("timeInput").value = selectedTime;
-      const date = `${yearSelect.value}-${monthSelect.value.toString().padStart(2,"0")}-${daySelect.value.toString().padStart(2,"0")}`;
-      document.getElementById("dateInput").value = date;
-    });
-  </script>
+        checkNewMessages();
+        setInterval(checkNewMessages, 5000); 
+        if (window.location.pathname.includes('inbox.php')) {
+          window.hasUnread = false; 
+        }
+    </script>
 
 </body>
 </html>
