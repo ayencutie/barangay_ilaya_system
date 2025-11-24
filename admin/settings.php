@@ -23,7 +23,6 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 <body>
 
-    <!-- SIDEBAR — SAME AS DASHBOARD -->
     <aside class="sidebar">
         <h2>Barangay Ilaya</h2>
         <ul class="nav">
@@ -37,19 +36,15 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
         </ul>
     </aside>
 
-    <!-- MAIN CONTENT WRAPPER -->
     <main class="main">
 
-        <!-- TOP NAVBAR HEADER -->
         <div class="header">
             <h1>Settings</h1>
             <input type="text" placeholder="Search here..." class="search">
         </div>
 
-        <!-- PAGE CONTENT -->
         <div class="settings-wrapper">
 
-            <!-- PROFILE -->
             <div class="card">
                 <h2 class="card-title">Profile Information</h2>
 
@@ -68,22 +63,25 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                     <span><?= $user['email']; ?></span>
                 </div>
 
-                <!-- DATE REGISTERED REMOVED -->
-            </div>
+                </div>
 
-            <!-- CHANGE PASSWORD -->
             <div class="card">
                 <h2 class="card-title">Change Password</h2>
 
                 <form id="changePassForm">
                     <div class="input-group">
                         <label>Current Password</label>
-                        <input type="password" id="currentPass" required>
+                        <input type="password" id="currentPass" name="old_password" required>
                     </div>
 
                     <div class="input-group">
                         <label>New Password</label>
-                        <input type="password" id="newPass" required>
+                        <input type="password" id="newPass" name="new_password" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" id="confirmNewPass" name="confirm_password" required>
                     </div>
 
                     <button type="submit" class="btn">Update Password</button>
@@ -95,25 +93,44 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
         </div>
     </main>
 
-    <!-- CLEAN JS (NO DARK MODE) -->
     <script>
     document.addEventListener("DOMContentLoaded", () => {
         const form = document.getElementById("changePassForm");
+        const msgP = document.getElementById("passMessage");
 
         form.addEventListener("submit", e => {
             e.preventDefault();
+            
+            // Client-Side Validation: Check if new passwords match
+            let newP = document.getElementById("newPass").value;
+            let confirmP = document.getElementById("confirmNewPass").value;
 
-            let cur = document.getElementById("currentPass").value;
-            let newp = document.getElementById("newPass").value;
+            if (newP !== confirmP) {
+                msgP.innerHTML = '<span style="color:red;">New passwords do not match.</span>';
+                return;
+            }
 
-            fetch("update_password.php", {
+            // Prepare FormData (automatically grabs all named inputs)
+            const formData = new FormData(form);
+
+            // FIX 1: Corrected the fetch path to navigate out of the admin folder (..)
+            // FIX 2: Using FormData instead of manual body construction
+            fetch("../php/update_password.php", {
                 method: "POST",
-                headers: {"Content-Type": "application/x-www-form-urlencoded"},
-                body: `current=${cur}&new=${newp}`
+                body: formData
             })
             .then(r => r.text())
             .then(msg => {
-                document.getElementById("passMessage").textContent = msg;
+                // Display the success/error message from the PHP script
+                msgP.innerHTML = msg; 
+                
+                // Clear the form fields if the update was successful
+                if (msg.includes('success-message')) {
+                    form.reset();
+                }
+            })
+            .catch(err => {
+                msgP.innerHTML = '<span style="color:red;">Network error or failed to connect.</span>';
             });
         });
     });
