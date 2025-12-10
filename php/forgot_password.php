@@ -193,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($_SESSION['error_message']);
     }
     ?>
-    <p><a href="../landing_page.html">Return to Log In</a></p>
+    <p><a href="../landing_page.php">Return to Log In</a></p>
 
 </div>
 </body>
